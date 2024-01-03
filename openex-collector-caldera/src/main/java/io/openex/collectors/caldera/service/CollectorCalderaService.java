@@ -71,18 +71,18 @@ public class CollectorCalderaService implements Runnable {
           endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());
           endpoint.setIps(agent.getHost_ip_addrs());
           endpoint.setHostname(agent.getHost());
-          endpoint.setOs(toOs(agent.getPlatform()));
+          endpoint.setPlatform(toPlatform(agent.getPlatform()));
           endpoint.setLastSeen(toInstant(agent.getLast_seen()));
           return endpoint;
         })
         .toList();
   }
 
-  private Endpoint.OS_TYPE toOs(@NotBlank final String os) {
-    return switch (os) {
-      case "linux" -> Endpoint.OS_TYPE.LINUX;
-      case "windows" -> Endpoint.OS_TYPE.WINDOWS;
-      default -> throw new IllegalArgumentException("This OS is not supported : " + os);
+  private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
+    return switch (platform) {
+      case "linux" -> Endpoint.PLATFORM_TYPE.LINUX;
+      case "windows" -> Endpoint.PLATFORM_TYPE.WINDOWS;
+      default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
     };
   }
 
@@ -100,7 +100,7 @@ public class CollectorCalderaService implements Runnable {
     source.setDescription(external.getDescription());
     source.setIps(external.getIps());
     source.setHostname(external.getHostname());
-    source.setOs(external.getOs());
+    source.setPlatform(external.getPlatform());
   }
 
 }

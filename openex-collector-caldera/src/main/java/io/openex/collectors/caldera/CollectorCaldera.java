@@ -25,7 +25,7 @@ public class CollectorCaldera {
     // If enabled, scheduled every 60 seconds
     if (this.config.isEnable()) {
       CollectorCalderaService service = new CollectorCalderaService(this.client, this.assetEndpointService);
-      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
+      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(this.config.getInterval()));
     }
   }
 
