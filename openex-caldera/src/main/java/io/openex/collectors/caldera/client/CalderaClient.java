@@ -1,6 +1,10 @@
 package io.openex.collectors.caldera.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.collectors.caldera.config.CollectorCalderaConfig;
+import io.openex.collectors.caldera.model.Agent;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -18,15 +23,18 @@ public class CalderaClient {
 
   private static final String KEY_HEADER = "KEY";
 
-  private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
   private final CollectorCalderaConfig config;
+  private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   // -- AGENTS --
 
   private final static String AGENT_URI = "/agents";
 
-  public String agents() throws ClientProtocolException {
-    return this.get(AGENT_URI);
+  public List<Agent> agents() throws ClientProtocolException, JsonProcessingException {
+    String jsonResponse = this.get(AGENT_URI);
+    return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+    });
   }
 
   // -- PRIVATE --
@@ -42,7 +50,7 @@ public class CalderaClient {
           response -> EntityUtils.toString(response.getEntity())
       );
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for index: " + uri);
+      throw new ClientProtocolException("Unexpected response for request on: " + uri);
     }
   }
 

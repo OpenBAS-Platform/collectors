@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @ConfigurationProperties(prefix = "collector.caldera")
 public class CollectorCalderaConfig {
 
-  private final static String REST_URI = "/api/v2";
+  private final static String REST_V2_URI = "/api/v2";
 
   @Getter
   private boolean enable;
@@ -28,6 +28,6 @@ public class CollectorCalderaConfig {
   private int interval = 60;
 
   public String getRestApiV2Url() {
-    return url + REST_URI;
+    return url + REST_V2_URI;
   }
 }

@@ -28,16 +28,12 @@ public class CollectorCalderaService implements Runnable {
 
   private final CalderaClient client;
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
   private final AssetEndpointService assetEndpointService;
 
   @Override
   public void run() {
     try {
-      String jsonResponse = this.client.agents();
-      List<Agent> agents = this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
-      });
+      List<Agent> agents = this.client.agents();
       List<Endpoint> endpoints = toEndpoint(agents);
 
       List<Endpoint> toCreate = new ArrayList<>();
