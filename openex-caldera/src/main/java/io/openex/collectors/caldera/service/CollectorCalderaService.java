@@ -78,6 +78,7 @@ public class CollectorCalderaService implements Runnable {
     return switch (platform) {
       case "linux" -> Endpoint.PLATFORM_TYPE.LINUX;
       case "windows" -> Endpoint.PLATFORM_TYPE.WINDOWS;
+      case "darwin" -> Endpoint.PLATFORM_TYPE.DARWIN;
       default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
     };
   }
