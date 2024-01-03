@@ -90,6 +90,6 @@
 
     <modules>
         <module>openex-users</module>
-        <module>openex-collector-caldera</module>
+        <module>openex-caldera</module>
     </modules>
 </project>
