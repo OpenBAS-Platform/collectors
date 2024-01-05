@@ -19,7 +19,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class CalderaClient {
+public class CollectorCalderaClient {
 
   private static final String KEY_HEADER = "KEY";
 

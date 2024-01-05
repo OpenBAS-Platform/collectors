@@ -1,6 +1,6 @@
 package io.openex.collectors.caldera;
 
-import io.openex.collectors.caldera.client.CalderaClient;
+import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.service.CollectorCalderaService;
 import io.openex.service.AssetEndpointService;
@@ -17,7 +17,7 @@ public class CollectorCaldera {
 
   private final CollectorCalderaConfig config;
   private final TaskScheduler taskScheduler;
-  private final CalderaClient client;
+  private final CollectorCalderaClient client;
   private final AssetEndpointService assetEndpointService;
 
   @PostConstruct

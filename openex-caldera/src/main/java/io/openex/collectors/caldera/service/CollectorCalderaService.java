@@ -1,9 +1,7 @@
 package io.openex.collectors.caldera.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openex.collectors.caldera.client.CalderaClient;
+import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
@@ -26,7 +24,7 @@ import static java.time.ZoneOffset.UTC;
 @RequiredArgsConstructor
 public class CollectorCalderaService implements Runnable {
 
-  private final CalderaClient client;
+  private final CollectorCalderaClient client;
 
   private final AssetEndpointService assetEndpointService;
 
@@ -51,6 +49,7 @@ public class CollectorCalderaService implements Runnable {
       }));
       this.assetEndpointService.createEndpoints(toCreate);
       this.assetEndpointService.updateEndpoints(toUpdate);
+      System.out.println("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
     } catch (ClientProtocolException | JsonProcessingException e) {
       throw new RuntimeException(e);
     }
