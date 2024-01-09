@@ -15,6 +15,8 @@ import java.time.Duration;
 @Service
 public class CollectorCaldera {
 
+  public static final String CALDERA_SOURCE = "Caldera";
+
   private final CollectorCalderaConfig config;
   private final TaskScheduler taskScheduler;
   private final CollectorCalderaClient client;

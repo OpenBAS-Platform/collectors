@@ -14,11 +14,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
+import static io.openex.collectors.caldera.CollectorCaldera.CALDERA_SOURCE;
 import static java.time.ZoneOffset.UTC;
 
 @RequiredArgsConstructor
@@ -37,11 +35,15 @@ public class CollectorCalderaService implements Runnable {
       List<Endpoint> toCreate = new ArrayList<>();
       List<Endpoint> toUpdate = new ArrayList<>();
       endpoints.forEach((endpoint -> {
-        Optional<Endpoint> existing = this.assetEndpointService.endpointFromExternalId(endpoint.getExternalId());
+        Optional<Endpoint> existing = this.assetEndpointService
+            .findBySource(CALDERA_SOURCE, endpoint.getSources().get(CALDERA_SOURCE));
         existing.ifPresentOrElse((e) -> {
-              // Update
-              mergeEndpoint(e, endpoint);
-              toUpdate.add(e);
+              // Verify source authenticity
+              if (endpoint.getSources().containsKey(CALDERA_SOURCE) && endpoint.getSources().size() == 1) {
+                // Update
+                mergeEndpoint(e, endpoint);
+                toUpdate.add(e);
+              }
             },
             // Create
             () -> toCreate.add(endpoint)
@@ -61,7 +63,9 @@ public class CollectorCalderaService implements Runnable {
     return agents.stream()
         .map((agent) -> {
           Endpoint endpoint = new Endpoint();
-          endpoint.setExternalId(agent.getPaw());
+          endpoint.setSources(new HashMap<>() {{
+            put(CALDERA_SOURCE, agent.getPaw());
+          }});
           endpoint.setName(agent.getPaw());
           endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());
           endpoint.setIps(agent.getHost_ip_addrs());
@@ -91,7 +95,7 @@ public class CollectorCalderaService implements Runnable {
   }
 
   private void mergeEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
-    source.setExternalId(external.getExternalId());
+    source.setSources(external.getSources());
     source.setName(external.getName());
     source.setDescription(external.getDescription());
     source.setIps(external.getIps());
