@@ -15,6 +15,6 @@ public class Agent {
   private String platform;
   private String username;
   private String privilege;
-  private List<String> host_ip_addrs;
+  private String[] host_ip_addrs;
 
 }
