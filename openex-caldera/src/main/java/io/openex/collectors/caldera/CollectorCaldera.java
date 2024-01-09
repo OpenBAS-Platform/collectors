@@ -4,11 +4,11 @@ import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.service.CollectorCalderaService;
 import io.openex.service.AssetEndpointService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.time.Duration;
 
 @RequiredArgsConstructor

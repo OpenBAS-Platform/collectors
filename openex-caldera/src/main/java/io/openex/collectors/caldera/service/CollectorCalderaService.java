@@ -5,11 +5,11 @@ import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
