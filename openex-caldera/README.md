@@ -42,7 +42,7 @@ Deduplication is done thanks to the caldera `paw` property :
   - if there is no asset on OpenEx with this `paw`, a new asset is created
   - if there is an asset on OpenEx with this `paw` and the source of creation is only Caldera, this asset is updated
 
-There is no automatic deletion of OpenEx assets if Caldera agents no longer exist
+There is no automatic deletion of OpenEx assets if Caldera agents no longer exist.
 
 #### Mapping
 

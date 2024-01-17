@@ -1,6 +1,7 @@
 package io.openex.collectors.caldera.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.hypersistence.utils.hibernate.type.array.internal.ArrayUtil;
 import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
@@ -35,14 +36,19 @@ public class CollectorCalderaService implements Runnable {
       List<Endpoint> toCreate = new ArrayList<>();
       List<Endpoint> toUpdate = new ArrayList<>();
       endpoints.forEach((endpoint -> {
-        Optional<Endpoint> existing = this.assetEndpointService
+        Optional<Endpoint> existingOptional = this.assetEndpointService
             .findBySource(CALDERA_SOURCE, endpoint.getSources().get(CALDERA_SOURCE));
-        existing.ifPresentOrElse((e) -> {
+        existingOptional.ifPresentOrElse((existing) -> {
               // Verify source authenticity
-              if (endpoint.getSources().containsKey(CALDERA_SOURCE) && endpoint.getSources().size() == 1) {
+              if (existing.getSources().containsKey(CALDERA_SOURCE) && existing.getSources().size() == 1) {
                 // Update
-                mergeEndpoint(e, endpoint);
-                toUpdate.add(e);
+                replaceEndpoint(existing, endpoint);
+                toUpdate.add(existing);
+              } else {
+                // Update only a few properties
+                mergeEndpoint(existing, endpoint);
+                existing.setLastSeen(endpoint.getLastSeen());
+                toUpdate.add(existing);
               }
             },
             // Create
@@ -77,6 +83,21 @@ public class CollectorCalderaService implements Runnable {
         .toList();
   }
 
+  private void replaceEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
+    source.setName(external.getName());
+    source.setIps(external.getIps());
+    source.setHostname(external.getHostname());
+    source.setPlatform(external.getPlatform());
+    source.setLastSeen(external.getLastSeen());
+  }
+
+  private void mergeEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
+    List<String> ips = ArrayUtil.asList(source.getIps());
+    ips.addAll(ArrayUtil.asList(external.getIps()));
+    source.setIps(ips.toArray(new String[0]));
+    source.setLastSeen(external.getLastSeen());
+  }
+
   private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
     return switch (platform) {
       case "linux" -> Endpoint.PLATFORM_TYPE.Linux;
@@ -92,15 +113,6 @@ public class CollectorCalderaService implements Runnable {
     LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
     ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
     return zonedDateTime.toInstant();
-  }
-
-  private void mergeEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
-    source.setSources(external.getSources());
-    source.setName(external.getName());
-    source.setDescription(external.getDescription());
-    source.setIps(external.getIps());
-    source.setHostname(external.getHostname());
-    source.setPlatform(external.getPlatform());
   }
 
 }
