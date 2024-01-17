@@ -72,7 +72,7 @@ public class CollectorCalderaService implements Runnable {
           endpoint.setSources(new HashMap<>() {{
             put(CALDERA_SOURCE, agent.getPaw());
           }});
-          endpoint.setName(agent.getPaw());
+          endpoint.setName(agent.getHost() + " - " + agent.getPaw());
           endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());
           endpoint.setIps(agent.getHost_ip_addrs());
           endpoint.setHostname(agent.getHost());
