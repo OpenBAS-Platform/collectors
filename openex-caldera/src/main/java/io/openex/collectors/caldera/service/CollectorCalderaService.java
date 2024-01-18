@@ -42,7 +42,7 @@ public class CollectorCalderaService implements Runnable {
               // Verify source authenticity
               if (existing.getSources().containsKey(CALDERA_SOURCE) && existing.getSources().size() == 1) {
                 // Update
-                replaceEndpoint(existing, endpoint);
+                updateEndpoint(existing, endpoint);
                 toUpdate.add(existing);
               } else {
                 // Update only a few properties
@@ -65,6 +65,9 @@ public class CollectorCalderaService implements Runnable {
 
   // -- PRIVATE --
 
+  /**
+   * On creation of new asset managed by Caldera
+   */
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
     return agents.stream()
         .map((agent) -> {
@@ -83,7 +86,10 @@ public class CollectorCalderaService implements Runnable {
         .toList();
   }
 
-  private void replaceEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
+  /**
+   * On update of existing asset managed by Caldera
+   */
+  private void updateEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
     source.setName(external.getName());
     source.setIps(external.getIps());
     source.setHostname(external.getHostname());
@@ -91,6 +97,9 @@ public class CollectorCalderaService implements Runnable {
     source.setLastSeen(external.getLastSeen());
   }
 
+  /**
+   * On update of existing asset managed by Caldera & update manually
+   */
   private void mergeEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
     List<String> ips = ArrayUtil.asList(source.getIps());
     ips.addAll(ArrayUtil.asList(external.getIps()));

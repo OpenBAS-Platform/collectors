@@ -44,15 +44,16 @@ Deduplication is done thanks to the caldera `paw` property :
 
 There is no automatic deletion of OpenEx assets if Caldera agents no longer exist.
 
-#### Mapping
+### Mapping
 
-| Agent Property  | Asset Property |
-|-----------------|----------------|
-| paw             | externalId     |
-| paw             | name           |
-| host_ip_addrs   | ips            |
-| platform        | platform       |
-| last_seen       | lastSeen       |
+| Agent Property | Asset Property |
+|----------------|----------------|
+| paw            | externalId     |
+| host - paw     | name           |
+| host_ip_addrs  | ips            |
+| host           | hostname       |
+| platform       | platform       |
+| last_seen      | lastSeen       |
 
 ### Sources
 

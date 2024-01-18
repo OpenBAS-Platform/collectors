@@ -11,6 +11,10 @@
     <description>OpenEx collectors</description>
 
     <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <lombok.version>1.18.30</lombok.version>
         <httpclient5.version>5.3</httpclient5.version>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
