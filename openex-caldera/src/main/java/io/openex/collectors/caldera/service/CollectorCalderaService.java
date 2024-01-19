@@ -3,6 +3,7 @@ package io.openex.collectors.caldera.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.hypersistence.utils.hibernate.type.array.internal.ArrayUtil;
 import io.openex.collectors.caldera.client.CollectorCalderaClient;
+import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
@@ -18,13 +19,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static io.openex.collectors.caldera.CollectorCaldera.CALDERA_SOURCE;
 import static java.time.ZoneOffset.UTC;
 
 @RequiredArgsConstructor
 public class CollectorCalderaService implements Runnable {
 
   private final CollectorCalderaClient client;
+  private final CollectorCalderaConfig config;
 
   private final AssetEndpointService assetEndpointService;
 
@@ -39,10 +40,10 @@ public class CollectorCalderaService implements Runnable {
       List<Endpoint> toUpdate = new ArrayList<>();
       endpoints.forEach((endpoint -> {
         Optional<Endpoint> existingOptional = this.assetEndpointService
-            .findBySource(CALDERA_SOURCE, endpoint.getSources().get(CALDERA_SOURCE));
+            .findBySource(this.config.getId(), endpoint.getSources().get(this.config.getId()));
         existingOptional.ifPresentOrElse((existing) -> {
               // Verify source authenticity
-              if (existing.getSources().containsKey(CALDERA_SOURCE) && existing.getSources().size() == 1) {
+              if (existing.getSources().containsKey(this.config.getId()) && existing.getSources().size() == 1) {
                 // Update
                 updateEndpoint(existing, endpoint);
                 toUpdate.add(existing);
@@ -71,11 +72,12 @@ public class CollectorCalderaService implements Runnable {
    * On creation of new asset managed by Caldera
    */
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
+    final String collectorId = this.config.getId();
     return agents.stream()
         .map((agent) -> {
           Endpoint endpoint = new Endpoint();
           endpoint.setSources(new HashMap<>() {{
-            put(CALDERA_SOURCE, agent.getPaw());
+            put(collectorId, agent.getPaw());
           }});
           endpoint.setName(agent.getHost() + " - " + agent.getPaw());
           endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());

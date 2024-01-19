@@ -17,6 +17,10 @@ public class CollectorCalderaConfig {
   @Getter
   private boolean enable;
 
+  @Getter
+  @NotBlank
+  private String id;
+
   @NotBlank
   private String url;
 

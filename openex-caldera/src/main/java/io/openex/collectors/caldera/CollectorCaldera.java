@@ -15,8 +15,6 @@ import java.time.Duration;
 @Service
 public class CollectorCaldera {
 
-  public static final String CALDERA_SOURCE = "Caldera";
-
   private final CollectorCalderaConfig config;
   private final TaskScheduler taskScheduler;
   private final CollectorCalderaClient client;
@@ -26,7 +24,7 @@ public class CollectorCaldera {
   public void init() {
     // If enabled, scheduled every X seconds
     if (this.config.isEnable()) {
-      CollectorCalderaService service = new CollectorCalderaService(this.client, this.assetEndpointService);
+      CollectorCalderaService service = new CollectorCalderaService(this.client, this.config, this.assetEndpointService);
       this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(this.config.getInterval()));
     }
   }
