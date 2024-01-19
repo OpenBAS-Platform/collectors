@@ -6,6 +6,7 @@ import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class CollectorCalderaService implements Runnable {
   private final AssetEndpointService assetEndpointService;
 
   @Override
+  @Transactional
   public void run() {
     try {
       List<Agent> agents = this.client.agents();
