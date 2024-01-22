@@ -91,6 +91,7 @@ public class CollectorCalderaService implements Runnable {
   private void updateEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
     String blob = external.getBlobs().get(this.config.getId());
     source.getBlobs().put(this.config.getId(), blob);
+    source.setLastSeen(external.getLastSeen());
   }
 
   private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
