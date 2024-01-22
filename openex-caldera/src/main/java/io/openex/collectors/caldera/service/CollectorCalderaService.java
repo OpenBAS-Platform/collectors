@@ -1,7 +1,7 @@
 package io.openex.collectors.caldera.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.hypersistence.utils.hibernate.type.array.internal.ArrayUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.collectors.caldera.client.CollectorCalderaClient;
 import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.model.Agent;
@@ -29,6 +29,8 @@ public class CollectorCalderaService implements Runnable {
 
   private final AssetEndpointService assetEndpointService;
 
+  private final ObjectMapper objectMapper = new ObjectMapper();
+
   @Override
   @Transactional
   public void run() {
@@ -42,17 +44,9 @@ public class CollectorCalderaService implements Runnable {
         Optional<Endpoint> existingOptional = this.assetEndpointService
             .findBySource(this.config.getId(), endpoint.getSources().get(this.config.getId()));
         existingOptional.ifPresentOrElse((existing) -> {
-              // Verify source authenticity
-              if (existing.getSources().containsKey(this.config.getId()) && existing.getSources().size() == 1) {
-                // Update
-                updateEndpoint(existing, endpoint);
-                toUpdate.add(existing);
-              } else {
-                // Update only a few properties
-                mergeEndpoint(existing, endpoint);
-                existing.setLastSeen(endpoint.getLastSeen());
-                toUpdate.add(existing);
-              }
+              // Update
+              updateEndpoint(existing, endpoint);
+              toUpdate.add(existing);
             },
             // Create
             () -> toCreate.add(endpoint)
@@ -68,9 +62,6 @@ public class CollectorCalderaService implements Runnable {
 
   // -- PRIVATE --
 
-  /**
-   * On creation of new asset managed by Caldera
-   */
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
     final String collectorId = this.config.getId();
     return agents.stream()
@@ -78,6 +69,13 @@ public class CollectorCalderaService implements Runnable {
           Endpoint endpoint = new Endpoint();
           endpoint.setSources(new HashMap<>() {{
             put(collectorId, agent.getPaw());
+          }});
+          endpoint.setBlobs(new HashMap<>() {{
+            try {
+              put(collectorId, objectMapper.writeValueAsString(agent)); // agent blob
+            } catch (JsonProcessingException e) {
+              throw new RuntimeException(e);
+            }
           }});
           endpoint.setName(agent.getHost() + " - " + agent.getPaw());
           endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());
@@ -90,25 +88,9 @@ public class CollectorCalderaService implements Runnable {
         .toList();
   }
 
-  /**
-   * On update of existing asset managed by Caldera
-   */
   private void updateEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
-    source.setName(external.getName());
-    source.setIps(external.getIps());
-    source.setHostname(external.getHostname());
-    source.setPlatform(external.getPlatform());
-    source.setLastSeen(external.getLastSeen());
-  }
-
-  /**
-   * On update of existing asset managed by Caldera & update manually
-   */
-  private void mergeEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
-    List<String> ips = ArrayUtil.asList(source.getIps());
-    ips.addAll(ArrayUtil.asList(external.getIps()));
-    source.setIps(ips.toArray(new String[0]));
-    source.setLastSeen(external.getLastSeen());
+    String blob = external.getBlobs().get(this.config.getId());
+    source.getBlobs().put(this.config.getId(), blob);
   }
 
   private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
