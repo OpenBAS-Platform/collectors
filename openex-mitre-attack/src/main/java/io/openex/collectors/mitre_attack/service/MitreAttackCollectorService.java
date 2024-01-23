@@ -1,5 +1,6 @@
 package io.openex.collectors.mitre_attack.service;
 
+import io.openex.database.model.AttackPattern;
 import io.openex.database.model.KillChainPhase;
 import io.openex.database.repository.AttackPatternRepository;
 import io.openex.database.repository.KillChainPhaseRepository;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static io.openex.helper.StreamHelper.fromIterable;
 
 public class MitreAttackCollectorService implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(MitreAttackCollectorService.class.getName());
@@ -44,10 +47,12 @@ public class MitreAttackCollectorService implements Runnable {
                 attackPatterns.add(object);
             } else if (object.getString("type").equals("x-mitre-tactic")) {
                 tactics.add(object);
-            } else if (object.getString("type").equals("relationship")) {
+            } else if (object.getString("type").equals("relationship") && object.getString("relationship_type").equals("subtechnique-of")) {
                 relationships.add(object);
             }
         }
+        // Sync kill chain phases
+        List<KillChainPhase> killChainPhasesToSave = new ArrayList<>();
         tactics.forEach(jsonObject -> {
             String phaseStixId = jsonObject.getString("id");
             String phaseShortName = jsonObject.getString("x_mitre_shortname");
@@ -84,7 +89,21 @@ public class MitreAttackCollectorService implements Runnable {
                 killChainPhaseRepository.save(killChainPhase);
             }
         });
+
+        // Sync attack patterns
+        List<AttackPattern> attackPatternsToSave = new ArrayList<>();
         attackPatterns.forEach(jsonObject -> {
+            String attackPatternStixId = jsonObject.getString("id");
+            String attackPatternName = jsonObject.getString("name");
+            String attackPatternDescription = jsonObject.getString("description");
+            String[] attackPatternPlatforms = new String[0];
+            if (jsonObject.has("x_mitre_platforms")) {
+                attackPatternPlatforms = fromIterable(jsonObject.getJSONArray("x_mitre_platforms")).stream().map(Object::toString).toList().toArray(new String[0]);
+            }
+            String[] attackPatternPermissionsRequired = new String[0];
+            if (jsonObject.has("x_mitre_permissions_required")) {
+                attackPatternPermissionsRequired = fromIterable(jsonObject.getJSONArray("x_mitre_permissions_required")).stream().map(Object::toString).toList().toArray(new String[0]);
+            }
             // Get the kill chain
             JSONArray killChainPhases = jsonObject.getJSONArray("kill_chain_phases");
             List<KillChainPhase> resolvedKillChainPhases = new ArrayList<>();
@@ -103,6 +122,40 @@ public class MitreAttackCollectorService implements Runnable {
                     attackPatternExternalId = externalReference.getString("external_id");
                 }
             }
+            Optional<AttackPattern> optionalAttackPattern = attackPatternRepository.findByExternalId(attackPatternExternalId);
+            if (optionalAttackPattern.isEmpty()) {
+                AttackPattern newAttackPattern = new AttackPattern();
+                newAttackPattern.setStixId(attackPatternStixId);
+                newAttackPattern.setExternalId(attackPatternExternalId);
+                newAttackPattern.setKillChainPhases(resolvedKillChainPhases);
+                newAttackPattern.setName(attackPatternName);
+                newAttackPattern.setDescription(attackPatternDescription);
+                newAttackPattern.setPlatforms(attackPatternPlatforms);
+                newAttackPattern.setPermissionsRequired(attackPatternPermissionsRequired);
+                LOGGER.log(Level.INFO, "Creating attack pattern [" + killChainName + "][" + attackPatternExternalId + "] " + attackPatternName);
+                attackPatternRepository.save(newAttackPattern);
+            } else {
+                AttackPattern attackPattern = optionalAttackPattern.get();
+                attackPattern.setStixId(attackPatternStixId);
+                attackPattern.setKillChainPhases(resolvedKillChainPhases);
+                attackPattern.setName(attackPatternName);
+                attackPattern.setDescription(attackPatternDescription);
+                attackPattern.setPlatforms(attackPatternPlatforms);
+                attackPattern.setPermissionsRequired(attackPatternPermissionsRequired);
+                LOGGER.log(Level.INFO, "Updating attack pattern [" + killChainName + "][" + attackPatternExternalId + "] " + attackPatternName);
+                attackPatternRepository.save(attackPattern);
+            }
+        });
+
+        // Sync relationships
+        List<AttackPattern> attackPatternsParenthoodToSave = new ArrayList<>();
+        relationships.forEach(jsonObject -> {
+            String parentAttackPatternRef = jsonObject.getString("target_ref");
+            String childAttackPatternRef = jsonObject.getString("source_ref");
+            AttackPattern parentAttackPattern = attackPatternRepository.findByStixId(parentAttackPatternRef).orElseThrow();
+            AttackPattern childAttackPattern = attackPatternRepository.findByStixId(childAttackPatternRef).orElseThrow();
+            childAttackPattern.setParent(parentAttackPattern);
+            attackPatternRepository.save(childAttackPattern);
         });
     }
 
