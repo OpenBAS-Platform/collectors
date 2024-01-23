@@ -95,5 +95,6 @@
     <modules>
         <module>openex-users</module>
         <module>openex-caldera</module>
+        <module>openex-mitre-attack</module>
     </modules>
 </project>
