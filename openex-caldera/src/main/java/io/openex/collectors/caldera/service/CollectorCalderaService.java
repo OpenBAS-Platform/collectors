@@ -7,7 +7,7 @@ import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
-import jakarta.transaction.Transactional;
+import io.openex.service.AssetEndpointService.EndpointDBUpdate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -32,26 +32,27 @@ public class CollectorCalderaService implements Runnable {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
-  @Transactional
   public void run() {
     try {
       List<Agent> agents = this.client.agents();
       List<Endpoint> endpoints = toEndpoint(agents);
 
       List<Endpoint> toCreate = new ArrayList<>();
-      List<Endpoint> toUpdate = new ArrayList<>();
+      List<EndpointDBUpdate> toUpdate = new ArrayList<>();
       endpoints.forEach((endpoint -> {
-        Optional<Endpoint> existingOptional = this.assetEndpointService
-            .findBySource(this.config.getId(), endpoint.getSources().get(this.config.getId()));
+        Optional<String> existingOptional = this.assetEndpointService
+            .findIdBySource(this.config.getId(), endpoint.getSources().get(this.config.getId()));
         existingOptional.ifPresentOrElse((existing) -> {
               // Update
-              updateEndpoint(existing, endpoint);
-              toUpdate.add(existing);
+              String blob = endpoint.getBlobs().get(this.config.getId());
+              EndpointDBUpdate update = new EndpointDBUpdate(existing, this.config.getId(), blob, endpoint.getLastSeen(), Instant.now());
+              toUpdate.add(update);
             },
             // Create
             () -> toCreate.add(endpoint)
         );
       }));
+
       this.assetEndpointService.createEndpoints(toCreate);
       this.assetEndpointService.updateEndpoints(toUpdate);
       System.out.println("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
@@ -86,12 +87,6 @@ public class CollectorCalderaService implements Runnable {
           return endpoint;
         })
         .toList();
-  }
-
-  private void updateEndpoint(@NotNull final Endpoint source, @NotNull final Endpoint external) {
-    String blob = external.getBlobs().get(this.config.getId());
-    source.getBlobs().put(this.config.getId(), blob);
-    source.setLastSeen(external.getLastSeen());
   }
 
   private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
