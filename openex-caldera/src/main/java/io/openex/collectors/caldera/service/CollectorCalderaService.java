@@ -7,10 +7,10 @@ import io.openex.collectors.caldera.config.CollectorCalderaConfig;
 import io.openex.collectors.caldera.model.Agent;
 import io.openex.database.model.Endpoint;
 import io.openex.service.AssetEndpointService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
 
 import java.time.Instant;
@@ -22,6 +22,7 @@ import java.util.*;
 import static java.time.ZoneOffset.UTC;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CollectorCalderaService implements Runnable {
 
   private final CollectorCalderaClient client;
@@ -32,7 +33,6 @@ public class CollectorCalderaService implements Runnable {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
-  @Transactional
   public void run() {
     try {
       List<Agent> agents = this.client.agents();
@@ -54,7 +54,7 @@ public class CollectorCalderaService implements Runnable {
       }));
       this.assetEndpointService.createEndpoints(toCreate);
       this.assetEndpointService.updateEndpoints(toUpdate);
-      System.out.println("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
+      log.info("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
     } catch (ClientProtocolException | JsonProcessingException e) {
       throw new RuntimeException(e);
     }
