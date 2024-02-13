@@ -1,4 +1,4 @@
-package io.openbas.collectors.sentinel.client;
+package io.openbas.collectors.sentinel;
 
 import com.microsoft.aad.msal4j.*;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Properties;
 
-public class SentinelClient {
+public class Client {
 
     // It is important to reuse this object, as it will cache tokens.
     private static IConfidentialClientApplication app;
@@ -21,7 +21,7 @@ public class SentinelClient {
 
         // Load properties file and set properties used throughout the sample
         Properties properties = new Properties();
-        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
+        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application-dev.properties"));
 
         String authority = properties.getProperty("AUTHORITY");
         String clientId = properties.getProperty("CLIENT_ID");
