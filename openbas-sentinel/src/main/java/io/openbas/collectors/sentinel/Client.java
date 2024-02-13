@@ -21,12 +21,12 @@ public class Client {
 
         // Load properties file and set properties used throughout the sample
         Properties properties = new Properties();
-        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application-dev.properties"));
+        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
 
-        String authority = properties.getProperty("AUTHORITY");
-        String clientId = properties.getProperty("CLIENT_ID");
-        String secret = properties.getProperty("SECRET");
-        String scope = properties.getProperty("SCOPE");
+        String authority = properties.getProperty("authority");
+        String clientId = properties.getProperty("client_id");
+        String secret = properties.getProperty("secret");
+        String scope = properties.getProperty("scope");
 
         try {
 
@@ -45,9 +45,9 @@ public class Client {
             // On subsequent calls, the app will return a token from its cache. It is important to reuse the app object
 
             // Now that we have a Bearer token, call the protected API
-            String usersListFromGraph = getAlerts(result.accessToken());
+            String alerts = getAlerts(result.accessToken());
 
-            System.out.println("Users in the Tenant = " + usersListFromGraph);
+            System.out.println("Users in the Tenant = " + alerts);
 
         } catch(Exception ex){
             System.out.println("Oops! We have an exception of type - " + ex.getClass());
