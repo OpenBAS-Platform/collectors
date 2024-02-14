@@ -11,6 +11,7 @@ public enum ResourceType {
     ALERT_RULES ("alertRules"),
     API_VERSION ("api-version"),
     BOOKMARKS ("bookmarks"),
+    EXPAND ("expand"),
     FILTER ("filter"),
     ENTITIES ("entities"),
     INCIDENTS ("incidents"),

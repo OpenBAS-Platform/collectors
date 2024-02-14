@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
-
 public class SentinelRestApiCaller {
 
     private final Client client;
@@ -60,7 +59,7 @@ public class SentinelRestApiCaller {
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
                 .build().toUri();
 
-        System.out.println(uri.getPath());
+        //System.out.println(uri.getPath());
 
         return restTemplate.exchange(uri, httpMethod, new HttpEntity<>(headers), String.class).getBody();
     }
