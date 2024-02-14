@@ -7,10 +7,12 @@ import lombok.Getter;
 public enum ResourceType {
 
     ALERT_RULES ("alertRules"),
+    API_VERSION ("api-version"),
     INCIDENTS ("incidents"),
-    API_VERSION ("api-version");
+    INCIDENT_ID ("incidentId"),
+    FILTER ("filter"),
+    RELATIONS ("relations");
 
    @Getter
     private String param;
-
 }
