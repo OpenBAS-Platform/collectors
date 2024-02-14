@@ -1,8 +1,5 @@
 package io.openbas.collectors.sentinel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,10 +13,10 @@ public class SentinelCollector {
         ConfigurableApplicationContext app = SpringApplication.run(SentinelCollector.class, args);
 
         SentinelRestApiCaller sentinelRestApiCaller = (SentinelRestApiCaller) app.getBean("sentinelRestApiCaller");
-        String alerts = sentinelRestApiCaller.getAlerts();
+        String alerts = sentinelRestApiCaller.getListOfResources(ResourceType.ALERT_RULES);
         System.out.println(alerts);
 
-        String incidents = sentinelRestApiCaller.getIncidents();
+        String incidents = sentinelRestApiCaller.getListOfResources(ResourceType.INCIDENTS);
         System.out.println(incidents);
     }
 

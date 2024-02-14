@@ -47,13 +47,13 @@ public class SentinelRestApiCaller {
                 .build().toUri();
     }
 
-    public String getAlerts() {
-        URI uri = buildUri(ResourceType.ALERT_RULES.getParam());
+    public String getListOfResources(ResourceType resourceType) {
+        URI uri = buildUri(resourceType.getParam());
         return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
-    public String getIncidents() {
-        URI uri = buildUri(ResourceType.INCIDENTS.getParam());
+    public String getOneResource(ResourceType resourceType) {
+        URI uri = buildUri(resourceType.getParam());
         return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 }
