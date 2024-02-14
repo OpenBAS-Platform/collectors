@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResourceType {
 
+    ACTIONS ("actions"),
     ALERTS ("alerts"),
     ALERT_RULES ("alertRules"),
     API_VERSION ("api-version"),
