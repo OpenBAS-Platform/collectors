@@ -6,11 +6,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResourceType {
 
+    ALERTS ("alerts"),
     ALERT_RULES ("alertRules"),
     API_VERSION ("api-version"),
-    INCIDENTS ("incidents"),
-    INCIDENT_ID ("incidentId"),
+    BOOKMARKS ("bookmarks"),
     FILTER ("filter"),
+    ENTITIES ("entities"),
+    INCIDENTS ("incidents"),
+    METADATA ("metadata"),
     RELATIONS ("relations");
 
    @Getter
