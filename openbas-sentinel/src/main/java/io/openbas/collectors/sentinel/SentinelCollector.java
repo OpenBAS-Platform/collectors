@@ -19,6 +19,9 @@ public class SentinelCollector {
         String alerts = sentinelRestApiCaller.get(HttpMethod.GET, ResourceType.ALERT_RULES, Strings.EMPTY, Optional.empty());
         System.out.println(alerts);
 
+        //Retrieve actions from alert rules
+
+
         //Retrieve incidents
         String incidents = sentinelRestApiCaller.get(HttpMethod.GET, ResourceType.INCIDENTS, Strings.EMPTY, Optional.empty());
         System.out.println(incidents);
