@@ -18,6 +18,8 @@ public class SentinelCollector {
 
         String incidents = sentinelRestApiCaller.getListOfResources(ResourceType.INCIDENTS);
         System.out.println(incidents);
-    }
 
+        String incident0 = sentinelRestApiCaller.getOneResource(ResourceType.INCIDENTS, "81e0a2fc-fc12-4665-8a63-f7f9ee1326be");
+        System.out.println(incidents);
+    }
 }
