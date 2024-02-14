@@ -53,7 +53,7 @@ public class SentinelRestApiCaller {
      * @param relationType secondary resource which is in relation with resourceId,  i.e : entities, bookmarks, alerts
      * @return
      */
-    public String get(HttpMethod httpMethod, ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
+    public String get(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
         URI uri = buildUri(resourceType.getParam())
                 .pathSegment(resourceId)
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
@@ -61,6 +61,17 @@ public class SentinelRestApiCaller {
 
         //System.out.println(uri.getPath());
 
-        return restTemplate.exchange(uri, httpMethod, new HttpEntity<>(headers), String.class).getBody();
+        return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
+    }
+
+    public String post(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
+        URI uri = buildUri(resourceType.getParam())
+                .pathSegment(resourceId)
+                .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
+                .build().toUri();
+
+        //System.out.println(uri.getPath());
+
+        return restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(headers), String.class).getBody();
     }
 }
