@@ -1,5 +1,6 @@
 package io.openbas.collectors.sentinel;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -43,17 +45,23 @@ public class SentinelRestApiCaller {
     private UriComponentsBuilder buildUri(String resourceTypeParam) {
         return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getEndpoint().getUrl())
                 .pathSegment(resourceTypeParam)
-                .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion())
-                ;
+                .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion());
     }
 
-    public String getListOfResources(ResourceType resourceType) {
-        URI uri = buildUri(resourceType.getParam()).build().toUri();
-        return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
-    }
+    /**
+     * @param resourceType principal resource: alertrules, incidents
+     * @param resourceId   resource's identifiant
+     * @param relationType secondary resource which is in relation with resourceId,  i.e : entities, bookmarks, alerts
+     * @return
+     */
+    public String get(HttpMethod httpMethod, ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
+        URI uri = buildUri(resourceType.getParam())
+                .pathSegment(resourceId)
+                .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
+                .build().toUri();
 
-    public String getOneResource(ResourceType resourceType, String incidentId) {
-        URI uri = buildUri(resourceType.getParam()).pathSegment(incidentId).pathSegment(ResourceType.RELATIONS.getParam()).build().toUri();
-        return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
+        System.out.println(uri.getPath());
+
+        return restTemplate.exchange(uri, httpMethod, new HttpEntity<>(headers), String.class).getBody();
     }
 }
