@@ -40,20 +40,20 @@ public class SentinelRestApiCaller {
         return client.fetchToken().accessToken();
     }
 
-    private URI buildUri(String resourceTypeParam) {
+    private UriComponentsBuilder buildUri(String resourceTypeParam) {
         return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getEndpoint().getUrl())
                 .pathSegment(resourceTypeParam)
                 .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion())
-                .build().toUri();
+                ;
     }
 
     public String getListOfResources(ResourceType resourceType) {
-        URI uri = buildUri(resourceType.getParam());
+        URI uri = buildUri(resourceType.getParam()).build().toUri();
         return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
-    public String getOneResource(ResourceType resourceType) {
-        URI uri = buildUri(resourceType.getParam());
+    public String getOneResource(ResourceType resourceType, String incidentId) {
+        URI uri = buildUri(resourceType.getParam()).pathSegment(incidentId).pathSegment(ResourceType.RELATIONS.getParam()).build().toUri();
         return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 }
