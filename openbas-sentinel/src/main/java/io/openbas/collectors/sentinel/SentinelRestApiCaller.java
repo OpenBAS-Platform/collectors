@@ -1,5 +1,6 @@
 package io.openbas.collectors.sentinel;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
+@Slf4j
 public class SentinelRestApiCaller {
 
     private final Client client;
@@ -59,8 +61,7 @@ public class SentinelRestApiCaller {
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
                 .build().toUri();
 
-        //System.out.println(uri.getPath());
-
+        log.info("uri : " + uri.getPath());
         return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
@@ -70,8 +71,7 @@ public class SentinelRestApiCaller {
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
                 .build().toUri();
 
-        //System.out.println(uri.getPath());
-
+        log.info("uri : " + uri.getPath());
         return restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(headers), String.class).getBody();
     }
 }
