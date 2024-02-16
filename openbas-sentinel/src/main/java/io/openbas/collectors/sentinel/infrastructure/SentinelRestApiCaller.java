@@ -1,5 +1,7 @@
-package io.openbas.collectors.sentinel;
+package io.openbas.collectors.sentinel.infrastructure;
 
+import io.openbas.collectors.sentinel.infrastructure.config.AuthenticationProperties;
+import io.openbas.collectors.sentinel.infrastructure.config.ResourceType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpEntity;
@@ -55,23 +57,21 @@ public class SentinelRestApiCaller {
      * @param relationType secondary resource which is in relation with resourceId,  i.e : entities, bookmarks, alerts
      * @return
      */
-    public String get(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
+    public String executeHttpRequest(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType, HttpMethod httpMethod) {
         URI uri = buildUri(resourceType.getParam())
                 .pathSegment(resourceId)
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
                 .build().toUri();
 
         log.info("uri : " + uri.getPath());
-        return restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
+        return restTemplate.exchange(uri, httpMethod, new HttpEntity<>(headers), String.class).getBody();
+    }
+
+    public String get(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
+        return executeHttpRequest(resourceType, resourceId, relationType, HttpMethod.GET);
     }
 
     public String post(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
-        URI uri = buildUri(resourceType.getParam())
-                .pathSegment(resourceId)
-                .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
-                .build().toUri();
-
-        log.info("uri : " + uri.getPath());
-        return restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(headers), String.class).getBody();
+        return executeHttpRequest(resourceType, resourceId, relationType, HttpMethod.POST);
     }
 }

@@ -1,6 +1,7 @@
-package io.openbas.collectors.sentinel;
+package io.openbas.collectors.sentinel.infrastructure;
 
 import com.microsoft.aad.msal4j.*;
+import io.openbas.collectors.sentinel.infrastructure.config.AuthenticationProperties;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

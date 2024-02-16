@@ -1,4 +1,4 @@
-package io.openbas.collectors.sentinel;
+package io.openbas.collectors.sentinel.infrastructure.config;
 
 import lombok.Getter;
 import lombok.Setter;
