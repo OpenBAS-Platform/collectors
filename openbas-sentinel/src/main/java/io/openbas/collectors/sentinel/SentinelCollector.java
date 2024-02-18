@@ -10,6 +10,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SentinelCollector {
     public static void main(String[] args) throws JsonProcessingException {
         ConfigurableApplicationContext app = SpringApplication.run(SentinelCollector.class, args);
-        ((SentinelService) app.getBean("sentinelService")).fetchingDataFromSentinelRestApi();
+        ((SentinelService) app.getBean("sentinelService")).fetchDataFromSentinelRestApi();
     }
 }
