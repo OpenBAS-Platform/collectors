@@ -12,9 +12,12 @@ public enum ResourceType {
     API_VERSION ("api-version"),
     BOOKMARKS ("bookmarks"),
     EXPAND ("expand"),
-    FILTER ("filter"),
     ENTITIES ("entities"),
+    FILTER ("$filter"),
+    FILTER_CREATED_SINCE_GREATER_THAN("$filter=properties/createdTimeUtc gt "),
+    GREATER_THAN ("gt"),
     INCIDENTS ("incidents"),
+    LESS_THAN ("lg"),
     METADATA ("metadata"),
     RELATIONS ("relations");
 

@@ -1,4 +1,18 @@
-authority:
-client_id:
-secret:
-scope:
+##Parameters for connecting to
+sentinel:
+  authority:
+    base-url:
+    tenant-id:
+    url:
+  created-since:
+  client-id:
+  secret:
+  scope:
+  endpoint:
+    workspace:
+      subscription-id:
+      resourcegroup-name:
+      name:
+      base-url:
+    api-version:
+    url:
