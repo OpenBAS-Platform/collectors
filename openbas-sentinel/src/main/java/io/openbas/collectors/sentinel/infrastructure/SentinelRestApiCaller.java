@@ -14,7 +14,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -22,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class SentinelRestApiCaller {
 
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'z'", Locale.FRANCE);
     private final Client client;
     private final RestTemplate restTemplate;
     private final AuthenticationProperties authenticationProperties;
@@ -46,15 +51,20 @@ public class SentinelRestApiCaller {
     }
 
     private UriComponentsBuilder buildUri(String resourceTypeParam) {
+        //String createdTimeParam = LocalDateTime.now(ZoneOffset.UTC).minusMonths(authenticationProperties.getCreatedSince()).format(FORMATTER); FIXME
+        String createdTimeParam = LocalDateTime.now(ZoneOffset.UTC).minusMonths(1L).format(FORMATTER);
+
         return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getEndpoint().getUrl())
                 .pathSegment(resourceTypeParam)
-                .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion());
+                .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion())
+                .query(ResourceType.FILTER_CREATED_SINCE_GREATER_THAN.getParam() + createdTimeParam);
     }
 
     /**
      * @param resourceType principal resource: alertrules, incidents
      * @param resourceId   resource's identifiant
      * @param relationType secondary resource which is in relation with resourceId,  i.e : entities, bookmarks, alerts
+     * @param httpMethod
      * @return
      */
     public String executeHttpRequest(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType, HttpMethod httpMethod) {
@@ -63,7 +73,7 @@ public class SentinelRestApiCaller {
                 .pathSegment(relationType.map(ResourceType::getParam).orElse(Strings.EMPTY))
                 .build().toUri();
 
-        log.info("uri : " + uri.getPath());
+        //log.info("uri : " + uri.getPath());
         return restTemplate.exchange(uri, httpMethod, new HttpEntity<>(headers), String.class).getBody();
     }
 

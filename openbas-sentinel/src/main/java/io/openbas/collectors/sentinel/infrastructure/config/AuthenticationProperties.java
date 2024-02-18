@@ -16,6 +16,7 @@ public class AuthenticationProperties {
     private String secret;
     private String scope;
     private Endpoint endpoint;
+    private Long createdSince;
 
     @Getter
     @Setter
