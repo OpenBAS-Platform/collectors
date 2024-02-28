@@ -6,7 +6,7 @@ import io.openbas.collectors.caldera.model.Agent;
 import io.openbas.collectors.caldera.client.CollectorCalderaClient;
 import io.openbas.collectors.caldera.config.CollectorCalderaConfig;
 import io.openbas.database.model.Endpoint;
-import io.openbas.service.AssetEndpointService;
+import io.openbas.asset.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class CollectorCalderaService implements Runnable {
   private final CollectorCalderaClient client;
   private final CollectorCalderaConfig config;
 
-  private final AssetEndpointService assetEndpointService;
+  private final EndpointService endpointService;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +41,7 @@ public class CollectorCalderaService implements Runnable {
       List<Endpoint> toCreate = new ArrayList<>();
       List<Endpoint> toUpdate = new ArrayList<>();
       endpoints.forEach((endpoint -> {
-        Optional<Endpoint> existingOptional = this.assetEndpointService
+        Optional<Endpoint> existingOptional = this.endpointService
             .findBySource(this.config.getId(), endpoint.getSources().get(this.config.getId()));
         existingOptional.ifPresentOrElse((existing) -> {
               // Update
@@ -52,8 +52,8 @@ public class CollectorCalderaService implements Runnable {
             () -> toCreate.add(endpoint)
         );
       }));
-      this.assetEndpointService.createEndpoints(toCreate);
-      this.assetEndpointService.updateEndpoints(toUpdate);
+      this.endpointService.createEndpoints(toCreate);
+      this.endpointService.updateEndpoints(toUpdate);
       log.info("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
     } catch (ClientProtocolException | JsonProcessingException e) {
       throw new RuntimeException(e);
