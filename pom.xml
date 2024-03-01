@@ -96,6 +96,6 @@
         <module>openbas-users</module>
         <module>openbas-caldera</module>
         <module>openbas-mitre-attack</module>
-        <module>openex-sentinel</module>
+        <module>openbas-sentinel</module>
     </modules>
 </project>

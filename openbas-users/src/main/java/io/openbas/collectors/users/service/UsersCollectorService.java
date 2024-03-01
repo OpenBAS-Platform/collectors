@@ -19,6 +19,5 @@ public class UsersCollectorService implements Runnable {
     public void run() {
         List<User> users = fromIterable(userRepository.findAll());
         System.out.println("User collector provisioning based on " + users.size() + " users");
-        // TODO
     }
 }
