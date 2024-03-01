@@ -47,8 +47,10 @@ public class SentinelService {
           .detectionExpectationsNotFill();
       log.info("Number of expectations: " + expectations.size());
 
-      this.computeExpectationForAssets(incidents, expectations);
-      this.computeExpectationForAssetGroups(expectations);
+      if (!expectations.isEmpty()) {
+        this.computeExpectationForAssets(incidents, expectations);
+        this.computeExpectationForAssetGroups(expectations);
+      }
     }
   }
 
@@ -71,8 +73,8 @@ public class SentinelService {
       } else if (ENDPOINT_TYPE.equals(asset.getType())) {
         Endpoint endpoint = this.endpointService.endpoint(asset.getId());
         // Fill expectation detected
-        if (match(endpoint, incidents)) {
-          expectation.setResult("Something relative to the alert");
+        if (match(endpoint, incidents, expectation.getCreatedAt())) {
+          expectation.setResult("Detected by Microsoft Sentinel");
           expectation.setScore(expectation.getExpectedScore());
           this.injectExpectationService.update(expectation);
         }
@@ -97,12 +99,16 @@ public class SentinelService {
     }));
   }
 
-  private boolean match(Endpoint endpoint, List<Incident> incidents) {
+  private boolean match(
+      @NotNull final Endpoint endpoint,
+      @NotNull final List<Incident> incidents,
+      @NotNull final Instant after) {
     return incidents.stream()
+        .filter(i -> i.getProperties().getLastModifiedTimeUtc().isAfter(after))
         .anyMatch(incident -> {
           List<Entity> entities = incident.getEntities()
               .stream()
-              .filter(entity -> endpoint.getHostname().equals(entity.getProperties().getHostName()))
+              .filter(entity -> endpoint.getHostname().equalsIgnoreCase(entity.getProperties().getHostName()))
               .toList();
           return !entities.isEmpty();
         });
