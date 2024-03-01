@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.openex</groupId>
-    <artifactId>openex-collectors</artifactId>
+    <groupId>io.openbas</groupId>
+    <artifactId>openbas-collectors</artifactId>
     <version>3.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>OpenEx collectors</name>
-    <description>OpenEx collectors</description>
+    <name>OpenBAS collectors</name>
+    <description>OpenBAS collectors</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -47,8 +47,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.openex</groupId>
-            <artifactId>openex-framework</artifactId>
+            <groupId>io.openbas</groupId>
+            <artifactId>openbas-framework</artifactId>
             <version>3.5.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -93,8 +93,8 @@
     </build>
 
     <modules>
-        <module>openex-users</module>
-        <module>openex-caldera</module>
-        <module>openex-mitre-attack</module>
+        <module>openbas-users</module>
+        <module>openbas-caldera</module>
+        <module>openbas-mitre-attack</module>
     </modules>
 </project>
