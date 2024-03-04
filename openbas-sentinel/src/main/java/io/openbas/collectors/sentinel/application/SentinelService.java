@@ -37,7 +37,7 @@ public class SentinelService {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Transactional(rollbackFor = Exception.class)
-  public void computeDetectionExpectations() { // TESTME: test expectation group and expectation individual
+  public void computeDetectionExpectations() {
     List<Incident> incidents = incidents();
     incidents.forEach(this::processIncident);
     log.info("Number of incidents: " + incidents.size());
@@ -103,6 +103,10 @@ public class SentinelService {
       @NotNull final Endpoint endpoint,
       @NotNull final List<Incident> incidents,
       @NotNull final Instant after) {
+
+    // FIXME: Extract command line from Caldera to InjectStatus.Execution reporting
+    // FIXME: Match with alert command line
+
     return incidents.stream()
         .filter(i -> i.getProperties().getLastModifiedTimeUtc().isAfter(after))
         .anyMatch(incident -> {

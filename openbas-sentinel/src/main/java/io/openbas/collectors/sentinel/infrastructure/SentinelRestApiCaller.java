@@ -1,6 +1,5 @@
 package io.openbas.collectors.sentinel.infrastructure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.collectors.sentinel.infrastructure.config.AuthenticationProperties;
 import io.openbas.collectors.sentinel.infrastructure.config.ResourceType;
 import io.openbas.collectors.sentinel.utils.Utils;
@@ -35,29 +34,17 @@ public class SentinelRestApiCaller {
 
   private final Client client;
   private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-  private final ObjectMapper objectMapper = new ObjectMapper();
-  //  private final RestTemplate restTemplate;
   private final AuthenticationProperties authenticationProperties;
-  //  private final HttpHeaders headers;
   private final List<Header> headers;
 
-  public SentinelRestApiCaller(Client client,
-//      RestTemplate restTemplate,
+  public SentinelRestApiCaller(
+      Client client,
       AuthenticationProperties authenticationProperties
   ) throws IOException, ExecutionException, InterruptedException {
     this.client = client;
-//    this.restTemplate = restTemplate;
     this.authenticationProperties = authenticationProperties;
-//    this.headers = createHeaders();
     this.headers = createHeaders();
   }
-
-//  private HttpHeaders createHeaders() throws IOException, ExecutionException, InterruptedException {
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setBearerAuth(fetchAccessToken());
-//    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//    return headers;
-//  }
 
   private List<Header> createHeaders() throws IOException, ExecutionException, InterruptedException {
     List<Header> headers = new ArrayList<>();
@@ -72,7 +59,7 @@ public class SentinelRestApiCaller {
 
   private UriComponentsBuilder buildUri(String resourceTypeParam) {
     String createdTimeParam = LocalDateTime.now(ZoneOffset.UTC)
-        .minusDays(5L) // FIXME: Need to be changed to 1L
+        .minusMinutes(15L)
         .format(Utils.FORMATTER);
 
     return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getEndpoint().getUrl())
@@ -80,37 +67,6 @@ public class SentinelRestApiCaller {
         .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion())
         .query(ResourceType.FILTER_UPDATED_SINCE_GREATER_THAN.getParam() + createdTimeParam);
   }
-
-//  /**
-//   * @param resourceType principal resource: alertrules, incidents
-//   * @param resourceId   resource's identifiant
-//   * @param relationType secondary resource which is in relation with resourceId,  i.e : entities, bookmarks, alerts
-//   * @param httpMethod
-//   * @return
-//   */
-//  public <T> T executeHttpRequest(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType,
-//      HttpMethod httpMethod, ParameterizedTypeReference<T> responseType) {
-//    URI uri = buildUri(resourceType.getParam())
-//        .pathSegment(resourceId)
-//        .pathSegment(relationType.map(ResourceType::getParam).orElse(""))
-//        .build()
-//        .toUri();
-//
-//    //log.info("uri : " + uri.getPath());
-//    return restTemplate.exchange(
-//        uri, httpMethod, new HttpEntity<>(headers), responseType
-//    ).getBody();
-//  }
-//
-//  public <T> T get(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType,
-//      ParameterizedTypeReference<T> responseType) {
-//    return executeHttpRequest(resourceType, resourceId, relationType, HttpMethod.GET, responseType);
-//  }
-//
-//  public <T> T post(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType,
-//      ParameterizedTypeReference<T> responseType) {
-//    return executeHttpRequest(resourceType, resourceId, relationType, HttpMethod.POST, responseType);
-//  }
 
   public String get(ResourceType resourceType, String resourceId, Optional<ResourceType> relationType) {
     URI uri = buildUri(resourceType.getParam())
