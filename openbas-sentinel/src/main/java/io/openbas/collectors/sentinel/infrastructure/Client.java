@@ -21,7 +21,7 @@ public class Client {
     // Ensure the app object is not re-created on each request, as it holds a token cache
     // If you are getting tokens for many tenants (millions), see the msal-client-credential-secret-high-availability sample
     // which shows how to use an in-memory token cache with eviction based on a size limit
-    GetOrCreateApp(this.authenticationProperties.getClientId(), this.authenticationProperties.getSecret(),
+    GetOrCreateApp(this.authenticationProperties.getClientId(), this.authenticationProperties.getClientSecret(),
         this.authenticationProperties.getAuthority().getUrl());
 
     ClientCredentialParameters clientCredentialParam = ClientCredentialParameters.builder(

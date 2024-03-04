@@ -62,9 +62,9 @@ public class SentinelRestApiCaller {
         .minusMinutes(15L)
         .format(Utils.FORMATTER);
 
-    return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getEndpoint().getUrl())
+    return UriComponentsBuilder.fromHttpUrl(authenticationProperties.getSubscription().getSecurityInsightsUrl())
         .pathSegment(resourceTypeParam)
-        .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getEndpoint().getApiVersion())
+        .queryParam(ResourceType.API_VERSION.getParam(), authenticationProperties.getApiVersion())
         .query(ResourceType.FILTER_UPDATED_SINCE_GREATER_THAN.getParam() + createdTimeParam);
   }
 
