@@ -1,4 +1,4 @@
-package io.openbas.collectors.sentinel.infrastructure.config;
+package io.openbas.collectors.sentinel.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,10 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("collector.sentinel")
 @Getter
 @Setter
-public class AuthenticationProperties {
+public class CollectorSentinelConfig {
 
-  private static final String BASE_URL = "https://management.azure.com/";
-  private static final String API_VERSION = "2023-12-01-preview";
+  public static final String PRODUCT_NAME = "Microsoft Sentinel";
 
   private boolean enable;
   private String id;
@@ -21,19 +20,16 @@ public class AuthenticationProperties {
   private Authority authority;
   private String clientId;
   private String clientSecret;
-  private final String scope = "https://management.azure.com/.default";
 
   private Subscription subscription;
-
-  public String getApiVersion() {
-    return API_VERSION;
-  }
 
   @Getter
   @Setter
   public static class Authority {
+
     private String baseUrl;
     private String tenantId;
+
     public String getUrl() {
       return this.baseUrl + "/" + this.tenantId;
     }
@@ -42,25 +38,27 @@ public class AuthenticationProperties {
   @Getter
   @Setter
   public static class Subscription {
+
     private String id;
     private ResourceGroups resourceGroups;
     private Workspace workspace;
 
-    private String getUrl() {
-      return BASE_URL + "subscriptions/" + this.id;
+    private String getUri() {
+      return "/subscriptions/" + this.id;
     }
 
-    public String getSecurityInsightsUrl() {
-      return this.getUrl() + this.resourceGroups.getUrl() + this.workspace.getUrl() + "/providers/Microsoft.SecurityInsights/";
+    public String getBaseUri() {
+      return this.getUri() + this.resourceGroups.getUri() + this.workspace.getUri();
     }
   }
 
   @Getter
   @Setter
   public static class ResourceGroups {
+
     private String name;
 
-    private String getUrl() {
+    private String getUri() {
       return "/resourcegroups/" + this.name;
     }
   }
@@ -68,9 +66,10 @@ public class AuthenticationProperties {
   @Getter
   @Setter
   public static class Workspace {
+
     private String name;
 
-    private String getUrl() {
+    private String getUri() {
       return "/providers/microsoft.operationalinsights/workspaces/" + this.name;
     }
   }

@@ -17,6 +17,7 @@ public class IncidentProperties {
   private String providerName;
   private String providerIncidentId;
   private String severity;
+  private String incidentUrl;
   @Getter(NONE)
   private String createdTimeUtc;
   @Getter(NONE)

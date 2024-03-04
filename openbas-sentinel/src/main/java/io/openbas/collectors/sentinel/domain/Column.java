@@ -5,12 +5,9 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HostProperties {
+public class Column {
 
-  private String hostName;
-  private String osFamily;
-  private String osVersion;
-  private String friendlyName;
-  private String commandLine;
+  private String name;
+  private String type;
 
 }

@@ -10,7 +10,7 @@ import io.openbas.asset.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
 
 import java.time.Instant;
@@ -22,7 +22,7 @@ import java.util.*;
 import static java.time.ZoneOffset.UTC;
 
 @RequiredArgsConstructor
-@Slf4j
+@Log
 public class CollectorCalderaService implements Runnable {
 
   private final CollectorCalderaClient client;
@@ -78,7 +78,7 @@ public class CollectorCalderaService implements Runnable {
             }
           }});
           endpoint.setName(agent.getHost() + " - " + agent.getPaw());
-          endpoint.setDescription("Connected with " + agent.getUsername() + " on privilege " + agent.getPrivilege());
+          endpoint.setDescription("Asset collect by Caldera");
           endpoint.setIps(agent.getHost_ip_addrs());
           endpoint.setHostname(agent.getHost());
           endpoint.setPlatform(toPlatform(agent.getPlatform()));

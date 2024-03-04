@@ -7,7 +7,15 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Entity {
 
-  private String kind; // Host for us
+  private String kind;
   private HostProperties properties;
+
+  public String getHostName() {
+    return this.getProperties().getHostName();
+  }
+
+  public String getCommandLine() {
+    return this.getProperties().getCommandLine();
+  }
 
 }

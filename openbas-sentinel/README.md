@@ -37,8 +37,11 @@ Below are the properties you'll need to set for OpenBAS:
 
 ### Behavior
 
-Each interval, a job retrieves the latest incidents updated over the past 15 minutes on Microsoft Sentinel and performs
-an asset-based reconciliation between pending detection expectations and detected incidents.
+Each interval :
+- a job retrieves the latest incidents updated over the past 15 minutes on Microsoft Sentinel and performs
+an asset-based reconciliation between pending detection expectations and detected incidents
+- an other job retrieves the latest alerts updated over the past 15 minutes on Microsoft Sentinel and performs
+  an asset-based reconciliation between pending prevention expectations and alerts
 
 ### Sources
 

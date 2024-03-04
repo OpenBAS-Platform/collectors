@@ -1,4 +1,4 @@
-package io.openbas.collectors.sentinel.infrastructure;
+package io.openbas.collectors.sentinel.client;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
