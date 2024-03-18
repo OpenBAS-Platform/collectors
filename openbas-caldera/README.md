@@ -33,7 +33,7 @@ Below are the properties you'll need to set for OpenBAS:
 | Enable Caldera collector | collector.caldera.enable   | `COLLECTOR_CALDERA_ENABLE`   | Yes       | Enable the Caldera collector.                                                       |
 | Collector ID             | collector.caldera.id       | `COLLECTOR_CALDERA_ID`       | Yes       | The ID of the collector.                                                            |
 | Caldera URL              | collector.caldera.url      | `COLLECTOR_CALDERA_URL`      | Yes       | The URL of the Caldera instance.                                                    |
-| Caldera API Key          | collector.caldera.api-key  | `COLLECTOR_CALDERA_API-KEY`  | Yes       | The API Key for the rest API of the Caldera instance.                               |
+| Caldera API Key          | collector.caldera.api-key  | `COLLECTOR_CALDERA_API_KEY`  | Yes       | The API Key for the rest API of the Caldera instance.                               |
 | Caldera polling interval | collector.caldera.interval | `COLLECTOR_CALDERA_INTERVAL` | No        | The time interval in seconds where the collect is triggered. Default is 60 seconds. |
 
 ### Behavior

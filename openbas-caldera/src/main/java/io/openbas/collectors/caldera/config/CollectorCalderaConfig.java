@@ -21,15 +21,15 @@ public class CollectorCalderaConfig {
   @NotBlank
   private String id;
 
+  @Getter
+  private int interval = 60;
+
   @NotBlank
   private String url;
 
   @Getter
   @NotBlank
   private String apiKey;
-
-  @Getter
-  private int interval = 60;
 
   public String getRestApiV2Url() {
     return url + REST_V2_URI;
