@@ -1,0 +1,11 @@
+openbas:
+  url: 'http://localhost:3001/api'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  type: 'mitre_attack'
+  name: 'Mitre Attack'
+  period: 3600
+  log_level: 'info'
+

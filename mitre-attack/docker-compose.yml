@@ -1,0 +1,11 @@
+version: '3'
+services:
+  collector-mitre-attack:
+    image: openbas/collector-mitre-attack:4.0.0
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - "COLLECTOR_NAME=MITRE ATT&CK"
+      - COLLECTOR_LOG_LEVEL=error
+    restart: always
