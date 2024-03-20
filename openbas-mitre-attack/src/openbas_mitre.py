@@ -85,7 +85,7 @@ class OpenBASMitre:
                 "attack_pattern_kill_chain_phases": kill_chain_phases,
             }
             attack_patterns.append(attack_pattern)
-        print(attack_patterns)
+        # print(attack_patterns)
         self.client.attack_pattern.upsert(attack_patterns)
 
     def _relationships(self, relationships):
@@ -99,6 +99,7 @@ class OpenBASMitre:
                     "child_attack_pattern": source_ref,
                 }
             )
+        # TODO
         # self.client.relationships.upsert(parents)
 
     def _process_message(self) -> None:
