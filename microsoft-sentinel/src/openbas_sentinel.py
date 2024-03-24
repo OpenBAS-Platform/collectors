@@ -1,6 +1,6 @@
 import requests
 from pybas import OpenBAS
-from pybas._injectors.injector_helper import OpenBASCollectorHelper
+from pybas._collectors.collector_helper import OpenBASCollectorHelper
 
 ENTERPRISE_ATTACK_URI = (
     "https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json"
@@ -12,9 +12,9 @@ class OpenBASMitre:
         self.session = requests.Session()
         config = {
             "collector_id": "ba0003bc-4edc-45f3-b047-bda6c3b66f78",
-            "collector_name": "Http injector",
+            "collector_name": "Http collector",
         }
-        injector_config = {
+        collector_config = {
             "connection": {
                 "host": "192.168.2.36",
                 "vhost": "/",
@@ -28,7 +28,7 @@ class OpenBASMitre:
             url="http://localhost:3001/api",
             token="3207fa04-35d8-4baa-a735-17033abf101d",
         )
-        self.helper = OpenBASCollectorHelper(self.client, config, injector_config)
+        self.helper = OpenBASCollectorHelper(self.client, config, collector_config)
 
     def _kill_chain_phases(self, tactics):
         kill_chain_name = "mitre-attack"
