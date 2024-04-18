@@ -6,6 +6,7 @@ services:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
       - COLLECTOR_ID=ChangeMe
+      - COLLECTOR_TYPE=mitre_attack
       - "COLLECTOR_NAME=MITRE ATT&CK"
       - COLLECTOR_LOG_LEVEL=error
     restart: always

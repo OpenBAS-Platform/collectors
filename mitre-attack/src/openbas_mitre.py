@@ -1,5 +1,5 @@
 import requests
-from helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+from pyobas import OpenBASCollectorHelper, OpenBASConfigHelper
 
 ENTERPRISE_ATTACK_URI = (
     "https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json"
@@ -61,9 +61,10 @@ class OpenBASMitre:
                 "phase_description": phase_description,
             }
             kill_chain_phases.append(kill_chain_phase)
-        self.helper.api.kill_chain_phase.upsert(kill_chain_phases)
+        result = self.helper.api.kill_chain_phase.upsert(kill_chain_phases)
+        return result
 
-    def _attack_patterns(self, attacks, relationships):
+    def _attack_patterns(self, attacks, kill_chain_phases, relationships):
         attack_patterns = []
         for attack in attacks:
             stix_id = attack.get("id")
@@ -73,7 +74,7 @@ class OpenBASMitre:
             attack_pattern_permissions_required = attack.get(
                 "x_mitre_permissions_required", []
             )
-            kill_chain_phases = list(
+            attack_pattern_kill_chain_phases_short_names = list(
                 map(
                     lambda chain: chain.get("phase_name"),
                     attack.get("kill_chain_phases", []),
@@ -90,7 +91,18 @@ class OpenBASMitre:
                 if relationship["target_ref"] == stix_id:  # subtechnique-of
                     attack_pattern_parent = relationship["source_ref"]
                     break
-
+            attack_pattern_kill_chain_phases_ids = list(
+                map(
+                    lambda x: x.get("phase_id"),
+                    list(
+                        filter(
+                            lambda y: y["phase_shortname"]
+                            in attack_pattern_kill_chain_phases_short_names,
+                            kill_chain_phases,
+                        )
+                    ),
+                )
+            )
             attack_pattern = {
                 "attack_pattern_name": attack_pattern_name,
                 "attack_pattern_stix_id": stix_id,
@@ -98,7 +110,7 @@ class OpenBASMitre:
                 "attack_pattern_description": attack_pattern_description,
                 "attack_pattern_platforms": attack_pattern_platforms,
                 "attack_pattern_permissions_required": attack_pattern_permissions_required,
-                "attack_pattern_kill_chain_phases": kill_chain_phases,
+                "attack_pattern_kill_chain_phases": attack_pattern_kill_chain_phases_ids,
                 "attack_pattern_parent": attack_pattern_parent,
             }
             attack_patterns.append(attack_pattern)
@@ -125,9 +137,9 @@ class OpenBASMitre:
             ):
                 relationships.append(item)
         # Sync kill chain phases
-        self._kill_chain_phases(tactics)
+        kill_chain_phases = self._kill_chain_phases(tactics)
         # Sync attack patterns
-        self._attack_patterns(attack_patterns, relationships)
+        self._attack_patterns(attack_patterns, kill_chain_phases, relationships)
 
     # Start the main loop
     def start(self):

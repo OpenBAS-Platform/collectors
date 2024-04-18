@@ -5,7 +5,7 @@ openbas:
 collector:
   id: 'changeme'
   type: 'mitre_attack'
-  name: 'Mitre Attack'
+  name: 'MITRE ATT&CK'
   period: 3600
   log_level: 'info'
 

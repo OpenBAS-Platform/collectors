@@ -1,0 +1,14 @@
+openbas:
+  url: 'http://localhost:3001/api'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  type: 'microsoft_entra'
+  name: 'Microsoft Entra'
+  period: 3600
+  log_level: 'info'
+  microsoft_entra_tenant_id: ''
+  microsoft_entra_client_id: ''
+  microsoft_entra_client_secret: ''
+  include_external: false

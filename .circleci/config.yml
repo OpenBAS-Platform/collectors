@@ -57,11 +57,17 @@ jobs:
           name: Build Docker image openbas/collector-mitre-attack
           command: docker build -t openbas/collector-mitre-attack:latest . && docker tag openbas/collector-mitre-attack:latest openbas/collector-mitre-attack:${CIRCLE_TAG}
       - run:
+          working_directory: ~/openbas/microsoft-entra
+          name: Build Docker image openbas/collector-microsoft-entra
+          command: docker build -t openbas/collector-microsoft-entra:latest . && docker tag openbas/collector-microsoft-entra:latest openbas/collector-microsoft-entra:${CIRCLE_TAG}
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:latest
             docker push openbas/collector-mitre-attack:${CIRCLE_TAG}
+            docker push openbas/collector-microsoft-entra:latest
+            docker push openbas/collector-microsoft-entra:${CIRCLE_TAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -81,10 +87,15 @@ jobs:
           name: Build Docker image openbas/collector-mitre-attack
           command: docker build -t openbas/collector-mitre-attack:rolling .
       - run:
+          working_directory: ~/openbas/microsoft-entra
+          name: Build Docker image openbas/collector-microsoft-entra
+          command: docker build -t openbas/collector-microsoft-entra:rolling .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:rolling
+            docker push openbas/collector-microsoft-entra:rolling
       - slack/notify:
           event: fail
           template: basic_fail_1
