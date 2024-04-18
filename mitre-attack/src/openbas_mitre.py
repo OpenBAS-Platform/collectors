@@ -1,5 +1,5 @@
 import requests
-from pyobas import OpenBASCollectorHelper, OpenBASConfigHelper
+from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 ENTERPRISE_ATTACK_URI = (
     "https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json"
