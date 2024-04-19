@@ -91,18 +91,12 @@ class OpenBASMitre:
                 if relationship["target_ref"] == stix_id:  # subtechnique-of
                     attack_pattern_parent = relationship["source_ref"]
                     break
-            attack_pattern_kill_chain_phases_ids = list(
-                map(
-                    lambda x: x.get("phase_id"),
-                    list(
-                        filter(
-                            lambda y: y["phase_shortname"]
-                            in attack_pattern_kill_chain_phases_short_names,
-                            kill_chain_phases,
-                        )
-                    ),
-                )
-            )
+            attack_pattern_kill_chain_phases_ids = [
+                x.get("phase_id")
+                for x in kill_chain_phases
+                if x.get("phase_shortname")
+                in attack_pattern_kill_chain_phases_short_names
+            ]
             attack_pattern = {
                 "attack_pattern_name": attack_pattern_name,
                 "attack_pattern_stix_id": stix_id,
