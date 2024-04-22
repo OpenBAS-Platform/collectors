@@ -2,7 +2,7 @@
 name: Feature request
 about: Ask for a new feature/collector to be implemented in OpenBAS
 title: ''
-labels: needs triage
+labels: feature, needs triage
 assignees: ''
 
 ---

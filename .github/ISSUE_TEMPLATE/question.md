@@ -2,7 +2,7 @@
 name: Question
 about: Ask a question concerning OpenBAS collectors
 title: ''
-labels: needs triage
+labels: needs triage, question
 assignees: ''
 
 ---
