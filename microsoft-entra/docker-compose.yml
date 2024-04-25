@@ -6,7 +6,7 @@ services:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
       - COLLECTOR_ID=ChangeMe
-      - COLLECTOR_TYPE=microsoft_entra
+      - COLLECTOR_TYPE=openbas_microsoft_entra
       - "COLLECTOR_NAME=Microsoft Entra"
       - COLLECTOR_LOG_LEVEL=error
       - MICROSOFT_ENTRA_TENANT_ID=

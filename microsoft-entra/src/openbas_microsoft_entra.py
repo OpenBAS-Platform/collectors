@@ -53,7 +53,9 @@ class OpenBASMicrosoftEntra:
                 },
             },
         )
-        self.helper = OpenBASCollectorHelper(self.config, open("img/entra.png", "rb"))
+        self.helper = OpenBASCollectorHelper(
+            self.config, open("img/icon-microsoft-entra.png", "rb")
+        )
 
         # Graph client authentication
         scopes = ["https://graph.microsoft.com/.default"]

@@ -37,7 +37,9 @@ class OpenBASMitre:
                 },
             },
         )
-        self.helper = OpenBASCollectorHelper(self.config, open("img/mitre.png", "rb"))
+        self.helper = OpenBASCollectorHelper(
+            self.config, open("img/icon-mitre-attack.png", "rb")
+        )
 
     def _kill_chain_phases(self, tactics):
         kill_chain_name = "mitre-attack"
@@ -56,7 +58,7 @@ class OpenBASMitre:
                 "phase_kill_chain_name": kill_chain_name,
                 "phase_stix_id": phase_stix_id,
                 "phase_external_id": phase_external_id,
-                "phase_short_name": phase_shortname,
+                "phase_shortname": phase_shortname,
                 "phase_name": phase_name,
                 "phase_description": phase_description,
             }
@@ -121,7 +123,7 @@ class OpenBASMitre:
         # Generate items
         for item in objects:
             object_type = item.get("type")
-            if object_type == "attack-pattern":
+            if object_type == "attack-pattern" and not item.get("revoked"):
                 attack_patterns.append(item)
             if object_type == "x-mitre-tactic":
                 tactics.append(item)
