@@ -90,8 +90,8 @@ class OpenBASMitre:
             # Find a possible parent in relationships
             attack_pattern_parent = None
             for relationship in relationships:
-                if relationship["target_ref"] == stix_id:  # subtechnique-of
-                    attack_pattern_parent = relationship["source_ref"]
+                if relationship["source_ref"] == stix_id:  # subtechnique-of
+                    attack_pattern_parent = relationship["target_ref"]
                     break
             attack_pattern_kill_chain_phases_ids = [
                 x.get("phase_id")
