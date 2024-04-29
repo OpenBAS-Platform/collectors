@@ -30,6 +30,7 @@ class OpenBASMicrosoftEntra:
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
                     "file_path": ["collector", "type"],
+                    "default": "openbas_microsoft_entra",
                 },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",

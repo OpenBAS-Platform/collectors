@@ -30,6 +30,7 @@ class OpenBASMitre:
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
                     "file_path": ["collector", "type"],
+                    "default": "openbas_mitre_attack",
                 },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
