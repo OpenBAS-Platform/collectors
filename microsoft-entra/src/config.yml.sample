@@ -4,7 +4,6 @@ openbas:
 
 collector:
   id: 'changeme'
-  type: 'openbas_microsoft_entra'
   name: 'Microsoft Entra'
   period: 3600
   log_level: 'info'

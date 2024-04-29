@@ -4,7 +4,6 @@ openbas:
 
 collector:
   id: 'changeme'
-  type: 'openbas_mitre_attack'
   name: 'MITRE ATT&CK'
   period: 3600
   log_level: 'info'
