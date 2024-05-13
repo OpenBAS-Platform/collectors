@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-microsoft-entra:
-    image: openbas/collector-microsoft-entra:3.5.1
+    image: openbas/collector-microsoft-entra:1.0.0
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
