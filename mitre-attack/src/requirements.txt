@@ -1,3 +1,3 @@
 requests==2.31.0
 dataclasses-json==0.6.6
-pyobas==1.0.2
+pyobas==1.0.3
