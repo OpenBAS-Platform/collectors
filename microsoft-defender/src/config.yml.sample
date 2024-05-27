@@ -1,0 +1,12 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Microsoft Defender'
+  period: 3600
+  log_level: 'info'
+  microsoft_defender_tenant_id: ''
+  microsoft_defender_client_id: ''
+  microsoft_defender_client_secret: ''

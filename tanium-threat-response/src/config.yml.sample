@@ -1,0 +1,13 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Tanium Threat Response'
+  period: 60
+  log_level: 'info'
+  tanium_url: ''
+  tanium_url_console: ''
+  tanium_ssl_verify: ''
+  tanium_token: ''

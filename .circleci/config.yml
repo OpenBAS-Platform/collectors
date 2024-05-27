@@ -61,6 +61,14 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-entra
           command: docker build -t openbas/collector-microsoft-entra:latest . && docker tag openbas/collector-microsoft-entra:latest openbas/collector-microsoft-entra:${CIRCLE_TAG}
       - run:
+          working_directory: ~/openbas/tanium-threat-response
+          name: Build Docker image openbas/collector-tanium-threat-response
+          command: docker build -t openbas/collector-tanium-threat-response:latest . && docker tag openbas/collector-tanium-threat-response:latest openbas/collector-tanium-threat-response:${CIRCLE_TAG}
+      - run:
+          working_directory: ~/openbas/microsoft-defender
+          name: Build Docker image openbas/collector-microsoft-defender
+          command: docker build -t openbas/collector-microsoft-defender:latest . && docker tag openbas/collector-microsoft-defender:latest openbas/collector-microsoft-defender:${CIRCLE_TAG}
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -68,6 +76,10 @@ jobs:
             docker push openbas/collector-mitre-attack:${CIRCLE_TAG}
             docker push openbas/collector-microsoft-entra:latest
             docker push openbas/collector-microsoft-entra:${CIRCLE_TAG}
+            docker push openbas/collector-tanium-threat-response:latest
+            docker push openbas/collector-tanium-threat-response:${CIRCLE_TAG}
+            docker push openbas/collector-microsoft-defender:latest
+            docker push openbas/collector-microsoft-defender:${CIRCLE_TAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -91,11 +103,21 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-entra
           command: docker build -t openbas/collector-microsoft-entra:rolling .
       - run:
+          working_directory: ~/openbas/tanium-threat-response
+          name: Build Docker image openbas/collector-tanium-threat-response
+          command: docker build -t openbas/collector-tanium-threat-response:rolling .
+      - run:
+          working_directory: ~/openbas/microsoft-defender
+          name: Build Docker image openbas/collector-microsoft-defender
+          command: docker build -t openbas/collector-microsoft-defender:rolling .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:rolling
             docker push openbas/collector-microsoft-entra:rolling
+            docker push openbas/collector-tanium-threat-response:rolling
+            docker push openbas/collector-microsoft-defender:rolling
       - slack/notify:
           event: fail
           template: basic_fail_1

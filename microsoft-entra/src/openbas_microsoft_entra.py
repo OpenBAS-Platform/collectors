@@ -32,6 +32,10 @@ class OpenBASMicrosoftEntra:
                     "file_path": ["collector", "type"],
                     "default": "openbas_microsoft_entra",
                 },
+                "collector_log_level": {
+                    "env": "COLLECTOR_LOG_LEVEL",
+                    "file_path": ["collector", "log_level"],
+                },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],

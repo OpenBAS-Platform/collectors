@@ -1,0 +1,15 @@
+version: '3'
+services:
+  collector-tanium-threat-response:
+    image: openbas/collector-tanium-threat-response:1.0.3
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - "COLLECTOR_NAME=Tanium Threat Response"
+      - COLLECTOR_LOG_LEVEL=error
+      - TANIUM_URL=https://console.changeme.com
+      - TANIUM_URL_CONSOLE=https://console.changeme.com
+      - TANIUM_SSL_VERIFY=true
+      - TANIUM_TOKEN=ChangeMe
+    restart: always
