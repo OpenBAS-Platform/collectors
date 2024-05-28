@@ -155,7 +155,7 @@ class OpenBASMicrosoftSentinel:
                         + ")"
                     )
                     ratio = fuzz.ratio(process_name, signature["value"])
-                    if ratio > 80:
+                    if ratio > 90:
                         self.helper.collector_logger.info(
                             "MATCHING! (score: " + str(ratio) + ")"
                         )

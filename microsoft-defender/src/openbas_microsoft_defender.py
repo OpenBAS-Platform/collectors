@@ -105,7 +105,7 @@ class OpenBASMicrosoftDefender:
     def _is_prevented(self, alert):
         for evidence in alert.evidence:
             if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                if evidence.remediation_status in [
+                if evidence.detection_status in [
                     "prevented",
                     "remediated",
                     "blocked",
@@ -147,7 +147,7 @@ class OpenBASMicrosoftDefender:
                         + ")"
                     )
                     ratio = fuzz.ratio(process_name, signature["value"])
-                    if ratio > 80:
+                    if ratio > 90:
                         self.helper.collector_logger.info(
                             "MATCHING! (score: " + str(ratio) + ")"
                         )
