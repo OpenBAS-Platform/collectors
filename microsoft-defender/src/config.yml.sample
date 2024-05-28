@@ -5,7 +5,7 @@ openbas:
 collector:
   id: 'changeme'
   name: 'Microsoft Defender'
-  period: 3600
+  period: 60
   log_level: 'info'
   microsoft_defender_tenant_id: ''
   microsoft_defender_client_id: ''

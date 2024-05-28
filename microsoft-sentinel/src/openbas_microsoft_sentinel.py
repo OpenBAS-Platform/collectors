@@ -1,21 +1,16 @@
-import asyncio
+import json
 from datetime import datetime
 
 import pytz
 import requests
-from azure.identity.aio import ClientSecretCredential
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from msgraph import GraphServiceClient
-from msgraph.generated.security.alerts_v2.alerts_v2_request_builder import (
-    Alerts_v2RequestBuilder,
-    RequestConfiguration,
-)
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+from sentinel_api_handler import SentinelApiHandler
 from thefuzz import fuzz
 
 
-class OpenBASMicrosoftDefender:
+class OpenBASMicrosoftSentinel:
     def __init__(self):
         self.session = requests.Session()
         self.config = OpenBASConfigHelper(
@@ -39,7 +34,7 @@ class OpenBASMicrosoftDefender:
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
                     "file_path": ["collector", "type"],
-                    "default": "openbas_microsoft_defender",
+                    "default": "openbas_microsoft_sentinel",
                 },
                 "collector_log_level": {
                     "env": "COLLECTOR_LOG_LEVEL",
@@ -49,74 +44,87 @@ class OpenBASMicrosoftDefender:
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
                 },
-                "microsoft_defender_tenant_id": {
-                    "env": "MICROSOFT_DEFENDER_TENANT_ID",
-                    "file_path": ["collector", "microsoft_defender_tenant_id"],
+                "microsoft_sentinel_tenant_id": {
+                    "env": "MICROSOFT_SENTINEL_TENANT_ID",
+                    "file_path": ["collector", "microsoft_sentinel_tenant_id"],
                 },
-                "microsoft_defender_client_id": {
-                    "env": "MICROSOFT_DEFENDER_CLIENT_ID",
-                    "file_path": ["collector", "microsoft_defender_client_id"],
+                "microsoft_sentinel_client_id": {
+                    "env": "MICROSOFT_SENTINEL_CLIENT_ID",
+                    "file_path": ["collector", "microsoft_sentinel_client_id"],
                 },
-                "microsoft_defender_client_secret": {
-                    "env": "MICROSOFT_DEFENDER_CLIENT_SECRET",
-                    "file_path": ["collector", "microsoft_defender_client_secret"],
+                "microsoft_sentinel_client_secret": {
+                    "env": "MICROSOFT_SENTINEL_CLIENT_SECRET",
+                    "file_path": ["collector", "microsoft_sentinel_client_secret"],
+                },
+                "microsoft_sentinel_subscription_id": {
+                    "env": "MICROSOFT_SENTINEL_SUBSCRIPTION_ID",
+                    "file_path": ["collector", "microsoft_sentinel_subscription_id"],
+                },
+                "microsoft_sentinel_workspace_id": {
+                    "env": "MICROSOFT_SENTINEL_WORKSPACE_ID",
+                    "file_path": ["collector", "microsoft_sentinel_workspace_id"],
+                },
+                "microsoft_sentinel_resource_group": {
+                    "env": "MICROSOFT_SENTINEL_RESOURCE_GROUP",
+                    "file_path": ["collector", "microsoft_sentinel_resource_group"],
                 },
             },
         )
+
         self.helper = OpenBASCollectorHelper(
-            self.config, open("img/icon-microsoft-defender.png", "rb")
+            self.config, open("img/icon-microsoft-sentinel.png", "rb")
         )
 
-        # Graph client authentication
-        scopes = ["https://graph.microsoft.com/.default"]
+        self.log_analytics_url = "https://api.loganalytics.azure.com/v1"
 
-        # Values from app registration
-        # azure.identity.aio
-        credential = ClientSecretCredential(
-            tenant_id=self.config.get_conf("microsoft_defender_tenant_id"),
-            client_id=self.config.get_conf("microsoft_defender_client_id"),
-            client_secret=self.config.get_conf("microsoft_defender_client_secret"),
+        # Initialize Sentinel API
+        self.sentinel_api_handler = SentinelApiHandler(
+            self.helper,
+            self.config.get_conf("microsoft_sentinel_tenant_id"),
+            self.config.get_conf("microsoft_sentinel_client_id"),
+            self.config.get_conf("microsoft_sentinel_client_secret"),
         )
 
-        self.graph_client = GraphServiceClient(credential, scopes)  # type: ignore
-
-    def _extract_device(self, alert):
-        for evidence in alert.evidence:
-            if evidence.odata_type == "#microsoft.graph.security.deviceEvidence":
-                return evidence.device_dns_name
+    def _extract_device(self, columns_index, alert):
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "host":
+                return entity["HostName"]
         return None
 
-    def _extract_process_names(self, alert):
+    def _extract_process_names(self, columns_index, alert):
         process_names = []
-        for evidence in alert.evidence:
-            if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                process_names.append(evidence.image_file.file_name)
-            elif evidence.odata_type == "#microsoft.graph.security.fileEvidence":
-                process_names.append(evidence.file_details.file_name)
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "process":
+                if "ImageFile" in entity and "Name" in entity["ImageFile"]:
+                    process_names.append(entity["ImageFile"]["Name"])
+            elif "Type" in entity and entity["Type"] == "file":
+                process_names.append(entity["Name"])
         return process_names
 
-    def _extract_command_lines(self, alert):
+    def _extract_command_lines(self, columns_index, alert):
         command_lines = []
-        for evidence in alert.evidence:
-            if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                command_lines.append(evidence.process_command_line)
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "process":
+                command_lines.append(entity["CommandLine"])
         return command_lines
 
-    def _is_prevented(self, alert):
-        for evidence in alert.evidence:
-            if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                if evidence.remediation_status in [
-                    "prevented",
-                    "remediated",
-                    "blocked",
-                ]:
-                    return True
+    def _is_prevented(self, columns_index, alert):
+        extended_properties = json.loads(alert[columns_index["ExtendedProperties"]])
+        if "Action" in extended_properties and extended_properties["Action"] in [
+            "blocked",
+            "quarantine",
+            "remove",
+        ]:
+            return True
         return False
 
-    def _match_alert(self, alert, expectation):
+    def _match_alert(self, columns_index, alert, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
-            + str(alert.id)
+            + str(alert[columns_index["SystemAlertId"]])
             + " with expectation "
             + expectation["inject_expectation_id"]
         )
@@ -125,7 +133,7 @@ class OpenBASMicrosoftDefender:
             return False
         endpoint = self.helper.api.endpoint.get(expectation["inject_expectation_asset"])
         # Check hostname
-        hostname = self._extract_device(alert)
+        hostname = self._extract_device(columns_index, alert)
         if hostname is None or hostname != endpoint["endpoint_hostname"]:
             return False
         self.helper.collector_logger.info(
@@ -137,7 +145,7 @@ class OpenBASMicrosoftDefender:
         # Match signature values to alert
         for signature in expectation["inject_expectation_signatures"]:
             if signature["type"] == "process_name":
-                process_names = self._extract_process_names(alert)
+                process_names = self._extract_process_names(columns_index, alert)
                 for process_name in process_names:
                     self.helper.collector_logger.info(
                         "Comparing process names ("
@@ -154,7 +162,7 @@ class OpenBASMicrosoftDefender:
                         matching_number = matching_number + 1
                         break
             elif signature["type"] == "command_line":
-                command_lines = self._extract_command_lines(alert)
+                command_lines = self._extract_command_lines(columns_index, alert)
                 if len(command_lines) == 0:
                     matching_number = matching_number + 1
                     break
@@ -175,27 +183,34 @@ class OpenBASMicrosoftDefender:
                         break
 
         if signatures_number == matching_number:
-            if self._is_prevented(alert):
+            if self._is_prevented(columns_index, alert):
                 return "PREVENTED"
             else:
                 return "DETECTED"
         return False
 
-    async def _process_alerts(self):
+    def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = self.helper.api.inject_expectation.expectations_for_source(
             self.config.get_conf("collector_id")
         )
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
-        query_params = (
-            Alerts_v2RequestBuilder.Alerts_v2RequestBuilderGetQueryParameters(
-                orderby=["createdDateTime DESC"], top=100
-            )
+
+        # Retrive alerts
+        url = (
+            self.log_analytics_url
+            + "/workspaces/"
+            + self.config.get_conf("microsoft_sentinel_workspace_id")
+            + "/query"
         )
-        request_configuration = RequestConfiguration(query_parameters=query_params)
-        alerts = await self.graph_client.security.alerts_v2.get(
-            request_configuration=request_configuration
-        )
+        body = {"query": "SecurityAlert | sort by TimeGenerated desc"}
+        data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
+        if len(data["tables"]) == 0:
+            return
+        columns = data["tables"][0]["columns"]
+        columns_index = {}
+        for idx, column in enumerate(columns):
+            columns_index[column["name"]] = idx
         # For each expectation, try to find the proper alert
         for expectation in expectations:
             # Check expired expectation
@@ -216,11 +231,12 @@ class OpenBASMicrosoftDefender:
                     },
                 )
                 continue
-            for i in range(len(alerts.value)):
-                alert = alerts.value[i]
-                alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
+            for alert in data["tables"][0]["rows"]:
+                alert_date = parse(
+                    str(alert[columns_index["TimeGenerated"]])
+                ).astimezone(pytz.UTC)
                 if alert_date > limit_date:
-                    result = self._match_alert(alert, expectation)
+                    result = self._match_alert(columns_index, alert, expectation)
                     if result is not False:
                         if expectation["inject_expectation_type"] == "DETECTION":
                             self.helper.api.inject_expectation.update(
@@ -249,8 +265,7 @@ class OpenBASMicrosoftDefender:
                             )
 
     def _process_message(self) -> None:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._process_alerts())
+        self._process_alerts()
 
     # Start the main loop
     def start(self):
@@ -259,5 +274,5 @@ class OpenBASMicrosoftDefender:
 
 
 if __name__ == "__main__":
-    openBASMicrosoftDefender = OpenBASMicrosoftDefender()
-    openBASMicrosoftDefender.start()
+    openBASMicrosoftSentinel = OpenBASMicrosoftSentinel()
+    openBASMicrosoftSentinel.start()

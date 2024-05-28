@@ -155,7 +155,7 @@ class OpenBASTaniumThreatResponse:
         self.helper.collector_logger.info(
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
         )
-        # Flatten alert
+        # Matching logics
         signatures_number = len(expectation["inject_expectation_signatures"])
         matching_number = 0
         # Match signature values to alert
@@ -170,11 +170,18 @@ class OpenBASTaniumThreatResponse:
                         + signature["value"]
                         + ")"
                     )
-                    if fuzz.ratio(process_name, signature["value"]) > 80:
+                    ratio = fuzz.ratio(process_name, signature["value"])
+                    if ratio > 80:
+                        self.helper.collector_logger.info(
+                            "MATCHING! (score: " + str(ratio) + ")"
+                        )
                         matching_number = matching_number + 1
                         break
             elif signature["type"] == "command_line":
                 command_lines = self._extract_command_lines(alert_details)
+                if len(command_lines) == 0:
+                    matching_number = matching_number + 1
+                    break
                 for command_line in command_lines:
                     self.helper.collector_logger.info(
                         "Comparing command lines ("
@@ -183,7 +190,11 @@ class OpenBASTaniumThreatResponse:
                         + signature["value"]
                         + ")"
                     )
-                    if fuzz.ratio(command_line, signature["value"]) > 80:
+                    ratio = fuzz.ratio(command_line, signature["value"])
+                    if ratio > 50:
+                        self.helper.collector_logger.info(
+                            "MATCHING! (score: " + str(ratio) + ")"
+                        )
                         matching_number = matching_number + 1
                         break
 
@@ -193,8 +204,10 @@ class OpenBASTaniumThreatResponse:
 
     def _process_message(self) -> None:
         self.helper.collector_logger.info("Gathering expectations for executed injects")
-        expectations = self.helper.api.inject_expectation.expectations_for_source(
-            self.config.get_conf("collector_id")
+        expectations = (
+            self.helper.api.inject_expectation.detection_expectations_for_source(
+                self.config.get_conf("collector_id")
+            )
         )
         alerts = self.tanium_api_handler._query(
             "get",

@@ -69,6 +69,10 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-defender
           command: docker build -t openbas/collector-microsoft-defender:latest . && docker tag openbas/collector-microsoft-defender:latest openbas/collector-microsoft-defender:${CIRCLE_TAG}
       - run:
+          working_directory: ~/openbas/microsoft-sentinel
+          name: Build Docker image openbas/collector-microsoft-sentinel
+          command: docker build -t openbas/collector-microsoft-sentinel:latest . && docker tag openbas/collector-microsoft-sentinel:latest openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -80,6 +84,8 @@ jobs:
             docker push openbas/collector-tanium-threat-response:${CIRCLE_TAG}
             docker push openbas/collector-microsoft-defender:latest
             docker push openbas/collector-microsoft-defender:${CIRCLE_TAG}
+            docker push openbas/collector-microsoft-sentinel:latest
+            docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -111,6 +117,10 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-defender
           command: docker build -t openbas/collector-microsoft-defender:rolling .
       - run:
+          working_directory: ~/openbas/microsoft-sentinel
+          name: Build Docker image openbas/collector-microsoft-sentinel
+          command: docker build -t openbas/collector-microsoft-sentinel:rolling .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -118,6 +128,7 @@ jobs:
             docker push openbas/collector-microsoft-entra:rolling
             docker push openbas/collector-tanium-threat-response:rolling
             docker push openbas/collector-microsoft-defender:rolling
+            docker push openbas/collector-microsoft-sentinel:rolling
       - slack/notify:
           event: fail
           template: basic_fail_1

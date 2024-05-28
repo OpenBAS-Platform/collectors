@@ -1,0 +1,17 @@
+version: '3'
+services:
+  collector-microsoft-sentinel:
+    image: openbas/collector-microsoft-sentinel:1.0.3
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - "COLLECTOR_NAME=Microsoft Sentinel"
+      - COLLECTOR_LOG_LEVEL=error
+      - MICROSOFT_SENTINEL_TENANT_ID=
+      - MICROSOFT_SENTINEL_CLIENT_ID=
+      - MICROSOFT_SENTINEL_CLIENT_SECRET=
+      - MICROSOFT_SENTINEL_SUBSCRIPTION_ID=
+      - MICROSOFT_SENTINEL_WORKSPACE_ID=
+      - MICROSOFT_SENTINEL_RESOURCE_GROUP=
+    restart: always

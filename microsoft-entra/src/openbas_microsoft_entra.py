@@ -136,7 +136,8 @@ class OpenBASMicrosoftEntra:
                     await self.create_users(groups.value[i].id, openbas_team)
 
     def _process_message(self) -> None:
-        asyncio.run(self.create_groups())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.create_groups())
 
     # Start the main loop
     def start(self):

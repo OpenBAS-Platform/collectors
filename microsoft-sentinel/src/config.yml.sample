@@ -1,0 +1,15 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Microsoft Sentinel'
+  period: 60
+  log_level: 'info'
+  microsoft_sentinel_tenant_id: ''
+  microsoft_sentinel_client_id: ''
+  microsoft_sentinel_client_secret: ''
+  microsoft_sentinel_subscription_id: ''
+  microsoft_sentinel_workspace_id: ''
+  microsoft_sentinel_resource_group: ''
