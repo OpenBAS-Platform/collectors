@@ -1,3 +1,4 @@
 pyobas==1.0.3
 msgraph-sdk==1.4.0
 thefuzz==0.22.1
+msal==1.28.0

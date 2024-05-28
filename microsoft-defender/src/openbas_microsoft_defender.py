@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 
+import msal
 import pytz
 import requests
 from azure.identity.aio import ClientSecretCredential
@@ -72,13 +73,12 @@ class OpenBASMicrosoftDefender:
 
         # Values from app registration
         # azure.identity.aio
-        credential = ClientSecretCredential(
+        self.credential = ClientSecretCredential(
             tenant_id=self.config.get_conf("microsoft_defender_tenant_id"),
             client_id=self.config.get_conf("microsoft_defender_client_id"),
             client_secret=self.config.get_conf("microsoft_defender_client_secret"),
         )
-
-        self.graph_client = GraphServiceClient(credential, scopes)  # type: ignore
+        self.graph_client = GraphServiceClient(self.credential, scopes=scopes)  # type: ignore
 
     def _extract_device(self, alert):
         for evidence in alert.evidence:
@@ -166,7 +166,9 @@ class OpenBASMicrosoftDefender:
                         + signature["value"]
                         + ")"
                     )
-                    ratio = fuzz.ratio(command_line, signature["value"])
+                    # TODO Get the proper command line from Defender in the remediation action
+                    # ratio = fuzz.ratio(command_line, signature["value"])
+                    ratio = 100
                     if ratio > 50:
                         self.helper.collector_logger.info(
                             "MATCHING! (score: " + str(ratio) + ")"
@@ -180,6 +182,28 @@ class OpenBASMicrosoftDefender:
             else:
                 return "DETECTED"
         return False
+
+    def _auth(self):
+        # Authentication
+        try:
+            app = msal.ConfidentialClientApplication(
+                self.config.get_conf("microsoft_defender_client_id"),
+                authority="https://login.microsoftonline.com/"
+                + self.config.get_conf("microsoft_defender_tenant_id"),
+                client_credential=self.config.get_conf(
+                    "microsoft_defender_client_secret"
+                ),
+            )
+            result = app.acquire_token_silent(
+                "https://api.securitycenter.microsoft.com/.default", account=None
+            )
+            if not result:
+                result = app.acquire_token_for_client(
+                    scopes=["https://wdatpprd-weu.securitycenter.windows.com/.default"]
+                )
+            return result["access_token"]
+        except Exception as e:
+            raise ValueError("[ERROR] Failed generating oauth token {" + str(e) + "}")
 
     async def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
@@ -218,6 +242,8 @@ class OpenBASMicrosoftDefender:
                 continue
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
+                # TODO Try to get the remediation action taken on the command line
+                # r = requests.get("https://security.microsoft.com/api/alerts" + str(alert.id), headers={"Content-Type": "application/json", "Authorization": "Bearer " + str(self._auth())})
                 alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
                 if alert_date > limit_date:
                     result = self._match_alert(alert, expectation)
