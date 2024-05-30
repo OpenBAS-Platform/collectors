@@ -121,7 +121,7 @@ class OpenBASMicrosoftSentinel:
             return True
         return False
 
-    def _match_alert(self, columns_index, alert, expectation):
+    def _match_alert(self, endpoint, columns_index, alert, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert[columns_index["SystemAlertId"]])
@@ -131,7 +131,6 @@ class OpenBASMicrosoftSentinel:
         # No asset
         if expectation["inject_expectation_asset"] is None:
             return False
-        endpoint = self.helper.api.endpoint.get(expectation["inject_expectation_asset"])
         # Check hostname
         hostname = self._extract_device(columns_index, alert)
         if hostname is None or hostname != endpoint["endpoint_hostname"]:
@@ -206,7 +205,7 @@ class OpenBASMicrosoftSentinel:
             + self.config.get_conf("microsoft_sentinel_workspace_id")
             + "/query"
         )
-        body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 50"}
+        body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 200"}
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
         if len(data["tables"]) == 0:
             return
@@ -239,12 +238,17 @@ class OpenBASMicrosoftSentinel:
                 + str(len(data["tables"][0]["rows"]))
                 + " alerts (taking first 50)"
             )
+            endpoint = self.helper.api.endpoint.get(
+                expectation["inject_expectation_asset"]
+            )
             for alert in data["tables"][0]["rows"]:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
                 if alert_date > limit_date:
-                    result = self._match_alert(columns_index, alert, expectation)
+                    result = self._match_alert(
+                        endpoint, columns_index, alert, expectation
+                    )
                     if result is not False:
                         if expectation["inject_expectation_type"] == "DETECTION":
                             self.helper.api.inject_expectation.update(

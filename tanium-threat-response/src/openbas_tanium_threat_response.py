@@ -134,7 +134,7 @@ class OpenBASTaniumThreatResponse:
                     )
         return command_lines
 
-    def _match_alert(self, alert, expectation):
+    def _match_alert(self, endpoint, alert, expectation):
         alert_details = json.loads(alert["details"])
         self.helper.collector_logger.info(
             "Trying to match alert "
@@ -148,7 +148,6 @@ class OpenBASTaniumThreatResponse:
         # Defender / Deep Instinct (dedicated collectors)
         if alert["matchType"] in ["windows_defender", "deep_instinct"]:
             return False
-        endpoint = self.helper.api.endpoint.get(expectation["inject_expectation_asset"])
         # Check hostname
         if endpoint["endpoint_hostname"] != alert["computerName"]:
             return False
@@ -235,12 +234,15 @@ class OpenBASTaniumThreatResponse:
                 )
                 continue
             self.helper.collector_logger.info(
-                "Found " + str(len(alerts)) + " alerts (taking first 50)"
+                "Found " + str(len(alerts)) + " alerts (taking first 200)"
             )
-            for alert in alerts[:50]:
+            endpoint = self.helper.api.endpoint.get(
+                expectation["inject_expectation_asset"]
+            )
+            for alert in alerts[:200]:
                 alert_date = parse(alert["createdAt"]).astimezone(pytz.UTC)
                 if alert_date > limit_date and alert["state"] != "suppressed":
-                    if self._match_alert(alert, expectation):
+                    if self._match_alert(endpoint, alert, expectation):
                         self.helper.api.inject_expectation.update(
                             expectation["inject_expectation_id"],
                             {

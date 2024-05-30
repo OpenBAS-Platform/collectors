@@ -100,7 +100,7 @@ class OpenBASMicrosoftDefender:
                     return True
         return False
 
-    def _match_alert(self, alert, expectation):
+    def _match_alert(self, endpoint, alert, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert.id)
@@ -110,7 +110,6 @@ class OpenBASMicrosoftDefender:
         # No asset
         if expectation["inject_expectation_asset"] is None:
             return False
-        endpoint = self.helper.api.endpoint.get(expectation["inject_expectation_asset"])
         # Check hostname
         hostname = self._extract_device(alert)
         if hostname is None or hostname != endpoint["endpoint_hostname"]:
@@ -181,7 +180,7 @@ class OpenBASMicrosoftDefender:
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
         query_params = (
             Alerts_v2RequestBuilder.Alerts_v2RequestBuilderGetQueryParameters(
-                orderby=["createdDateTime DESC"], top=50
+                orderby=["createdDateTime DESC"], top=200
             )
         )
         request_configuration = RequestConfiguration(query_parameters=query_params)
@@ -209,13 +208,16 @@ class OpenBASMicrosoftDefender:
                 )
                 continue
             self.helper.collector_logger.info(
-                "Found " + str(len(alerts.value)) + " alerts (taking first 50)"
+                "Found " + str(len(alerts.value)) + " alerts"
+            )
+            endpoint = self.helper.api.endpoint.get(
+                expectation["inject_expectation_asset"]
             )
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
                 alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
                 if alert_date > limit_date:
-                    result = self._match_alert(alert, expectation)
+                    result = self._match_alert(endpoint, alert, expectation)
                     if result is not False:
                         if expectation["inject_expectation_type"] == "DETECTION":
                             self.helper.api.inject_expectation.update(
