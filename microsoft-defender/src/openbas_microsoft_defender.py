@@ -172,8 +172,10 @@ class OpenBASMicrosoftDefender:
 
     async def _process_alerts(self, graph_client):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
-        expectations = self.helper.api.inject_expectation.expectations_for_source(
-            self.config.get_conf("collector_id")
+        expectations = (
+            self.helper.api.inject_expectation.expectations_assets_for_source(
+                self.config.get_conf("collector_id")
+            )
         )
         self.helper.collector_logger.info(
             "Found " + str(len(expectations)) + " expectations waiting to be matched"
