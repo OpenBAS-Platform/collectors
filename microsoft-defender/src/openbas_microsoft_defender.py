@@ -1,7 +1,6 @@
 import asyncio
 from datetime import datetime
 
-import msal
 import pytz
 import requests
 from azure.identity.aio import ClientSecretCredential
@@ -67,18 +66,6 @@ class OpenBASMicrosoftDefender:
         self.helper = OpenBASCollectorHelper(
             self.config, open("img/icon-microsoft-defender.png", "rb")
         )
-
-        # Graph client authentication
-        scopes = ["https://graph.microsoft.com/.default"]
-
-        # Values from app registration
-        # azure.identity.aio
-        self.credential = ClientSecretCredential(
-            tenant_id=self.config.get_conf("microsoft_defender_tenant_id"),
-            client_id=self.config.get_conf("microsoft_defender_client_id"),
-            client_secret=self.config.get_conf("microsoft_defender_client_secret"),
-        )
-        self.graph_client = GraphServiceClient(self.credential, scopes=scopes)  # type: ignore
 
     def _extract_device(self, alert):
         for evidence in alert.evidence:
@@ -183,29 +170,7 @@ class OpenBASMicrosoftDefender:
                 return "DETECTED"
         return False
 
-    def _auth(self):
-        # Authentication
-        try:
-            app = msal.ConfidentialClientApplication(
-                self.config.get_conf("microsoft_defender_client_id"),
-                authority="https://login.microsoftonline.com/"
-                + self.config.get_conf("microsoft_defender_tenant_id"),
-                client_credential=self.config.get_conf(
-                    "microsoft_defender_client_secret"
-                ),
-            )
-            result = app.acquire_token_silent(
-                "https://api.securitycenter.microsoft.com/.default", account=None
-            )
-            if not result:
-                result = app.acquire_token_for_client(
-                    scopes=["https://wdatpprd-weu.securitycenter.windows.com/.default"]
-                )
-            return result["access_token"]
-        except Exception as e:
-            raise ValueError("[ERROR] Failed generating oauth token {" + str(e) + "}")
-
-    async def _process_alerts(self):
+    async def _process_alerts(self, graph_client):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = self.helper.api.inject_expectation.expectations_for_source(
             self.config.get_conf("collector_id")
@@ -217,7 +182,7 @@ class OpenBASMicrosoftDefender:
             )
         )
         request_configuration = RequestConfiguration(query_parameters=query_params)
-        alerts = await self.graph_client.security.alerts_v2.get(
+        alerts = await graph_client.security.alerts_v2.get(
             request_configuration=request_configuration
         )
         # For each expectation, try to find the proper alert
@@ -242,8 +207,6 @@ class OpenBASMicrosoftDefender:
                 continue
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
-                # TODO Try to get the remediation action taken on the command line
-                # r = requests.get("https://security.microsoft.com/api/alerts" + str(alert.id), headers={"Content-Type": "application/json", "Authorization": "Bearer " + str(self._auth())})
                 alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
                 if alert_date > limit_date:
                     result = self._match_alert(alert, expectation)
@@ -275,12 +238,22 @@ class OpenBASMicrosoftDefender:
                             )
 
     def _process_message(self) -> None:
+        # Auth
+        scopes = ["https://graph.microsoft.com/.default"]
+        credential = ClientSecretCredential(
+            tenant_id=self.config.get_conf("microsoft_defender_tenant_id"),
+            client_id=self.config.get_conf("microsoft_defender_client_id"),
+            client_secret=self.config.get_conf("microsoft_defender_client_secret"),
+        )
+        graph_client = GraphServiceClient(credential, scopes=scopes)  # type: ignore
+
+        # Execute
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._process_alerts())
+        loop.run_until_complete(self._process_alerts(graph_client))
 
     # Start the main loop
     def start(self):
-        period = self.config.get_conf("collector_period", default=60, is_number=True)
+        period = self.config.get_conf("collector_period", default=120, is_number=True)
         self.helper.schedule(message_callback=self._process_message, delay=period)
 
 

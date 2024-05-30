@@ -62,22 +62,11 @@ class OpenBASMicrosoftEntra:
             self.config, open("img/icon-microsoft-entra.png", "rb")
         )
 
-        # Graph client authentication
-        scopes = ["https://graph.microsoft.com/.default"]
-
-        # Values from app registration
-        # azure.identity.aio
-        credential = ClientSecretCredential(
-            tenant_id=self.config.get_conf("microsoft_entra_tenant_id"),
-            client_id=self.config.get_conf("microsoft_entra_client_id"),
-            client_secret=self.config.get_conf("microsoft_entra_client_secret"),
-        )
-
-        self.graph_client = GraphServiceClient(credential, scopes)  # type: ignore
+        # External
         self.include_external = self.config.get_conf("include_external", default=False)
 
-    async def create_users(self, group_id, openbas_team):
-        members = await self.graph_client.groups.by_group_id(group_id).members.get()
+    async def create_users(self, graph_client, group_id, openbas_team):
+        members = await graph_client.groups.by_group_id(group_id).members.get()
         if members:
             for i in range(len(members.value)):
                 if members.value[i].mail is not None and (
@@ -98,7 +87,7 @@ class OpenBASMicrosoftEntra:
         # iterate over result batches > 100 rows
         while members is not None and members.odata_next_link is not None:
             members = (
-                await self.graph_client.groups.by_group_id(id)
+                await graph_client.groups.by_group_id(id)
                 .members.with_url(members.odata_next_link)
                 .get()
             )
@@ -119,8 +108,8 @@ class OpenBASMicrosoftEntra:
                         }
                         self.helper.api.user.upsert(user)
 
-    async def create_groups(self):
-        groups = await self.graph_client.groups.get()
+    async def create_groups(self, graph_client):
+        groups = await graph_client.groups.get()
         if groups:
             for i in range(len(groups.value)):
                 team = {"team_name": groups.value[i].display_name}
@@ -128,16 +117,28 @@ class OpenBASMicrosoftEntra:
                 await self.create_users(groups.value[i].id, openbas_team)
         # iterate over result batches > 100 rows
         while groups is not None and groups.odata_next_link is not None:
-            groups = await self.graph_client.groups.with_url(groups.odata_next_link)
+            groups = await graph_client.groups.with_url(groups.odata_next_link)
             if groups:
                 for i in range(len(groups.value)):
                     team = {"team_name": groups.value[i].display_name}
                     openbas_team = self.helper.api.team.upsert(team)
-                    await self.create_users(groups.value[i].id, openbas_team)
+                    await self.create_users(
+                        graph_client, groups.value[i].id, openbas_team
+                    )
 
     def _process_message(self) -> None:
+        # Auth
+        scopes = ["https://graph.microsoft.com/.default"]
+        credential = ClientSecretCredential(
+            tenant_id=self.config.get_conf("microsoft_entra_tenant_id"),
+            client_id=self.config.get_conf("microsoft_entra_client_id"),
+            client_secret=self.config.get_conf("microsoft_entra_client_secret"),
+        )
+        graph_client = GraphServiceClient(credential, scopes)  # type: ignore
+
+        # Execute
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.create_groups())
+        loop.run_until_complete(self.create_groups(graph_client))
 
     # Start the main loop
     def start(self):

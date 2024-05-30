@@ -246,7 +246,7 @@ class OpenBASTaniumThreatResponse:
 
     # Start the main loop
     def start(self):
-        period = self.config.get_conf("collector_period", default=60, is_number=True)
+        period = self.config.get_conf("collector_period", default=120, is_number=True)
         self.helper.schedule(message_callback=self._process_message, delay=period)
 
 
