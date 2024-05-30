@@ -194,6 +194,13 @@ class OpenBASMicrosoftDefender:
                 expectation["inject_expectation_created_at"]
             ).astimezone(pytz.UTC)
             if expectation_date < limit_date:
+                self.helper.collector_logger.info(
+                    "Expectation expired, failing inject "
+                    + expectation["inject_expectation_inject"]
+                    + " ("
+                    + expectation["inject_expectation_type"]
+                    + ")"
+                )
                 self.helper.api.inject_expectation.update(
                     expectation["inject_expectation_id"],
                     {
@@ -219,6 +226,13 @@ class OpenBASMicrosoftDefender:
                 if alert_date > limit_date:
                     result = self._match_alert(endpoint, alert, expectation)
                     if result is not False:
+                        self.helper.collector_logger.info(
+                            "Expectation matched, fulfilling expectation "
+                            + expectation["inject_expectation_inject"]
+                            + " ("
+                            + expectation["inject_expectation_type"]
+                            + ")"
+                        )
                         if expectation["inject_expectation_type"] == "DETECTION":
                             self.helper.api.inject_expectation.update(
                                 expectation["inject_expectation_id"],

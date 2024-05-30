@@ -224,6 +224,13 @@ class OpenBASTaniumThreatResponse:
                 expectation["inject_expectation_created_at"]
             ).astimezone(pytz.UTC)
             if expectation_date < limit_date:
+                self.helper.collector_logger.info(
+                    "Expectation expired, failing inject "
+                    + expectation["inject_expectation_inject"]
+                    + " ("
+                    + expectation["inject_expectation_type"]
+                    + ")"
+                )
                 self.helper.api.inject_expectation.update(
                     expectation["inject_expectation_id"],
                     {
@@ -243,6 +250,13 @@ class OpenBASTaniumThreatResponse:
                 alert_date = parse(alert["createdAt"]).astimezone(pytz.UTC)
                 if alert_date > limit_date and alert["state"] != "suppressed":
                     if self._match_alert(endpoint, alert, expectation):
+                        self.helper.collector_logger.info(
+                            "Expectation matched, fulfilling expectation "
+                            + expectation["inject_expectation_inject"]
+                            + " ("
+                            + expectation["inject_expectation_type"]
+                            + ")"
+                        )
                         self.helper.api.inject_expectation.update(
                             expectation["inject_expectation_id"],
                             {
