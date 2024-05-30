@@ -209,6 +209,9 @@ class OpenBASTaniumThreatResponse:
                 self.config.get_conf("collector_id")
             )
         )
+        self.helper.collector_logger.info(
+            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+        )
         alerts = self.tanium_api_handler._query(
             "get",
             "/plugin/products/threat-response/api/v1/alerts",
@@ -231,6 +234,9 @@ class OpenBASTaniumThreatResponse:
                     },
                 )
                 continue
+            self.helper.collector_logger.info(
+                "Found " + str(len(alerts)) + " alerts (taking first 50)"
+            )
             for alert in alerts[:50]:
                 alert_date = parse(alert["createdAt"]).astimezone(pytz.UTC)
                 if alert_date > limit_date and alert["state"] != "suppressed":

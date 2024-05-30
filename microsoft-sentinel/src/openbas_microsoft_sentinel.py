@@ -194,6 +194,9 @@ class OpenBASMicrosoftSentinel:
         expectations = self.helper.api.inject_expectation.expectations_for_source(
             self.config.get_conf("collector_id")
         )
+        self.helper.collector_logger.info(
+            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+        )
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
 
         # Retrieve alerts
@@ -203,7 +206,7 @@ class OpenBASMicrosoftSentinel:
             + self.config.get_conf("microsoft_sentinel_workspace_id")
             + "/query"
         )
-        body = {"query": "SecurityAlert | sort by TimeGenerated desc"}
+        body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 50"}
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
         if len(data["tables"]) == 0:
             return
@@ -231,7 +234,12 @@ class OpenBASMicrosoftSentinel:
                     },
                 )
                 continue
-            for alert in data["tables"][0]["rows"][:50]:
+            self.helper.collector_logger.info(
+                "Found "
+                + str(len(data["tables"][0]["rows"]))
+                + " alerts (taking first 50)"
+            )
+            for alert in data["tables"][0]["rows"]:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)

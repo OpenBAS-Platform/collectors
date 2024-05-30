@@ -175,6 +175,9 @@ class OpenBASMicrosoftDefender:
         expectations = self.helper.api.inject_expectation.expectations_for_source(
             self.config.get_conf("collector_id")
         )
+        self.helper.collector_logger.info(
+            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+        )
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
         query_params = (
             Alerts_v2RequestBuilder.Alerts_v2RequestBuilderGetQueryParameters(
@@ -205,6 +208,9 @@ class OpenBASMicrosoftDefender:
                     },
                 )
                 continue
+            self.helper.collector_logger.info(
+                "Found " + str(len(alerts.value)) + " alerts (taking first 50)"
+            )
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
                 alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
