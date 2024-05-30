@@ -178,7 +178,7 @@ class OpenBASMicrosoftDefender:
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
         query_params = (
             Alerts_v2RequestBuilder.Alerts_v2RequestBuilderGetQueryParameters(
-                orderby=["createdDateTime DESC"], top=100
+                orderby=["createdDateTime DESC"], top=50
             )
         )
         request_configuration = RequestConfiguration(query_parameters=query_params)

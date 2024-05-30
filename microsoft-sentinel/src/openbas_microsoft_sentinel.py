@@ -231,7 +231,7 @@ class OpenBASMicrosoftSentinel:
                     },
                 )
                 continue
-            for alert in data["tables"][0]["rows"]:
+            for alert in data["tables"][0]["rows"][:50]:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)

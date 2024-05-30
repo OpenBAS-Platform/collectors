@@ -231,7 +231,7 @@ class OpenBASTaniumThreatResponse:
                     },
                 )
                 continue
-            for alert in alerts:
+            for alert in alerts[:50]:
                 alert_date = parse(alert["createdAt"]).astimezone(pytz.UTC)
                 if alert_date > limit_date and alert["state"] != "suppressed":
                     if self._match_alert(alert, expectation):
