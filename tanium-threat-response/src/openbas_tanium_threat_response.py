@@ -216,6 +216,9 @@ class OpenBASTaniumThreatResponse:
             "/plugin/products/threat-response/api/v1/alerts",
             {"sort": "-createdAt"},
         )
+        self.helper.collector_logger.info(
+            "Found " + str(len(alerts)) + " alerts (taking first 200)"
+        )
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
         # For each expectation, try to find the proper alert
         for expectation in expectations:
@@ -240,9 +243,6 @@ class OpenBASTaniumThreatResponse:
                     },
                 )
                 continue
-            self.helper.collector_logger.info(
-                "Found " + str(len(alerts)) + " alerts (taking first 200)"
-            )
             endpoint = self.helper.api.endpoint.get(
                 expectation["inject_expectation_asset"]
             )

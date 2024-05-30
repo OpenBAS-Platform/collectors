@@ -209,6 +209,9 @@ class OpenBASMicrosoftSentinel:
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
         if len(data["tables"]) == 0:
             return
+        self.helper.collector_logger.info(
+            "Found " + str(len(data["tables"][0]["rows"])) + " alerts"
+        )
         columns = data["tables"][0]["columns"]
         columns_index = {}
         for idx, column in enumerate(columns):
@@ -240,11 +243,6 @@ class OpenBASMicrosoftSentinel:
                     },
                 )
                 continue
-            self.helper.collector_logger.info(
-                "Found "
-                + str(len(data["tables"][0]["rows"]))
-                + " alerts (taking first 50)"
-            )
             endpoint = self.helper.api.endpoint.get(
                 expectation["inject_expectation_asset"]
             )

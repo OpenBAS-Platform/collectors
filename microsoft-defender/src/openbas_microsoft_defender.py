@@ -187,6 +187,7 @@ class OpenBASMicrosoftDefender:
         alerts = await graph_client.security.alerts_v2.get(
             request_configuration=request_configuration
         )
+        self.helper.collector_logger.info("Found " + str(len(alerts.value)) + " alerts")
         # For each expectation, try to find the proper alert
         for expectation in expectations:
             # Check expired expectation
@@ -214,9 +215,6 @@ class OpenBASMicrosoftDefender:
                     },
                 )
                 continue
-            self.helper.collector_logger.info(
-                "Found " + str(len(alerts.value)) + " alerts"
-            )
             endpoint = self.helper.api.endpoint.get(
                 expectation["inject_expectation_asset"]
             )
