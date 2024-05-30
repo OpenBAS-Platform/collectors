@@ -156,9 +156,10 @@ class OpenBASMicrosoftDefender:
                     # ratio = fuzz.ratio(command_line, signature["value"])
                     ratio = 100
                     if ratio > 50:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
+                        # TODO given the above todo, we avoid logging
+                        # self.helper.collector_logger.info(
+                        #    "MATCHING! (score: " + str(ratio) + ")"
+                        # )
                         matching_number = matching_number + 1
                         break
 
