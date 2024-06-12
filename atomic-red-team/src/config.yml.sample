@@ -1,0 +1,10 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Atomic Red Team'
+  period: 3600
+  log_level: 'info'
+

@@ -138,11 +138,21 @@ class OpenBASMicrosoftSentinel:
         self.helper.collector_logger.info(
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
         )
+
+        # Take only the relevant signatures
+        signature_types = ["process_name", "command_line", "hostname", "ipv4_address"]
+        relevant_signatures = [
+            s
+            for s in expectation["inject_expectation_signatures"]
+            if s["type"] in signature_types
+        ]
+
         # Matching logics
-        signatures_number = len(expectation["inject_expectation_signatures"])
+        signatures_number = len(relevant_signatures)
         matching_number = 0
+
         # Match signature values to alert
-        for signature in expectation["inject_expectation_signatures"]:
+        for signature in relevant_signatures:
             if signature["type"] == "process_name":
                 process_names = self._extract_process_names(columns_index, alert)
                 for process_name in process_names:
