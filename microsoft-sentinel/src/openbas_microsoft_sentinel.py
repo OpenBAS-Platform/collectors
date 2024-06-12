@@ -1,11 +1,16 @@
 import json
+import urllib.parse
 from datetime import datetime
 
 import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 from sentinel_api_handler import SentinelApiHandler
 from thefuzz import fuzz
 
@@ -85,6 +90,19 @@ class OpenBASMicrosoftSentinel:
             self.config.get_conf("microsoft_sentinel_client_secret"),
         )
 
+        # Initialize signatures helper
+        self.relevant_signatures_types = [
+            "process_name",
+            "command_line",
+            "file_name",
+            "hostname",
+            "ipv4_address",
+            "ipv6_address",
+        ]
+        self.openbas_detection_helper = OpenBASDetectionHelper(
+            self.helper.collector_logger, self.relevant_signatures_types
+        )
+
     def _extract_device(self, columns_index, alert):
         entities = json.loads(alert[columns_index["Entities"]])
         for entity in entities:
@@ -111,6 +129,36 @@ class OpenBASMicrosoftSentinel:
                 command_lines.append(entity["CommandLine"])
         return command_lines
 
+    def _extract_file_names(self, columns_index, alert):
+        file_names = []
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "process":
+                if "ImageFile" in entity and "Name" in entity["ImageFile"]:
+                    file_names.append(entity["ImageFile"]["Name"])
+            elif "Type" in entity and entity["Type"] == "file":
+                file_names.append(entity["Name"])
+        return file_names
+
+    def _extract_hostnames(self, columns_index, alert):
+        hostnames = []
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "dns":
+                hostnames.append(entity["DomainName"])
+            elif "Type" in entity and entity["Type"] == "url":
+                parsed_url = urllib.parse.urlparse(entity["Url"])
+                hostnames.append(parsed_url.netloc)
+        return hostnames
+
+    def _extract_ip_addresses(self, columns_index, alert):
+        ip_addresses = []
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "ip":
+                ip_addresses.append(entity["Address"])
+        return ip_addresses
+
     def _is_prevented(self, columns_index, alert):
         extended_properties = json.loads(alert[columns_index["ExtendedProperties"]])
         if "Action" in extended_properties and extended_properties["Action"] in [
@@ -122,6 +170,7 @@ class OpenBASMicrosoftSentinel:
         return False
 
     def _match_alert(self, endpoint, columns_index, alert, expectation):
+        print(alert)
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert[columns_index["SystemAlertId"]])
@@ -139,60 +188,51 @@ class OpenBASMicrosoftSentinel:
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
         )
 
-        # Take only the relevant signatures
-        signature_types = ["process_name", "command_line", "hostname", "ipv4_address"]
-        relevant_signatures = [
-            s
-            for s in expectation["inject_expectation_signatures"]
-            if s["type"] in signature_types
-        ]
-
-        # Matching logics
-        signatures_number = len(relevant_signatures)
-        matching_number = 0
-
-        # Match signature values to alert
-        for signature in relevant_signatures:
-            if signature["type"] == "process_name":
-                process_names = self._extract_process_names(columns_index, alert)
-                for process_name in process_names:
-                    self.helper.collector_logger.info(
-                        "Comparing process names ("
-                        + process_name
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    ratio = fuzz.ratio(process_name, signature["value"])
-                    if ratio > 90:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
-                        matching_number = matching_number + 1
-                        break
-            elif signature["type"] == "command_line":
-                command_lines = self._extract_command_lines(columns_index, alert)
-                if len(command_lines) == 0:
-                    matching_number = matching_number + 1
-                    break
-                for command_line in command_lines:
-                    self.helper.collector_logger.info(
-                        "Comparing command lines ("
-                        + command_line
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    ratio = fuzz.ratio(command_line, signature["value"])
-                    if ratio > 50:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
-                        matching_number = matching_number + 1
-                        break
-
-        if signatures_number == matching_number:
-            if self._is_prevented(columns_index, alert):
+        alert_data = {}
+        for type in self.relevant_signatures_types:
+            alert_data[type] = {}
+            if type == "process_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_process_names(alert),
+                    "score": 90,
+                }
+            elif type == "command_line":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_command_lines(alert),
+                    "score": 60,
+                }
+            elif type == "file_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_file_names(alert),
+                    "score": 90,
+                }
+            elif type == "hostname":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_hostnames(alert),
+                    "score": 90,
+                }
+            elif type == "ipv4_address":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_ip_addresses(alert),
+                    "score": 90,
+                }
+            elif type == "ipv6_address":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_ip_addresses(alert),
+                    "score": 90,
+                }
+        match_result = self.openbas_detection_helper.match_alert_elements(
+            signatures=expectation["inject_expectation_signatures"],
+            alert_data=alert_data,
+        )
+        if match_result:
+            if self._is_prevented(alert):
                 return "PREVENTED"
             else:
                 return "DETECTED"
@@ -262,6 +302,7 @@ class OpenBASMicrosoftSentinel:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
+                print(alert)
                 if alert_date > limit_date:
                     result = self._match_alert(
                         endpoint, columns_index, alert, expectation

@@ -5,7 +5,11 @@ import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 from tanium_api_handler import TaniumApiHandler
 from thefuzz import fuzz
 
@@ -72,6 +76,19 @@ class OpenBASTaniumThreatResponse:
             self.config.get_conf("tanium_url"),
             self.config.get_conf("tanium_token"),
             self.config.get_conf("tanium_ssl_verify"),
+        )
+
+        # Initialize signatures helper
+        self.relevant_signatures_types = [
+            "process_name",
+            "command_line",
+            "file_name",
+            "hostname",
+            "ipv4_address",
+            "ipv6_address",
+        ]
+        self.openbas_detection_helper = OpenBASDetectionHelper(
+            self.helper.collector_logger, self.relevant_signatures_types
         )
 
     # Recursive function
@@ -155,59 +172,42 @@ class OpenBASTaniumThreatResponse:
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
         )
 
-        # Take only the relevant signatures
-        signature_types = ["process_name", "command_line", "hostname", "ipv4_address"]
-        relevant_signatures = [
-            s
-            for s in expectation["inject_expectation_signatures"]
-            if s["type"] in signature_types
-        ]
+        alert_data = {}
+        for type in self.relevant_signatures_types:
+            alert_data[type] = {}
+            if type == "process_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_process_names(alert),
+                    "score": 90,
+                }
+            elif type == "command_line":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_command_lines(alert),
+                    "score": 60,
+                }
+            elif type == "file_name":
+                alert_data[type] = {
+                    "type": "simple",
+                    "data": str(alert),
+                }
+            elif type == "hostname":
+                alert_data[type] = {
+                    "type": "simple",
+                    "data": str(alert),
+                }
+            elif type == "ipv4_address":
+                alert_data[type] = {
+                    "type": "simple",
+                    "data": str(alert),
+                }
+        match_result = self.openbas_detection_helper.match_alert_elements(
+            signatures=expectation["inject_expectation_signatures"],
+            alert_data=alert_data,
+        )
 
-        # Matching logics
-        signatures_number = len(relevant_signatures)
-        matching_number = 0
-
-        # Match signature values to alert
-        for signature in relevant_signatures:
-            if signature["type"] == "process_name":
-                process_names = self._extract_process_names(alert_details)
-                for process_name in process_names:
-                    self.helper.collector_logger.info(
-                        "Comparing process names ("
-                        + process_name
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    ratio = fuzz.ratio(process_name, signature["value"])
-                    if ratio > 90:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
-                        matching_number = matching_number + 1
-                        break
-            elif signature["type"] == "command_line":
-                command_lines = self._extract_command_lines(alert_details)
-                if len(command_lines) == 0:
-                    matching_number = matching_number + 1
-                    break
-                for command_line in command_lines:
-                    self.helper.collector_logger.info(
-                        "Comparing command lines ("
-                        + command_line
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    ratio = fuzz.ratio(command_line, signature["value"])
-                    if ratio > 50:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
-                        matching_number = matching_number + 1
-                        break
-
-        if signatures_number == matching_number:
+        if match_result:
             return True
         return False
 

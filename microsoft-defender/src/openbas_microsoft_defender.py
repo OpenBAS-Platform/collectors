@@ -1,4 +1,5 @@
 import asyncio
+import urllib.parse
 from datetime import datetime
 
 import pytz
@@ -11,8 +12,11 @@ from msgraph.generated.security.alerts_v2.alerts_v2_request_builder import (
     Alerts_v2RequestBuilder,
     RequestConfiguration,
 )
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
-from thefuzz import fuzz
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 
 
 class OpenBASMicrosoftDefender:
@@ -67,6 +71,20 @@ class OpenBASMicrosoftDefender:
             self.config, open("img/icon-microsoft-defender.png", "rb")
         )
 
+        # Initialize signatures helper
+        # TODO Command line
+        # self.relevant_signatures_types = ["process_name", "command_line", "file_name", "hostname", "ipv4_address"]
+        self.relevant_signatures_types = [
+            "process_name",
+            "file_name",
+            "hostname",
+            "ipv4_address",
+            "ipv6_address",
+        ]
+        self.openbas_detection_helper = OpenBASDetectionHelper(
+            self.helper.collector_logger, self.relevant_signatures_types
+        )
+
     def _extract_device(self, alert):
         for evidence in alert.evidence:
             if evidence.odata_type == "#microsoft.graph.security.deviceEvidence":
@@ -89,6 +107,28 @@ class OpenBASMicrosoftDefender:
                 command_lines.append(evidence.process_command_line)
         return command_lines
 
+    def _extract_hostnames(self, alert):
+        hostnames = []
+        for evidence in alert.evidence:
+            if evidence.odata_type == "#microsoft.graph.security.urlEvidence":
+                parsed_url = urllib.parse.urlparse(evidence.url)
+                hostnames.append(parsed_url.netloc)
+        return hostnames
+
+    def _extract_file_names(self, alert):
+        file_names = []
+        for evidence in alert.evidence:
+            if evidence.odata_type == "#microsoft.graph.security.fileEvidence":
+                file_names.append(evidence.file_details.file_name)
+        return file_names
+
+    def _extract_ip_addresses(self, alert):
+        ip_addresses = []
+        for evidence in alert.evidence:
+            if evidence.odata_type == "#microsoft.graph.security.ipEvidence":
+                ip_addresses.append(evidence.ip_address)
+        return ip_addresses
+
     def _is_prevented(self, alert):
         for evidence in alert.evidence:
             if evidence.odata_type == "#microsoft.graph.security.processEvidence":
@@ -107,9 +147,11 @@ class OpenBASMicrosoftDefender:
             + " with expectation "
             + expectation["inject_expectation_id"]
         )
+
         # No asset
         if expectation["inject_expectation_asset"] is None:
             return False
+
         # Check hostname
         hostname = self._extract_device(alert)
         if hostname is None or hostname != endpoint["endpoint_hostname"]:
@@ -118,62 +160,51 @@ class OpenBASMicrosoftDefender:
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
         )
 
-        # Take only the relevant signatures
-        signature_types = ["process_name", "command_line", "hostname", "ipv4_address"]
-        relevant_signatures = [
-            s
-            for s in expectation["inject_expectation_signatures"]
-            if s["type"] in signature_types
-        ]
-
-        # Matching logics
-        signatures_number = len(relevant_signatures)
-        matching_number = 0
-
-        # Match signature values to alert
-        for signature in relevant_signatures:
-            if signature["type"] == "process_name":
-                process_names = self._extract_process_names(alert)
-                for process_name in process_names:
-                    self.helper.collector_logger.info(
-                        "Comparing process names ("
-                        + process_name
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    ratio = fuzz.ratio(process_name, signature["value"])
-                    if ratio > 90:
-                        self.helper.collector_logger.info(
-                            "MATCHING! (score: " + str(ratio) + ")"
-                        )
-                        matching_number = matching_number + 1
-                        break
-            elif signature["type"] == "command_line":
-                command_lines = self._extract_command_lines(alert)
-                if len(command_lines) == 0:
-                    matching_number = matching_number + 1
-                    break
-                for command_line in command_lines:
-                    self.helper.collector_logger.info(
-                        "Comparing command lines ("
-                        + command_line
-                        + ", "
-                        + signature["value"]
-                        + ")"
-                    )
-                    # TODO Get the proper command line from Defender in the remediation action
-                    # ratio = fuzz.ratio(command_line, signature["value"])
-                    ratio = 100
-                    if ratio > 50:
-                        # TODO given the above todo, we avoid logging
-                        # self.helper.collector_logger.info(
-                        #    "MATCHING! (score: " + str(ratio) + ")"
-                        # )
-                        matching_number = matching_number + 1
-                        break
-
-        if signatures_number == matching_number:
+        alert_data = {}
+        for type in self.relevant_signatures_types:
+            alert_data[type] = {}
+            if type == "process_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_process_names(alert),
+                    "score": 90,
+                }
+            elif type == "command_line":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_command_lines(alert),
+                    "score": 60,
+                }
+                alert_data[type]["fuzzy"] = 60
+            elif type == "file_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_file_names(alert),
+                    "score": 90,
+                }
+            elif type == "hostname":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_hostnames(alert),
+                    "score": 90,
+                }
+            elif type == "ipv4_address":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_ip_addresses(alert),
+                    "score": 90,
+                }
+            elif type == "ipv6_address":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_ip_addresses(alert),
+                    "score": 90,
+                }
+        match_result = self.openbas_detection_helper.match_alert_elements(
+            signatures=expectation["inject_expectation_signatures"],
+            alert_data=alert_data,
+        )
+        if match_result:
             if self._is_prevented(alert):
                 return "PREVENTED"
             else:
