@@ -11,7 +11,6 @@ from pyobas.helpers import (
     OpenBASDetectionHelper,
 )
 from tanium_api_handler import TaniumApiHandler
-from thefuzz import fuzz
 
 
 class OpenBASTaniumThreatResponse:
@@ -178,13 +177,13 @@ class OpenBASTaniumThreatResponse:
             if type == "process_name":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_process_names(alert),
+                    "data": self._extract_process_names(alert_details),
                     "score": 90,
                 }
             elif type == "command_line":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_command_lines(alert),
+                    "data": self._extract_command_lines(alert_details),
                     "score": 60,
                 }
             elif type == "file_name":

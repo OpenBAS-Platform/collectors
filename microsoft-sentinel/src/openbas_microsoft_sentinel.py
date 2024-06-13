@@ -12,7 +12,6 @@ from pyobas.helpers import (
     OpenBASDetectionHelper,
 )
 from sentinel_api_handler import SentinelApiHandler
-from thefuzz import fuzz
 
 
 class OpenBASMicrosoftSentinel:
