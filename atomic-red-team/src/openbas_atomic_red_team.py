@@ -1,12 +1,40 @@
 import requests
+import yaml
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
-ENTERPRISE_ATTACK_URI = (
-    "https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json"
-)
+ATOMIC_RED_TEAM_INDEX = "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/master/atomics/Indexes/index.yaml"
+
+PLATFORMS = {
+    "windows": "Windows",
+    "linux": "Linux",
+    "macos": "MacOS",
+    "azure-ad": "Windows",
+    "office-365": "Windows",
+    "containers": "Linux",
+    "iaas:aws": ["Windows", "Linux", "MacOS"],
+    "iaas:gcp": ["Windows", "Linux", "MacOS"],
+    "iaas:azure": "Windows",
+    "google-workspace": ["Windows", "Linux", "MacOS"],
+}
+
+EXECUTORS = {
+    "powershell": "psh",
+    "command_prompt": "cmd",
+    "bash": "bash",
+    "sh": "sh",
+    "manual": "manual",
+}
 
 
-class OpenBASMitre:
+def flatten_chain(matrix):
+    if matrix == []:
+        return matrix
+    if isinstance(matrix[0], list):
+        return flatten_chain(matrix[0]) + flatten_chain(matrix[1:])
+    return matrix[:1] + flatten_chain(matrix[1:])
+
+
+class OpenBASAtomicRedTeam:
     def __init__(self):
         self.session = requests.Session()
         self.config = OpenBASConfigHelper(
@@ -30,7 +58,7 @@ class OpenBASMitre:
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
                     "file_path": ["collector", "type"],
-                    "default": "openbas_mitre_attack",
+                    "default": "openbas_atomic_red_team",
                 },
                 "collector_log_level": {
                     "env": "COLLECTOR_LOG_LEVEL",
@@ -43,111 +71,99 @@ class OpenBASMitre:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            self.config, open("img/icon-mitre-attack.png", "rb")
+            self.config, open("img/icon-atomic-red-team.png", "rb")
         )
 
-    def _kill_chain_phases(self, tactics):
-        kill_chain_name = "mitre-attack"
-        kill_chain_phases = []
-        for tactic in tactics:
-            phase_stix_id = tactic.get("id")
-            phase_shortname = tactic.get("x_mitre_shortname")
-            phase_name = tactic.get("name")
-            phase_description = tactic.get("description")
-            phase_external_id = ""
-            external_references = tactic.get("external_references")
-            for external_reference in external_references:
-                if external_reference.get("source_name") == "mitre-attack":
-                    phase_external_id = external_reference.get("external_id")
-            kill_chain_phase = {
-                "phase_kill_chain_name": kill_chain_name,
-                "phase_stix_id": phase_stix_id,
-                "phase_external_id": phase_external_id,
-                "phase_shortname": phase_shortname,
-                "phase_name": phase_name,
-                "phase_description": phase_description,
-            }
-            kill_chain_phases.append(kill_chain_phase)
-        result = self.helper.api.kill_chain_phase.upsert(kill_chain_phases)
-        return result
-
-    def _attack_patterns(self, attacks, kill_chain_phases, relationships):
-        attack_patterns = []
-        for attack in attacks:
-            stix_id = attack.get("id")
-            attack_pattern_name = attack.get("name")
-            attack_pattern_description = attack.get("description")
-            attack_pattern_platforms = attack.get("x_mitre_platforms", [])
-            attack_pattern_permissions_required = attack.get(
-                "x_mitre_permissions_required", []
-            )
-            attack_pattern_kill_chain_phases_short_names = list(
-                map(
-                    lambda chain: chain.get("phase_name"),
-                    attack.get("kill_chain_phases", []),
-                )
-            )
-            attack_pattern_external_id = ""
-            external_references = attack.get("external_references")
-            for external_reference in external_references:
-                if external_reference.get("source_name") == "mitre-attack":
-                    attack_pattern_external_id = external_reference.get("external_id")
-            # Find a possible parent in relationships
-            attack_pattern_parent = None
-            for relationship in relationships:
-                if relationship["source_ref"] == stix_id:  # subtechnique-of
-                    attack_pattern_parent = relationship["target_ref"]
-                    break
-            attack_pattern_kill_chain_phases_ids = [
-                x.get("phase_id")
-                for x in kill_chain_phases
-                if x.get("phase_shortname")
-                in attack_pattern_kill_chain_phases_short_names
-            ]
-            attack_pattern = {
-                "attack_pattern_name": attack_pattern_name,
-                "attack_pattern_stix_id": stix_id,
-                "attack_pattern_external_id": attack_pattern_external_id,
-                "attack_pattern_description": attack_pattern_description,
-                "attack_pattern_platforms": attack_pattern_platforms,
-                "attack_pattern_permissions_required": attack_pattern_permissions_required,
-                "attack_pattern_kill_chain_phases": attack_pattern_kill_chain_phases_ids,
-                "attack_pattern_parent": attack_pattern_parent,
-            }
-            attack_patterns.append(attack_pattern)
-        # print(attack_patterns)
-        self.helper.api.attack_pattern.upsert(attack_patterns)
-
     def _process_message(self) -> None:
-        response = self.session.get(url=ENTERPRISE_ATTACK_URI)
-        enterprise_attack = response.json()
-        objects = enterprise_attack.get("objects")
-        tactics = []
-        attack_patterns = []
-        relationships = []
-        # Generate items
-        for item in objects:
-            object_type = item.get("type")
-            if object_type == "attack-pattern" and not item.get("revoked"):
-                attack_patterns.append(item)
-            if object_type == "x-mitre-tactic":
-                tactics.append(item)
-            if (
-                object_type == "relationship"
-                and item.get("relationship_type") == "subtechnique-of"
-            ):
-                relationships.append(item)
-        # Sync kill chain phases
-        kill_chain_phases = self._kill_chain_phases(tactics)
-        # Sync attack patterns
-        self._attack_patterns(attack_patterns, kill_chain_phases, relationships)
+        response = self.session.get(url=ATOMIC_RED_TEAM_INDEX)
+        art_index = yaml.safe_load(response.text)
+        for kill_chain_phase in art_index:
+            self.helper.collector_logger.info(
+                "Importing kill chain phase " + kill_chain_phase
+            )
+            for attack_pattern in art_index[kill_chain_phase]:
+                self.helper.collector_logger.info(
+                    "Importing attack pattern " + attack_pattern
+                )
+                for atomic_test in art_index[kill_chain_phase][attack_pattern][
+                    "atomic_tests"
+                ]:
+                    arguments = []
+                    if "input_arguments" in atomic_test:
+                        for input_argument in atomic_test["input_arguments"]:
+                            atomic_input_argument = atomic_test["input_arguments"][
+                                input_argument
+                            ]
+                            argument = {
+                                "type": "text",
+                                "key": input_argument,
+                                "default_value": atomic_input_argument["default"],
+                            }
+                            arguments.append(argument)
+                    prerequisites = []
+                    if "dependencies" in atomic_test:
+                        for dependency in atomic_test["dependencies"]:
+                            prerequisite = {
+                                "executor": atomic_test.get(
+                                    "dependency_executor_name",
+                                    EXECUTORS[atomic_test["executor"]["name"]],
+                                ),
+                                "description": dependency["description"],
+                                "get_command": dependency["get_prereq_command"],
+                                "check_command": dependency["prereq_command"],
+                            }
+                            prerequisites.append(prerequisite)
+                    if (
+                        "executor" in atomic_test
+                        and "command" in atomic_test["executor"]
+                    ):
+                        self.helper.collector_logger.info(
+                            "Importing atomic test " + atomic_test["name"]
+                        )
+                        platforms = list(
+                            dict.fromkeys(
+                                flatten_chain(
+                                    [
+                                        PLATFORMS[platform]
+                                        for platform in atomic_test[
+                                            "supported_platforms"
+                                        ]
+                                    ]
+                                )
+                            )
+                        )
+                        platforms.sort()
+                        payload = {
+                            "payload_external_id": atomic_test["auto_generated_guid"],
+                            "payload_type": "Command",
+                            "payload_collector": self.helper.config.get("collector_id"),
+                            "payload_name": atomic_test["name"],
+                            "payload_description": atomic_test["description"],
+                            "payload_platforms": platforms,
+                            "payload_attack_patterns": [attack_pattern],
+                            "payload_arguments": arguments,
+                            "command_executor": EXECUTORS[
+                                atomic_test["executor"]["name"]
+                            ],
+                            "command_content": atomic_test["executor"]["command"],
+                            "payload_cleanup_command": atomic_test["executor"].get(
+                                "cleanup_command", None
+                            ),
+                            "payload_cleanup_executor": EXECUTORS[
+                                atomic_test["executor"]["name"]
+                            ],
+                            "payload_prerequisites": prerequisites,
+                        }
+                        self.helper.api.payload.upsert(payload)
 
     # Start the main loop
     def start(self):
-        period = self.config.get_conf("collector_period", default=3600, is_number=True)
+        period = self.config.get_conf(
+            "collector_period", default=604800, is_number=True
+        )  # 7 days
         self.helper.schedule(message_callback=self._process_message, delay=period)
 
 
 if __name__ == "__main__":
-    openBASMitre = OpenBASMitre()
-    openBASMitre.start()
+    openBASAtomicRedTeam = OpenBASAtomicRedTeam()
+    openBASAtomicRedTeam.start()

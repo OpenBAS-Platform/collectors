@@ -5,6 +5,6 @@ openbas:
 collector:
   id: 'changeme'
   name: 'MITRE ATT&CK'
-  period: 3600
+  period: 604800
   log_level: 'info'
 

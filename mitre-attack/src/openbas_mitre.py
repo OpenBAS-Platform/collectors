@@ -144,7 +144,9 @@ class OpenBASMitre:
 
     # Start the main loop
     def start(self):
-        period = self.config.get_conf("collector_period", default=3600, is_number=True)
+        period = self.config.get_conf(
+            "collector_period", default=604800, is_number=True
+        )  # 7 days
         self.helper.schedule(message_callback=self._process_message, delay=period)
 
 

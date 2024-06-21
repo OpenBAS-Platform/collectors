@@ -73,6 +73,10 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: docker build -t openbas/collector-microsoft-sentinel:latest . && docker tag openbas/collector-microsoft-sentinel:latest openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
       - run:
+          working_directory: ~/openbas/atomic-red-team
+          name: Build Docker image openbas/collector-atomic-red-team
+          command: docker build -t openbas/collector-atomic-red-team:latest . && docker tag openbas/collector-atomic-red-team:latest openbas/collector-atomic-red-team:${CIRCLE_TAG}
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -86,6 +90,8 @@ jobs:
             docker push openbas/collector-microsoft-defender:${CIRCLE_TAG}
             docker push openbas/collector-microsoft-sentinel:latest
             docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
+            docker push openbas/collector-atomic-red-team:latest
+            docker push openbas/collector-atomic-red-team:${CIRCLE_TAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -121,6 +127,10 @@ jobs:
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: docker build -t openbas/collector-microsoft-sentinel:rolling .
       - run:
+          working_directory: ~/openbas/atomic-red-team
+          name: Build Docker image openbas/collector-atomic-red-team
+          command: docker build -t openbas/collector-atomic-red-team:rolling .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -129,6 +139,7 @@ jobs:
             docker push openbas/collector-tanium-threat-response:rolling
             docker push openbas/collector-microsoft-defender:rolling
             docker push openbas/collector-microsoft-sentinel:rolling
+            docker push openbas/collector-atomic-red-team:rolling
       - slack/notify:
           event: fail
           template: basic_fail_1
