@@ -104,10 +104,12 @@ class OpenBASAtomicRedTeam:
                     if "dependencies" in atomic_test:
                         for dependency in atomic_test["dependencies"]:
                             prerequisite = {
-                                "executor": atomic_test.get(
-                                    "dependency_executor_name",
-                                    EXECUTORS[atomic_test["executor"]["name"]],
-                                ),
+                                "executor": EXECUTORS[
+                                    atomic_test.get(
+                                        "dependency_executor_name",
+                                        atomic_test["executor"]["name"],
+                                    )
+                                ],
                                 "description": dependency["description"],
                                 "get_command": dependency["get_prereq_command"],
                                 "check_command": dependency["prereq_command"],
