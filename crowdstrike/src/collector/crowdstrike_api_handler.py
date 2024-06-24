@@ -1,7 +1,3 @@
-######################
-# CROWDSTRIKE API HANDLER #
-######################
-
 from falconpy import IOC as CrowdstrikeIOC
 
 from .utils import Utils
@@ -46,4 +42,3 @@ class CrowdstrikeApiHandler:
                 extracted_iocs.append(Utils.format_ioc("Subdomains", ioc))
 
         return extracted_iocs
-
