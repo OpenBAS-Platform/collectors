@@ -3,7 +3,9 @@
 ######################
 
 from falconpy import IOC as CrowdstrikeIOC
+
 from .utils import Utils
+
 
 class CrowdstrikeApiHandler:
     def __init__(self, helper, client_id, client_secret, base_url):

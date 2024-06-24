@@ -1,7 +1,5 @@
-from pyobas.helpers import (
-    OpenBASCollectorHelper,
-    OpenBASConfigHelper,
-)
+from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+
 from .crowdstrike_api_handler import CrowdstrikeApiHandler
 
 
