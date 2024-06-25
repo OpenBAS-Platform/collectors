@@ -1,3 +1,9 @@
+from datetime import datetime
+
+import pytz
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 from .crowdstrike_api_handler import CrowdstrikeApiHandler
@@ -78,9 +84,51 @@ class OpenBASCrowdStrike:
         except Exception as e:
             print(f"Error matching expectations: {e}")
 
-    def _process_messages(self):
+    def _process(self):
+        self.helper.collector_logger.info("Gathering expectations for executed injects")
+        expectations = (
+          self.helper.api.inject_expectation.expectations_assets_for_source(
+              self.config.get_conf("collector_id")
+          )
+        )
+        self.helper.collector_logger.info(
+            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+        )
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
+
+        for expectation in expectations:
+            # Check expired expectation
+            print(expectation)
+            expectation_date = parse(
+                expectation["inject_expectation_created_at"]
+            ).astimezone(pytz.UTC)
+            if expectation_date < limit_date:
+                self.helper.collector_logger.info(
+                    "Expectation expired, failing inject "
+                    + expectation["inject_expectation_inject"]
+                    + " ("
+                    + expectation["inject_expectation_type"]
+                    + ")"
+                )
+                self.helper.api.inject_expectation.update(
+                    expectation["inject_expectation_id"],
+                    {
+                      "collector_id": self.config.get_conf("collector_id"),
+                      "result": (
+                        "Not Detected"
+                        if expectation["inject_expectation_type"] == "DETECTION"
+                        else "Not Prevented"
+                      ),
+                      "is_success": False,
+                    },
+                )
+                continue
+            endpoint = self.helper.api.endpoint.get(
+                expectation["inject_expectation_asset"]
+            )
+
         self._match_expectations()
 
     def start(self):
         period = self.config.get_conf("collector_period", True, 60)
-        self.helper.schedule(self._process_messages, period)
+        self.helper.schedule(self._process, period)
