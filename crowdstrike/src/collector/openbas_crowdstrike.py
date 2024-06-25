@@ -87,9 +87,9 @@ class OpenBASCrowdStrike:
     def _process(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
-          self.helper.api.inject_expectation.expectations_assets_for_source(
-              self.config.get_conf("collector_id")
-          )
+            self.helper.api.inject_expectation.expectations_assets_for_source(
+                self.config.get_conf("collector_id")
+            )
         )
         self.helper.collector_logger.info(
             "Found " + str(len(expectations)) + " expectations waiting to be matched"
@@ -113,13 +113,13 @@ class OpenBASCrowdStrike:
                 self.helper.api.inject_expectation.update(
                     expectation["inject_expectation_id"],
                     {
-                      "collector_id": self.config.get_conf("collector_id"),
-                      "result": (
-                        "Not Detected"
-                        if expectation["inject_expectation_type"] == "DETECTION"
-                        else "Not Prevented"
-                      ),
-                      "is_success": False,
+                        "collector_id": self.config.get_conf("collector_id"),
+                        "result": (
+                            "Not Detected"
+                            if expectation["inject_expectation_type"] == "DETECTION"
+                            else "Not Prevented"
+                        ),
+                        "is_success": False,
                     },
                 )
                 continue
