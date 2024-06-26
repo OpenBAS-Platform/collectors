@@ -1,4 +1,6 @@
-from falconpy import IOC as CrowdstrikeIOC
+from falconpy import IOC as CsIOC
+from falconpy import Alerts as CsAlerts
+from falconpy import Incidents as CsIncidents
 
 from .utils import Utils
 
@@ -12,19 +14,20 @@ class CrowdstrikeApiHandler:
 
         self._auth()
 
-    def _auth(self):
-        self.cs = CrowdstrikeIOC(
+    def _init_service(self, service_class):
+        return service_class(
             client_id=self.client_id,
             client_secret=self.client_secret,
-            base_url=self.base_url,
+            base_url=self.base_url
         )
 
+    def _auth(self):
+        self.ioc = self._init_service(CsIOC)
+        self.alerts = self._init_service(CsAlerts)
+        self.incidents = self._init_service(CsIncidents)
+
     def extract_iocs(self):
-        """
-        Retrieve all IOCs from CrowdStrike and process them into a readable
-        format.
-        """
-        response = self.cs.indicator_combined_v1()
+        response = self.ioc.indicator_combined_v1()
         if response["status_code"] != 200:
             raise Exception(f"Failed to retrieve IOCs: {response['errors']}")
 

@@ -3,8 +3,8 @@ from datetime import datetime
 import pytz
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
+from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 from .crowdstrike_api_handler import CrowdstrikeApiHandler
 
 
@@ -71,19 +71,7 @@ class OpenBASCrowdStrike:
             self.config.get_conf("crowdstrike_api_base_url"),
         )
 
-    def _match_expectations(self):
-        """
-        Retrieve and process the expectations from openBAS and match them with
-        the retrieved IOCs.
-        """
-        try:
-            iocs = self.crowdstrike_api_handler.extract_iocs()
-            print(iocs)
-            # Process alerts and incidents if needed
-        except Exception as e:
-            print(f"Error matching expectations: {e}")
-
-    def _process(self):
+    def _fetch_expectations(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
@@ -93,21 +81,21 @@ class OpenBASCrowdStrike:
         self.helper.collector_logger.info(
             "Found " + str(len(expectations)) + " expectations waiting to be matched"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(days=45)
+
+        valid_expectations = []
 
         for expectation in expectations:
-            # Check expired expectation
-            print(expectation)
+            # Parse the creation date of the expectation
             expectation_date = parse(
                 expectation["inject_expectation_created_at"]
             ).astimezone(pytz.UTC)
+
+            # Check if the expectation is expired
             if expectation_date < limit_date:
                 self.helper.collector_logger.info(
-                    "Expectation expired, failing inject "
-                    + expectation["inject_expectation_inject"]
-                    + " ("
-                    + expectation["inject_expectation_type"]
-                    + ")"
+                    f"Expectation expired, failing inject {expectation['inject_expectation_inject']} "
+                    f"({expectation['inject_expectation_type']})"
                 )
                 self.helper.api.inject_expectation.update(
                     expectation["inject_expectation_id"],
@@ -121,12 +109,29 @@ class OpenBASCrowdStrike:
                         "is_success": False,
                     },
                 )
-                continue
-            endpoint = self.helper.api.endpoint.get(
-                expectation["inject_expectation_asset"]
-            )
+            else:
+                # Add valid expectations to the list
+                valid_expectations.append(expectation)
 
-        self._match_expectations()
+        return valid_expectations
+
+    def _match_expectations(self, valid_expectations):
+        try:
+            iocs = self.crowdstrike_api_handler.extract_iocs()
+            print(iocs)
+            # Process alerts and incidents if needed
+        except Exception as e:
+            print(f"Error matching expectations: {e}")
+
+    # Implement the logic to match expectations
+        for expectation in valid_expectations:
+            self.helper.collector_logger.info(f"Processing expectation: {expectation}")
+            # Add your processing logic here
+
+    def _process(self):
+        """Fetch and match expectations with data from cs"""
+        valid_expectations = self._fetch_expectations()
+        self._match_expectations(valid_expectations)
 
     def start(self):
         period = self.config.get_conf("collector_period", True, 60)
