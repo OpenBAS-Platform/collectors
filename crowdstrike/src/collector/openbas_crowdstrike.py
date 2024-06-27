@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 from dateutil.parser import parse
-from dateutil.relativedelta import relativedelta
-
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
+
 from .crowdstrike_api_handler import CrowdstrikeApiHandler
 
 
@@ -71,7 +70,7 @@ class OpenBASCrowdStrike:
             self.config.get_conf("crowdstrike_api_base_url"),
         )
 
-    def _fetch_expectations(self):
+    def _fetch_expectations(self, start_time):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
@@ -81,7 +80,6 @@ class OpenBASCrowdStrike:
         self.helper.collector_logger.info(
             "Found " + str(len(expectations)) + " expectations waiting to be matched"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(days=45)
 
         valid_expectations = []
 
@@ -91,8 +89,8 @@ class OpenBASCrowdStrike:
                 expectation["inject_expectation_created_at"]
             ).astimezone(pytz.UTC)
 
-            # Check if the expectation is expired
-            if expectation_date < limit_date:
+            # Check if the expectation is expired: created date is greater than request start time
+            if expectation_date < start_time:
                 self.helper.collector_logger.info(
                     f"Expectation expired, failing inject {expectation['inject_expectation_inject']} "
                     f"({expectation['inject_expectation_type']})"
@@ -115,23 +113,47 @@ class OpenBASCrowdStrike:
 
         return valid_expectations
 
-    def _match_expectations(self, valid_expectations):
+    def _extract_ip_addresses(self, detections):
+        ips = []
+        for detection in detections:
+            if "device" in detection:
+                device = detection["device"]
+                if "local_ip" in device:
+                    ips.append(device["local_ip"])
+                if "external_ip" in device:
+                    ips.append(device["external_ip"])
+        return ips
+
+    def _match_expectations(self, valid_expectations, start_time):
         try:
             iocs = self.crowdstrike_api_handler.extract_iocs()
-            print(iocs)
-            # Process alerts and incidents if needed
+            print("iocs :", iocs)
+            alerts = self.crowdstrike_api_handler.extract_alerts(start_time)
+            print("alerts : ", alerts)
+            detections = self.crowdstrike_api_handler.extract_detects(start_time)
+            print("detections : ", detections)
+
+            ips = self._extract_ip_addresses(detections)
+            print(ips)
+
+            # Logic to match expectations
+            for expectation in valid_expectations:
+                self.helper.collector_logger.info(
+                    f"Processing expectation: {expectation}"
+                )
+                # Match with detections from cs
+
         except Exception as e:
             print(f"Error matching expectations: {e}")
 
-    # Implement the logic to match expectations
-        for expectation in valid_expectations:
-            self.helper.collector_logger.info(f"Processing expectation: {expectation}")
-            # Add your processing logic here
-
     def _process(self):
         """Fetch and match expectations with data from cs"""
-        valid_expectations = self._fetch_expectations()
-        self._match_expectations(valid_expectations)
+        # Calculate the time 45 minutes ago
+        now = datetime.now(pytz.UTC)
+        start_time = now - timedelta(minutes=15)
+
+        valid_expectations = self._fetch_expectations(start_time)
+        self._match_expectations(valid_expectations, start_time)
 
     def start(self):
         period = self.config.get_conf("collector_period", True, 60)
