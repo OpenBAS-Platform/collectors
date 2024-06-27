@@ -68,7 +68,9 @@ class OpenBASMicrosoftDefender:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            self.config, open("img/icon-microsoft-defender.png", "rb")
+            self.config,
+            "img/icon-microsoft-defender.png",
+            security_platform_type="EDR",
         )
 
         # Initialize signatures helper

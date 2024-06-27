@@ -76,7 +76,9 @@ class OpenBASMicrosoftSentinel:
         )
 
         self.helper = OpenBASCollectorHelper(
-            self.config, open("img/icon-microsoft-sentinel.png", "rb")
+            config=self.config,
+            icon="img/icon-microsoft-sentinel.png",
+            security_platform_type="SIEM",
         )
 
         self.log_analytics_url = "https://api.loganalytics.azure.com/v1"
