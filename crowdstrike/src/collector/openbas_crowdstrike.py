@@ -40,6 +40,10 @@ class OpenBASCrowdStrike:
                     "env": "COLLECTOR_LOG_LEVEL",
                     "file_path": ["collector", "log_level"],
                 },
+                "collector_platform": {
+                    "env": "COLLECTOR_PLATFORM",
+                    "file_path": ["collector", "platform"],
+                },
                 # CrowdStrike
                 "crowdstrike_client_id": {
                     "env": "CROWDSTRIKE_CLIENT_ID",

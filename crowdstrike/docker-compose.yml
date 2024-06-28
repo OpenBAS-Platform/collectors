@@ -8,6 +8,7 @@ services:
       - COLLECTOR_ID=ChangeMe
       - COLLECTOR_NAME=CrowdStrike
       - COLLECTOR_LOG_LEVEL=error
+      - COLLECTOR_PLATFORM=EDR
       - CROWDSTRIKE_BASE_URL=https://api.crowdstrike.com
       - CROWDSTRIKE_CLIENT_ID=ChangeMe
       - CROWDSTRIKE_CLIENT_SECRET=ChangeMe

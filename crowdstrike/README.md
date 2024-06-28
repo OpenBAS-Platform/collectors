@@ -7,6 +7,8 @@ details dictate what data is actually available to the connector.
 
 ## Installation
 
+
+
 ## Configuration
 
 The connector can be configured with the following variables:
