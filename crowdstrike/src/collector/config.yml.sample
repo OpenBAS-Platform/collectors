@@ -8,6 +8,7 @@ collector:
   name: 'CrowdStrike Endpoint Security'
   period: 60
   log_level: 'info'
+  platform: 'ChangeMe'
 
 crowdstrike:
   api_base_url: 'ChangeMe'
