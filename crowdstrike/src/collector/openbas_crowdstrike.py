@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 import pytz
 from dateutil.parser import parse
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
+from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 from .crowdstrike_api_handler import CrowdstrikeApiHandler
 
 
@@ -63,16 +63,19 @@ class OpenBASCrowdStrike:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            self.config, open("img/icon-crowdstrike.png", "rb")
+            config=self.config,
+            icon="img/icon-crowdstrike.png",
+            security_platform_type=self.config.get_conf("collector_platform"),
         )
 
         # Initialize CrowdStrike API
         self.crowdstrike_api_handler = CrowdstrikeApiHandler(
-            self.helper,
-            self.config.get_conf("crowdstrike_client_id"),
-            self.config.get_conf("crowdstrike_client_secret"),
-            self.config.get_conf("crowdstrike_api_base_url"),
-        )
+        self.helper,
+        self.config.get_conf("crowdstrike_client_id"),
+        self.config.get_conf("crowdstrike_client_secret"),
+        self.config.get_conf("crowdstrike_api_base_url"),
+
+    )
 
     def _fetch_expectations(self, start_time):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
