@@ -178,7 +178,7 @@ class OpenBASTaniumThreatResponse:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert_details),
-                    "score": 90,
+                    "score": 80,
                 }
             elif type == "command_line":
                 alert_data[type] = {

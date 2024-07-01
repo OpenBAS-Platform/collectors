@@ -169,7 +169,7 @@ class OpenBASMicrosoftDefender:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert),
-                    "score": 90,
+                    "score": 80,
                 }
             elif type == "command_line":
                 alert_data[type] = {
@@ -182,25 +182,25 @@ class OpenBASMicrosoftDefender:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_file_names(alert),
-                    "score": 90,
+                    "score": 80,
                 }
             elif type == "hostname":
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_hostnames(alert),
-                    "score": 90,
+                    "score": 80,
                 }
             elif type == "ipv4_address":
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_ip_addresses(alert),
-                    "score": 90,
+                    "score": 80,
                 }
             elif type == "ipv6_address":
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_ip_addresses(alert),
-                    "score": 90,
+                    "score": 80,
                 }
         match_result = self.openbas_detection_helper.match_alert_elements(
             signatures=expectation["inject_expectation_signatures"],
