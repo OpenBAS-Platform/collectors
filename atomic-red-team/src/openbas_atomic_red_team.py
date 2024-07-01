@@ -4,6 +4,8 @@ from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 ATOMIC_RED_TEAM_INDEX = "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/master/atomics/Indexes/index.yaml"
 
+VERIFIED_PAYLOADS = ["aa6cb8c4-b582-4f8e-b677-37733914abda"]
+
 PLATFORMS = {
     "windows": "Windows",
     "linux": "Linux",
@@ -89,7 +91,10 @@ class OpenBASAtomicRedTeam:
                     "atomic_tests"
                 ]:
                     arguments = []
-                    if "input_arguments" in atomic_test:
+                    if (
+                        "input_arguments" in atomic_test
+                        and atomic_test["input_arguments"] is not None
+                    ):
                         for input_argument in atomic_test["input_arguments"]:
                             atomic_input_argument = atomic_test["input_arguments"][
                                 input_argument
@@ -101,7 +106,10 @@ class OpenBASAtomicRedTeam:
                             }
                             arguments.append(argument)
                     prerequisites = []
-                    if "dependencies" in atomic_test:
+                    if (
+                        "dependencies" in atomic_test
+                        and atomic_test["dependencies"] is not None
+                    ):
                         for dependency in atomic_test["dependencies"]:
                             prerequisite = {
                                 "executor": EXECUTORS[
@@ -118,6 +126,7 @@ class OpenBASAtomicRedTeam:
                     if (
                         "executor" in atomic_test
                         and "command" in atomic_test["executor"]
+                        and atomic_test["executor"]["command"] is not None
                     ):
                         self.helper.collector_logger.info(
                             "Importing atomic test " + atomic_test["name"]
@@ -136,6 +145,13 @@ class OpenBASAtomicRedTeam:
                         )
                         platforms.sort()
                         payload = {
+                            "payload_source": "COMMUNITY",
+                            "payload_status": (
+                                "VERIFIED"
+                                if atomic_test["auto_generated_guid"]
+                                in VERIFIED_PAYLOADS
+                                else "UNVERIFIED"
+                            ),
                             "payload_external_id": atomic_test["auto_generated_guid"],
                             "payload_type": "Command",
                             "payload_collector": self.helper.config.get("collector_id"),
