@@ -66,7 +66,7 @@ class OpenBASTaniumThreatResponse:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            self.config, "img/icon-tanium.png", security_platform_type="EDR"
+            config=self.config, icon="img/icon-tanium.png", security_platform_type="EDR"
         )
 
         # Initialize Tanium API
