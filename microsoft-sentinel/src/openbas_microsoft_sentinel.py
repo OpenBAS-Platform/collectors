@@ -195,37 +195,37 @@ class OpenBASMicrosoftSentinel:
             if type == "process_name":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_process_names(alert),
+                    "data": self._extract_process_names(columns_index, alert),
                     "score": 80,
                 }
             elif type == "command_line":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_command_lines(alert),
+                    "data": self._extract_command_lines(columns_index, alert),
                     "score": 60,
                 }
             elif type == "file_name":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_file_names(alert),
+                    "data": self._extract_file_names(columns_index, alert),
                     "score": 80,
                 }
             elif type == "hostname":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_hostnames(alert),
+                    "data": self._extract_hostnames(columns_index, alert),
                     "score": 80,
                 }
             elif type == "ipv4_address":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_ip_addresses(alert),
+                    "data": self._extract_ip_addresses(columns_index, alert),
                     "score": 80,
                 }
             elif type == "ipv6_address":
                 alert_data[type] = {
                     "type": "fuzzy",
-                    "data": self._extract_ip_addresses(alert),
+                    "data": self._extract_ip_addresses(columns_index, alert),
                     "score": 80,
                 }
         match_result = self.openbas_detection_helper.match_alert_elements(
@@ -233,7 +233,7 @@ class OpenBASMicrosoftSentinel:
             alert_data=alert_data,
         )
         if match_result:
-            if self._is_prevented(alert):
+            if self._is_prevented(columns_index, alert):
                 return "PREVENTED"
             else:
                 return "DETECTED"
