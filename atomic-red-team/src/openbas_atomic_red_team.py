@@ -170,6 +170,9 @@ class OpenBASAtomicRedTeam:
                             "payload_cleanup_executor": EXECUTORS[
                                 atomic_test["executor"]["name"]
                             ],
+                            "payload_elevation_required": atomic_test["executor"].get(
+                                "elevation_required"
+                            ),
                             "payload_prerequisites": prerequisites,
                         }
                         self.helper.api.payload.upsert(payload)
