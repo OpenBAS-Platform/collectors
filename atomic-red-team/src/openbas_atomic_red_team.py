@@ -171,7 +171,7 @@ class OpenBASAtomicRedTeam:
                                 atomic_test["executor"]["name"]
                             ],
                             "payload_elevation_required": atomic_test["executor"].get(
-                                "elevation_required"
+                                "elevation_required", False
                             ),
                             "payload_prerequisites": prerequisites,
                         }
