@@ -114,7 +114,7 @@ class OpenBASMicrosoftEntra:
             for i in range(len(groups.value)):
                 team = {"team_name": groups.value[i].display_name}
                 openbas_team = self.helper.api.team.upsert(team)
-                await self.create_users(groups.value[i].id, openbas_team)
+                await self.create_users(graph_client, groups.value[i].id, openbas_team)
         # iterate over result batches > 100 rows
         while groups is not None and groups.odata_next_link is not None:
             groups = await graph_client.groups.with_url(groups.odata_next_link)
