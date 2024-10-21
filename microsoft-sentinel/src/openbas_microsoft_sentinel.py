@@ -183,7 +183,10 @@ class OpenBASMicrosoftSentinel:
             return False
         # Check hostname
         hostname = self._extract_device(columns_index, alert)
-        if hostname is None or hostname != endpoint["endpoint_hostname"]:
+        if (
+            hostname is None
+            or hostname.lower() != endpoint["endpoint_hostname"].lower()
+        ):
             return False
         self.helper.collector_logger.info(
             "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
