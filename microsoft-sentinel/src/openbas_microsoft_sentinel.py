@@ -162,16 +162,22 @@ class OpenBASMicrosoftSentinel:
 
     def _is_prevented(self, columns_index, alert):
         extended_properties = json.loads(alert[columns_index["ExtendedProperties"]])
-        if "Action" in extended_properties and extended_properties["Action"] in [
-            "blocked",
-            "quarantine",
-            "remove",
-        ]:
-            return True
-        return False
+        result_action = (
+            True
+            if "Action" in extended_properties
+            and extended_properties["Action"]
+            in [
+                "blocked",
+                "quarantine",
+                "remove",
+            ]
+            else False
+        )
+        alert_name = alert[columns_index["AlertName"]]
+        result_alert_name = True if "prevented" in alert_name.strip().lower() else False
+        return result_action or result_alert_name
 
     def _match_alert(self, endpoint, columns_index, alert, expectation):
-        print(alert)
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert[columns_index["SystemAlertId"]])
@@ -306,7 +312,6 @@ class OpenBASMicrosoftSentinel:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
-                print(alert)
                 if alert_date > limit_date:
                     result = self._match_alert(
                         endpoint, columns_index, alert, expectation
