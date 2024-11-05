@@ -161,21 +161,12 @@ class OpenBASMicrosoftSentinel:
         return ip_addresses
 
     def _is_prevented(self, columns_index, alert):
-        extended_properties = json.loads(alert[columns_index["ExtendedProperties"]])
-        result_action = (
-            True
-            if "Action" in extended_properties
-            and extended_properties["Action"]
-            in [
-                "blocked",
-                "quarantine",
-                "remove",
-            ]
-            else False
+        prevented_keywords = ["blocked", "quarantine", "remove", "prevented"]
+        alert_name = alert[columns_index["AlertName"]].strip().lower()
+        result_alert_name = any(
+            prevented_keyword in alert_name for prevented_keyword in prevented_keywords
         )
-        alert_name = alert[columns_index["AlertName"]]
-        result_alert_name = True if "prevented" in alert_name.strip().lower() else False
-        return result_action or result_alert_name
+        return result_alert_name
 
     def _match_alert(self, endpoint, columns_index, alert, expectation):
         self.helper.collector_logger.info(
