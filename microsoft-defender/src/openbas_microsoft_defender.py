@@ -106,8 +106,13 @@ class OpenBASMicrosoftDefender:
     def _extract_parent_process_name(self, alert):
         parent_process_names = []
         for evidence in alert.evidence:
-            if hasattr(evidence, 'parent_process_image_file') and evidence.parent_process_image_file:
-                parent_process_names.append(evidence.parent_process_image_file.file_name)
+            if (
+                hasattr(evidence, "parent_process_image_file")
+                and evidence.parent_process_image_file
+            ):
+                parent_process_names.append(
+                    evidence.parent_process_image_file.file_name
+                )
         return parent_process_names
 
     def _extract_command_lines(self, alert):
@@ -283,7 +288,9 @@ class OpenBASMicrosoftDefender:
             )
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
-                alert_date = parse(str(alert.last_update_date_time)).astimezone(pytz.UTC)
+                alert_date = parse(str(alert.last_update_date_time)).astimezone(
+                    pytz.UTC
+                )
                 if alert_date > limit_date:
                     result = self._match_alert(endpoint, alert, expectation)
                     if result is not False:

@@ -129,8 +129,13 @@ class OpenBASMicrosoftSentinel:
         for entity in entities:
             if "Type" in entity and entity["Type"] == "process":
                 if "ParentProcess" in entity and "ImageFile" in entity["ParentProcess"]:
-                    if "ImageFile" in entity["ParentProcess"] and "Name" in entity["ParentProcess"]["ImageFile"]:
-                        parent_process_names.append(entity["ParentProcess"]["ImageFile"]["Name"])
+                    if (
+                        "ImageFile" in entity["ParentProcess"]
+                        and "Name" in entity["ParentProcess"]["ImageFile"]
+                    ):
+                        parent_process_names.append(
+                            entity["ParentProcess"]["ImageFile"]["Name"]
+                        )
         return parent_process_names
 
     def _extract_command_lines(self, columns_index, alert):
