@@ -93,6 +93,7 @@ class OpenBASMicrosoftSentinel:
 
         # Initialize signatures helper
         self.relevant_signatures_types = [
+            "parent_process_name",
             "process_name",
             "command_line",
             "file_name",
@@ -121,6 +122,16 @@ class OpenBASMicrosoftSentinel:
             elif "Type" in entity and entity["Type"] == "file":
                 process_names.append(entity["Name"])
         return process_names
+
+    def _extract_parent_process_name(self, columns_index, alert):
+        parent_process_names = []
+        entities = json.loads(alert[columns_index["Entities"]])
+        for entity in entities:
+            if "Type" in entity and entity["Type"] == "process":
+                if "ParentProcess" in entity and "ImageFile" in entity["ParentProcess"]:
+                    if "ImageFile" in entity["ParentProcess"] and "Name" in entity["ParentProcess"]["ImageFile"]:
+                        parent_process_names.append(entity["ParentProcess"]["ImageFile"]["Name"])
+        return parent_process_names
 
     def _extract_command_lines(self, columns_index, alert):
         command_lines = []
@@ -196,6 +207,12 @@ class OpenBASMicrosoftSentinel:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(columns_index, alert),
+                    "score": 80,
+                }
+            if type == "parent_process_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_parent_process_name(columns_index, alert),
                     "score": 80,
                 }
             elif type == "command_line":
