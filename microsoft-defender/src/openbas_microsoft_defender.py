@@ -77,6 +77,7 @@ class OpenBASMicrosoftDefender:
         # TODO Command line
         # self.relevant_signatures_types = ["process_name", "command_line", "file_name", "hostname", "ipv4_address"]
         self.relevant_signatures_types = [
+            "parent_process_name",
             "process_name",
             "file_name",
             "hostname",
@@ -101,6 +102,18 @@ class OpenBASMicrosoftDefender:
             elif evidence.odata_type == "#microsoft.graph.security.fileEvidence":
                 process_names.append(evidence.file_details.file_name)
         return process_names
+
+    def _extract_parent_process_name(self, alert):
+        parent_process_names = []
+        for evidence in alert.evidence:
+            if (
+                hasattr(evidence, "parent_process_image_file")
+                and evidence.parent_process_image_file
+            ):
+                parent_process_names.append(
+                    evidence.parent_process_image_file.file_name
+                )
+        return parent_process_names
 
     def _extract_command_lines(self, alert):
         command_lines = []
@@ -134,7 +147,7 @@ class OpenBASMicrosoftDefender:
     def _is_prevented(self, alert):
         for evidence in alert.evidence:
             if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                if evidence.detection_status in [
+                if evidence.detection_status.lower() in [
                     "prevented",
                     "remediated",
                     "blocked",
@@ -172,6 +185,12 @@ class OpenBASMicrosoftDefender:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert),
+                    "score": 80,
+                }
+            elif type == "parent_process_name":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_parent_process_name(alert),
                     "score": 80,
                 }
             elif type == "command_line":
@@ -269,7 +288,9 @@ class OpenBASMicrosoftDefender:
             )
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
-                alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
+                alert_date = parse(str(alert.last_update_date_time)).astimezone(
+                    pytz.UTC
+                )
                 if alert_date > limit_date:
                     result = self._match_alert(endpoint, alert, expectation)
                     if result is not False:
