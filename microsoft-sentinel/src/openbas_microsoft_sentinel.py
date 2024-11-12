@@ -96,6 +96,7 @@ class OpenBASMicrosoftSentinel:
             "parent_process_name",
             "process_name",
             "command_line",
+            "command_line_base64",
             "file_name",
             "hostname",
             "ipv4_address",
@@ -221,6 +222,12 @@ class OpenBASMicrosoftSentinel:
                     "score": 80,
                 }
             elif type == "command_line":
+                alert_data[type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_command_lines(columns_index, alert),
+                    "score": 60,
+                }
+            elif type == "command_line_base64":
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_command_lines(columns_index, alert),
