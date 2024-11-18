@@ -330,10 +330,12 @@ class OpenBASAtomicRedTeam:
                         }
                         self.helper.api.payload.upsert(payload)
                         payload_external_ids.append(payload["payload_external_id"])
-        self.helper.api.payload.deprecate({
-            "collector_id": self.helper.config.get("collector_id"),
-            "payload_external_ids": payload_external_ids
-        })
+        self.helper.api.payload.deprecate(
+            {
+                "collector_id": self.helper.config.get("collector_id"),
+                "payload_external_ids": payload_external_ids,
+            }
+        )
 
     # Start the main loop
     def start(self):
