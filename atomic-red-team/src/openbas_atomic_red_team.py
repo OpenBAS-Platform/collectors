@@ -43,16 +43,20 @@ def _normalize_path(path):
     return path.replace("\\", "/")
 
 
-def get_argument_name_by_path(arguments, file_name):
+def get_argument_name_by_path(arguments, fullpath):
+    file_name = os.path.basename(fullpath)
+
     for ar in arguments:
-        if isinstance(ar["default_value"], str) and file_name in ar["default_value"]:
+        if isinstance(ar["default_value"], str) and file_name in ar["default_value"] and "http" not in ar["default_value"]:
+
             return ar["key"]
 
-    new_key = f"{os.path.splitext(file_name)[0].lower()}_path"
+    path_without_prefix = fullpath.replace("PathToAtomicsFolder", "").replace("$", "")
+    new_key = f"{file_name.replace('.', '_')}_path"
     new_argument = {
         "type": "text",
         "key": new_key,
-        "default_value": "./ExternalPayloads/" + file_name,
+        "default_value": "./ExternalPayloads" + _normalize_path(path_without_prefix),
     }
     arguments.append(new_argument)
 
@@ -68,7 +72,7 @@ def handle_resources(platforms, prerequisites, fullpath, arg_name):
             return
 
     if "Windows" in platforms:
-        windows_lines = [
+        command_line = [
             'New-Item -Type Directory (split-path "#{'
             + arg_name
             + '}") -ErrorAction ignore | Out-Null',
@@ -79,15 +83,27 @@ def handle_resources(platforms, prerequisites, fullpath, arg_name):
             + '}"',
         ]
         # On windows
-        new_window_prerequiste = {
+        prerequisite_command = {
             "executor": "psh",
             "description": "",
-            "get_command": "\n".join(windows_lines),
-            "check_command": "if (Test-Path '#{"
-            + arg_name
-            + "}') {exit 0} else {exit 1}",
+            "get_command": "\n".join(command_line),
+            "check_command": "if (Test-Path '#{" + arg_name + "}') {exit 0} else {exit 1}",
         }
-        prerequisites.append(new_window_prerequiste)
+        prerequisites.append(prerequisite_command)
+    else :
+        command_line = [
+            'mkdir -p "$(dirname "#{' + arg_name + '}")"',
+            'curl -L -o "#{' + arg_name + '}" "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics'
+            + _normalize_path(path_without_prefix)
+            + '"',
+        ]
+        prerequisite_command = {
+            "executor": "bash",
+            "description": "",
+            "get_command": "\n".join(command_line),
+            "check_command": '[ -f "#{' + arg_name + '}" ] && exit 0 || exit 1',
+        }
+        prerequisites.append(prerequisite_command)
 
     return
 
@@ -96,19 +112,18 @@ def _catch_atomic_folder_paths(string_to_analyse, handle_match_callback):
     regex = re.compile(r'\s*(\$?PathToAtomicsFolder(?:\\[^\\ \n"]+)+)')
     matches = regex.findall(string_to_analyse)
     for match in matches:
-        base_name = os.path.basename(match)
-        string_to_analyse = handle_match_callback(match, base_name)
+        string_to_analyse = handle_match_callback(string_to_analyse, match )
     return string_to_analyse
 
 
 def _format_command(string_to_analyse, arguments, platforms, prerequisites):
-    def handle_match_callback(match, base_name):
-        if base_name == "ExternalPayloads":
-            return string_to_analyse
+    def handle_match_callback(string, match):
+        if os.path.basename(match) == "ExternalPayloads":
+            return string
         else:
-            arg_name = get_argument_name_by_path(arguments, base_name)
+            arg_name = get_argument_name_by_path(arguments, match)
             handle_resources(platforms, prerequisites, match, arg_name)
-            return string_to_analyse.replace(match, f"#{{{arg_name}}}")
+            return string.replace(match, f"#{{{arg_name}}}")
 
     return _catch_atomic_folder_paths(string_to_analyse, handle_match_callback)
 
@@ -117,14 +132,14 @@ def _format_prerequisite(string_to_analyse, arguments):
     folder_name = ""
     arg_name = ""
 
-    def handle_match_callback(match, base_name):
+    def handle_match_callback(string, match):
         nonlocal folder_name, arg_name
-        if base_name == "ExternalPayloads":
+        if os.path.basename(match) == "ExternalPayloads":
             folder_name = match
-            return string_to_analyse
+            return string
         else:
-            arg_name = get_argument_name_by_path(arguments, base_name)
-            return string_to_analyse.replace(match, f"#{{{arg_name}}}")
+            arg_name = get_argument_name_by_path(arguments, match)
+            return string.replace(match, f"#{{{arg_name}}}")
 
     string_to_analyse = _catch_atomic_folder_paths(
         string_to_analyse, handle_match_callback
@@ -138,13 +153,12 @@ def _format_prerequisite(string_to_analyse, arguments):
     return string_to_analyse
 
 
-def _format_check_command(string_to_analyse, arguments):
-    def handle_match_callback(match, base_name):
-        arg_name = get_argument_name_by_path(arguments, base_name)
-        return string_to_analyse.replace(match, f"#{{{arg_name}}}")
+def _format_generic_command(string_to_analyse, arguments):
+    def handle_match_callback(string, match):
+        arg_name = get_argument_name_by_path(arguments, match)
+        return string.replace(match, f"#{{{arg_name}}}")
 
-    return _catch_atomic_folder_paths(string_to_analyse, handle_match_callback)
-
+    return _catch_atomic_folder_paths(string_to_analyse, handle_match_callback) if string_to_analyse else string_to_analyse
 
 class OpenBASAtomicRedTeam:
     def __init__(self):
@@ -232,7 +246,7 @@ class OpenBASAtomicRedTeam:
                                 "get_command": _format_prerequisite(
                                     dependency["get_prereq_command"], arguments
                                 ),
-                                "check_command": _format_check_command(
+                                "check_command": _format_generic_command(
                                     dependency["prereq_command"], arguments
                                 ),
                             }
@@ -287,7 +301,7 @@ class OpenBASAtomicRedTeam:
                                 platforms,
                                 prerequisites,
                             ),
-                            "payload_cleanup_command": cleanup_command,
+                            "payload_cleanup_command": _format_generic_command(cleanup_command, arguments),
                             "payload_cleanup_executor": (
                                 EXECUTORS[atomic_test["executor"]["name"]]
                                 if cleanup_command
