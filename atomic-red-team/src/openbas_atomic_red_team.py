@@ -47,7 +47,11 @@ def get_argument_name_by_path(arguments, fullpath):
     file_name = os.path.basename(fullpath)
 
     for ar in arguments:
-        if isinstance(ar["default_value"], str) and file_name in ar["default_value"] and "http" not in ar["default_value"]:
+        if (
+            isinstance(ar["default_value"], str)
+            and file_name in ar["default_value"]
+            and "http" not in ar["default_value"]
+        ):
 
             return ar["key"]
 
@@ -87,13 +91,17 @@ def handle_resources(platforms, prerequisites, fullpath, arg_name):
             "executor": "psh",
             "description": "",
             "get_command": "\n".join(command_line),
-            "check_command": "if (Test-Path '#{" + arg_name + "}') {exit 0} else {exit 1}",
+            "check_command": "if (Test-Path '#{"
+            + arg_name
+            + "}') {exit 0} else {exit 1}",
         }
         prerequisites.append(prerequisite_command)
-    else :
+    else:
         command_line = [
             'mkdir -p "$(dirname "#{' + arg_name + '}")"',
-            'curl -L -o "#{' + arg_name + '}" "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics'
+            'curl -L -o "#{'
+            + arg_name
+            + '}" "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics'
             + _normalize_path(path_without_prefix)
             + '"',
         ]
@@ -112,7 +120,7 @@ def _catch_atomic_folder_paths(string_to_analyse, handle_match_callback):
     regex = re.compile(r'\s*(\$?PathToAtomicsFolder(?:\\[^\\ \n"]+)+)')
     matches = regex.findall(string_to_analyse)
     for match in matches:
-        string_to_analyse = handle_match_callback(string_to_analyse, match )
+        string_to_analyse = handle_match_callback(string_to_analyse, match)
     return string_to_analyse
 
 
@@ -158,7 +166,12 @@ def _format_generic_command(string_to_analyse, arguments):
         arg_name = get_argument_name_by_path(arguments, match)
         return string.replace(match, f"#{{{arg_name}}}")
 
-    return _catch_atomic_folder_paths(string_to_analyse, handle_match_callback) if string_to_analyse else string_to_analyse
+    return (
+        _catch_atomic_folder_paths(string_to_analyse, handle_match_callback)
+        if string_to_analyse
+        else string_to_analyse
+    )
+
 
 class OpenBASAtomicRedTeam:
     def __init__(self):
