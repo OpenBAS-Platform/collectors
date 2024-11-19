@@ -144,6 +144,10 @@ class OpenBASAtomicRedTeam:
                             )
                         )
                         platforms.sort()
+                        cleanup_command = atomic_test["executor"].get("cleanup_command")
+                        cleanup_command = (
+                            None if cleanup_command == "" else cleanup_command
+                        )
                         payload = {
                             "payload_source": "COMMUNITY",
                             "payload_status": (
@@ -164,12 +168,12 @@ class OpenBASAtomicRedTeam:
                                 atomic_test["executor"]["name"]
                             ],
                             "command_content": atomic_test["executor"]["command"],
-                            "payload_cleanup_command": atomic_test["executor"].get(
-                                "cleanup_command", None
+                            "payload_cleanup_command": cleanup_command,
+                            "payload_cleanup_executor": (
+                                EXECUTORS[atomic_test["executor"]["name"]]
+                                if cleanup_command
+                                else None
                             ),
-                            "payload_cleanup_executor": EXECUTORS[
-                                atomic_test["executor"]["name"]
-                            ],
                             "payload_elevation_required": atomic_test["executor"].get(
                                 "elevation_required", False
                             ),
