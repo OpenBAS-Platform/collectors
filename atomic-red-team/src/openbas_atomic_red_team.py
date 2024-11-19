@@ -314,7 +314,9 @@ class OpenBASAtomicRedTeam:
                                 platforms,
                                 prerequisites,
                             ),
-                            "payload_cleanup_command": _format_generic_command(cleanup_command, arguments),
+                            "payload_cleanup_command": _format_generic_command(
+                                cleanup_command, arguments
+                            ),
                             "payload_cleanup_executor": (
                                 EXECUTORS[atomic_test["executor"]["name"]]
                                 if cleanup_command
