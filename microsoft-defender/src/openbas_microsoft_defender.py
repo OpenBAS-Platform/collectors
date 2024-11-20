@@ -12,11 +12,37 @@ from msgraph.generated.security.alerts_v2.alerts_v2_request_builder import (
     Alerts_v2RequestBuilder,
     RequestConfiguration,
 )
+from msgraph.generated.security.microsoft_graph_security_run_hunting_query.run_hunting_query_post_request_body import (
+    RunHuntingQueryPostRequestBody,
+)
+
 from pyobas.helpers import (
     OpenBASCollectorHelper,
     OpenBASConfigHelper,
     OpenBASDetectionHelper,
 )
+
+
+TH_API_QUERY = """
+let normalisePaths = (pathString:string) { trim_end("/", replace_string(pathString, "\", "/")); };
+let augmentedDeviceEvents = DeviceEvents | where isnotnull(InitiatingProcessId) and InitiatingProcessId != 0 | extend normalised_folder_path=normalisePaths(FolderPath), process_hash=hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime)) | project DeviceId, FileName, normalised_folder_path, process_hash;
+let augmentedFileEvents = DeviceFileEvents | extend normalised_folder_path=normalisePaths(parse_path(FolderPath).DirectoryPath), process_hash=hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime)) | project DeviceId, FileName, normalised_folder_path, process_hash;
+let singleMachinePerAlert = AlertEvidence | where EntityType has "Machine" and EvidenceRole has "Impacted" | distinct AlertId, DeviceId, DeviceName, Timestamp;
+let fileEvidence = singleMachinePerAlert | join AlertEvidence on $left.AlertId == $right.AlertId | where EntityType has "File" | extend normalised_folder_path=normalisePaths(FolderPath) | join (augmentedDeviceEvents | union augmentedFileEvents) on $left.DeviceId == $right.DeviceId and $left.FileName == $right.FileName and $left.normalised_folder_path == $right.normalised_folder_path | project AlertId, EntityType, DeviceId, DeviceName, FileName, normalised_folder_path, process_hash;
+let processEvidence = singleMachinePerAlert | join AlertEvidence on $left.AlertId == $right.AlertId | where EntityType has "Process" | extend d=parse_json(AdditionalFields) | extend process_hash=hash(strcat(DeviceId, d.ProcessId, FileName, todatetime(d.CreationTimeUtc))) | project AlertId, EntityType, DeviceId, DeviceName, FileName, normalised_folder_path="<empty>", process_hash;
+let hashedProcessEvents = DeviceProcessEvents | extend process_hash = hash(strcat(DeviceId, ProcessId, FileName, ProcessCreationTime)), parent_hash = hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime));
+let tree = hashedProcessEvents
+| join kind=leftouter hashedProcessEvents on $left.parent_hash == $right.process_hash
+| make-graph process_hash --> process_hash1 with hashedProcessEvents on process_hash
+| graph-match (parent)<-[spawnedBy*1..100]-(child)
+  where parent.FileName startswith "obas-implant"
+  project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine)
+| extend PathLength = array_length(Path);
+fileEvidence
+| union processEvidence
+| join tree on $left.process_hash == $right.child_process_hash
+| distinct AlertId, DeviceName, parent_FileName
+"""
 
 
 class OpenBASMicrosoftDefender:
@@ -77,7 +103,6 @@ class OpenBASMicrosoftDefender:
         # TODO Command line
         # self.relevant_signatures_types = ["process_name", "command_line", "file_name", "hostname", "ipv4_address"]
         self.relevant_signatures_types = [
-            "parent_process_name",
             "process_name",
             "file_name",
             "hostname",
@@ -102,18 +127,6 @@ class OpenBASMicrosoftDefender:
             elif evidence.odata_type == "#microsoft.graph.security.fileEvidence":
                 process_names.append(evidence.file_details.file_name)
         return process_names
-
-    def _extract_parent_process_name(self, alert):
-        parent_process_names = []
-        for evidence in alert.evidence:
-            if (
-                hasattr(evidence, "parent_process_image_file")
-                and evidence.parent_process_image_file
-            ):
-                parent_process_names.append(
-                    evidence.parent_process_image_file.file_name
-                )
-        return parent_process_names
 
     def _extract_command_lines(self, alert):
         command_lines = []
@@ -147,7 +160,7 @@ class OpenBASMicrosoftDefender:
     def _is_prevented(self, alert):
         for evidence in alert.evidence:
             if evidence.odata_type == "#microsoft.graph.security.processEvidence":
-                if evidence.detection_status.lower() in [
+                if evidence.detection_status in [
                     "prevented",
                     "remediated",
                     "blocked",
@@ -185,12 +198,6 @@ class OpenBASMicrosoftDefender:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert),
-                    "score": 80,
-                }
-            elif type == "parent_process_name":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_parent_process_name(alert),
                     "score": 80,
                 }
             elif type == "command_line":
@@ -288,9 +295,7 @@ class OpenBASMicrosoftDefender:
             )
             for i in range(len(alerts.value)):
                 alert = alerts.value[i]
-                alert_date = parse(str(alert.last_update_date_time)).astimezone(
-                    pytz.UTC
-                )
+                alert_date = parse(str(alert.created_date_time)).astimezone(pytz.UTC)
                 if alert_date > limit_date:
                     result = self._match_alert(endpoint, alert, expectation)
                     if result is not False:
