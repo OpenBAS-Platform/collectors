@@ -292,7 +292,7 @@ class OpenBASAtomicRedTeam:
                         )
                         payload = {
                             "payload_source": "COMMUNITY",
-                            "executable_arch": "x86_64",
+                            "executable_arch": "ALL_ARCHITECTURES",
                             "payload_status": (
                                 "VERIFIED"
                                 if atomic_test["auto_generated_guid"]
