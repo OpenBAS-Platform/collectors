@@ -22,6 +22,8 @@ PLATFORMS = {
     "google-workspace": ["Windows", "Linux", "MacOS"],
 }
 
+ALL_ARCHITECTURES = "all_architectures"
+
 EXECUTORS = {
     "powershell": "psh",
     "command_prompt": "cmd",
@@ -292,7 +294,7 @@ class OpenBASAtomicRedTeam:
                         )
                         payload = {
                             "payload_source": "COMMUNITY",
-                            "executable_arch": "ALL_ARCHITECTURES",
+                            "executable_arch": ALL_ARCHITECTURES,
                             "payload_status": (
                                 "VERIFIED"
                                 if atomic_test["auto_generated_guid"]
