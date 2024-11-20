@@ -216,6 +216,7 @@ class OpenBASAtomicRedTeam:
     def _process_message(self) -> None:
         response = self.session.get(url=ATOMIC_RED_TEAM_INDEX)
         art_index = yaml.safe_load(response.text)
+        payload_external_ids = []
         for kill_chain_phase in art_index:
             self.helper.collector_logger.info(
                 "Importing kill chain phase " + kill_chain_phase
@@ -328,6 +329,13 @@ class OpenBASAtomicRedTeam:
                             "payload_prerequisites": prerequisites,
                         }
                         self.helper.api.payload.upsert(payload)
+                        payload_external_ids.append(payload["payload_external_id"])
+        self.helper.api.payload.deprecate(
+            {
+                "collector_id": self.helper.config.get("collector_id"),
+                "payload_external_ids": payload_external_ids,
+            }
+        )
 
     # Start the main loop
     def start(self):
