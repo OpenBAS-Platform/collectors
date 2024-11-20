@@ -32,6 +32,11 @@ EXECUTORS = {
     "manual": "manual",
 }
 
+UNVERIFIED = "UNVERIFIED"
+
+VERIFIED = "VERIFIED"
+
+COMMUNITY = "COMMUNITY"
 
 def flatten_chain(matrix):
     if matrix == []:
@@ -293,13 +298,13 @@ class OpenBASAtomicRedTeam:
                             None if cleanup_command == "" else cleanup_command
                         )
                         payload = {
-                            "payload_source": "COMMUNITY",
+                            "payload_source": COMMUNITY,
                             "executable_arch": ALL_ARCHITECTURES,
                             "payload_status": (
-                                "VERIFIED"
+                                VERIFIED
                                 if atomic_test["auto_generated_guid"]
                                 in VERIFIED_PAYLOADS
-                                else "UNVERIFIED"
+                                else UNVERIFIED
                             ),
                             "payload_external_id": atomic_test["auto_generated_guid"],
                             "payload_type": "Command",
