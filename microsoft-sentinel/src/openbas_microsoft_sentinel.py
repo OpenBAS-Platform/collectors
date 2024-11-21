@@ -72,6 +72,10 @@ class OpenBASMicrosoftSentinel:
                     "env": "MICROSOFT_SENTINEL_RESOURCE_GROUP",
                     "file_path": ["collector", "microsoft_sentinel_resource_group"],
                 },
+                "microsoft_sentinel_edr_collectors": {
+                    "env": "MICROSOFT_SENTINEL_EDR_COLLECTORS",
+                    "file_path": ["collector", "microsoft_sentinel_edr_collectors"],
+                },
             },
         )
 
@@ -94,87 +98,25 @@ class OpenBASMicrosoftSentinel:
         # Initialize signatures helper
         self.relevant_signatures_types = [
             "parent_process_name",
-            "process_name",
-            "command_line",
-            "file_name",
-            "hostname",
-            "ipv4_address",
-            "ipv6_address",
         ]
         self.openbas_detection_helper = OpenBASDetectionHelper(
             self.helper.collector_logger, self.relevant_signatures_types
         )
 
-    def _extract_device(self, columns_index, alert):
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "host":
-                return entity["HostName"]
-        return None
+    # --- EXTRACTOR ---
 
-    def _extract_process_names(self, columns_index, alert):
-        process_names = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "process":
-                if "ImageFile" in entity and "Name" in entity["ImageFile"]:
-                    process_names.append(entity["ImageFile"]["Name"])
-            elif "Type" in entity and entity["Type"] == "file":
-                process_names.append(entity["Name"])
-        return process_names
+    def _extract_alert_link(self, columns_index, alert):
+        alert_link = []
+        # Direct Alert Link
+        alert_link.append(alert[columns_index["AlertLink"]])
+        # Extended Alert Link
+        if "ExtendedLinks" in alert:
+            for link in alert["ExtendedLinks"]:
+                if "Href" in link:
+                    alert_link.append(link["Href"])
+        return alert_link
 
-    def _extract_parent_process_name(self, columns_index, alert):
-        parent_process_names = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "process":
-                if "ParentProcess" in entity and "ImageFile" in entity["ParentProcess"]:
-                    if (
-                        "ImageFile" in entity["ParentProcess"]
-                        and "Name" in entity["ParentProcess"]["ImageFile"]
-                    ):
-                        parent_process_names.append(
-                            entity["ParentProcess"]["ImageFile"]["Name"]
-                        )
-        return parent_process_names
-
-    def _extract_command_lines(self, columns_index, alert):
-        command_lines = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "process":
-                command_lines.append(entity["CommandLine"])
-        return command_lines
-
-    def _extract_file_names(self, columns_index, alert):
-        file_names = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "process":
-                if "ImageFile" in entity and "Name" in entity["ImageFile"]:
-                    file_names.append(entity["ImageFile"]["Name"])
-            elif "Type" in entity and entity["Type"] == "file":
-                file_names.append(entity["Name"])
-        return file_names
-
-    def _extract_hostnames(self, columns_index, alert):
-        hostnames = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "dns":
-                hostnames.append(entity["DomainName"])
-            elif "Type" in entity and entity["Type"] == "url":
-                parsed_url = urllib.parse.urlparse(entity["Url"])
-                hostnames.append(parsed_url.netloc)
-        return hostnames
-
-    def _extract_ip_addresses(self, columns_index, alert):
-        ip_addresses = []
-        entities = json.loads(alert[columns_index["Entities"]])
-        for entity in entities:
-            if "Type" in entity and entity["Type"] == "ip":
-                ip_addresses.append(entity["Address"])
-        return ip_addresses
+    # --- MATCHING ---
 
     def _is_prevented(self, columns_index, alert):
         prevented_keywords = ["blocked", "quarantine", "remove", "prevented"]
@@ -184,75 +126,34 @@ class OpenBASMicrosoftSentinel:
         )
         return result_alert_name
 
-    def _match_alert(self, endpoint, columns_index, alert, expectation):
+    def _match_alert_link(self, expectation, alert_link_datas):
+        # Extract expectation alert link
+        alert_id_expectation = None
+        for item in expectation["inject_expectation_results"]:
+            self.helper.collector_logger.info(item["sourceName"])
+            attached_collectors = self.config.get_conf(
+                "microsoft_sentinel_edr_collectors"
+            )
+            if item["sourceId"] in attached_collectors:
+                alert_id_expectation = item["metadata"]["alertId"]
+                break
+
+        if alert_id_expectation:
+            for alert_link_data in alert_link_datas:
+                if alert_id_expectation in alert_link_data:
+                    return True
+        return False
+
+    def _match_alert_from_edr(self, _endpoint, columns_index, alert, expectation):
         self.helper.collector_logger.info(
-            "Trying to match alert "
+            "Trying to match alert from EDR"
             + str(alert[columns_index["SystemAlertId"]])
             + " with expectation "
             + expectation["inject_expectation_id"]
         )
-        # No asset
-        if expectation["inject_expectation_asset"] is None:
-            return False
-        # Check hostname
-        hostname = self._extract_device(columns_index, alert)
-        if (
-            hostname is None
-            or hostname.lower() != endpoint["endpoint_hostname"].lower()
-        ):
-            return False
-        self.helper.collector_logger.info(
-            "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
-        )
-
-        alert_data = {}
-        for type in self.relevant_signatures_types:
-            alert_data[type] = {}
-            if type == "process_name":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_process_names(columns_index, alert),
-                    "score": 80,
-                }
-            if type == "parent_process_name":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_parent_process_name(columns_index, alert),
-                    "score": 80,
-                }
-            elif type == "command_line":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_command_lines(columns_index, alert),
-                    "score": 60,
-                }
-            elif type == "file_name":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_file_names(columns_index, alert),
-                    "score": 80,
-                }
-            elif type == "hostname":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_hostnames(columns_index, alert),
-                    "score": 80,
-                }
-            elif type == "ipv4_address":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_ip_addresses(columns_index, alert),
-                    "score": 80,
-                }
-            elif type == "ipv6_address":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_ip_addresses(columns_index, alert),
-                    "score": 80,
-                }
-        match_result = self.openbas_detection_helper.match_alert_elements(
-            signatures=expectation["inject_expectation_signatures"],
-            alert_data=alert_data,
+        match_result = self._match_alert_link(
+            expectation=expectation,
+            alert_link_datas=self._extract_alert_link(columns_index, alert),
         )
         if match_result:
             if self._is_prevented(columns_index, alert):
@@ -260,6 +161,8 @@ class OpenBASMicrosoftSentinel:
             else:
                 return "DETECTED"
         return False
+
+    # --- PROCESS ---
 
     def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
@@ -326,7 +229,7 @@ class OpenBASMicrosoftSentinel:
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
                 if alert_date > limit_date:
-                    result = self._match_alert(
+                    result = self._match_alert_from_edr(
                         endpoint, columns_index, alert, expectation
                     )
                     if result is not False:
