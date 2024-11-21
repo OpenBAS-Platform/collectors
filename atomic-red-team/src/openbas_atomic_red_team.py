@@ -22,7 +22,7 @@ PLATFORMS = {
     "google-workspace": ["Windows", "Linux", "MacOS"],
 }
 
-ALL_ARCHITECTURES = "all_architectures"
+ALL_ARCHITECTURES = "All"
 
 EXECUTORS = {
     "powershell": "psh",
