@@ -38,6 +38,7 @@ VERIFIED = "VERIFIED"
 
 COMMUNITY = "COMMUNITY"
 
+
 def flatten_chain(matrix):
     if matrix == []:
         return matrix
