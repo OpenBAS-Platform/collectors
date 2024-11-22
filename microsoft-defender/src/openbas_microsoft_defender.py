@@ -15,13 +15,11 @@ from msgraph.generated.security.alerts_v2.alerts_v2_request_builder import (
 from msgraph.generated.security.microsoft_graph_security_run_hunting_query.run_hunting_query_post_request_body import (
     RunHuntingQueryPostRequestBody,
 )
-
 from pyobas.helpers import (
     OpenBASCollectorHelper,
     OpenBASConfigHelper,
     OpenBASDetectionHelper,
 )
-
 
 # This is the "god query" that aggregates a bunch of alert-related data
 # distributed in various tables within the Microsoft Defender saas.
