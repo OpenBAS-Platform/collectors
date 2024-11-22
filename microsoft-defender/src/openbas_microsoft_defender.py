@@ -8,10 +8,6 @@ from azure.identity.aio import ClientSecretCredential
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from msgraph import GraphServiceClient
-from msgraph.generated.security.alerts_v2.alerts_v2_request_builder import (
-    Alerts_v2RequestBuilder,
-    RequestConfiguration,
-)
 from msgraph.generated.security.microsoft_graph_security_run_hunting_query.run_hunting_query_post_request_body import (
     RunHuntingQueryPostRequestBody,
 )
