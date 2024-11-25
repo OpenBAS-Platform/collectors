@@ -89,12 +89,12 @@ let processEvidence = singleMachinePerAlert
 let hashedProcessEvents = DeviceProcessEvents
     | extend process_hash = hash(strcat(DeviceId, ProcessId, normalisePath(FileName), ProcessCreationTime)), parent_hash = hash(strcat(DeviceId, InitiatingProcessId, normalisePath(InitiatingProcessFileName), InitiatingProcessCreationTime));
 let tree = hashedProcessEvents
-    | join kind=leftouter hashedProcessEvents on $left.parent_hash == $right.process_hash
+    | join kind=inner hashedProcessEvents on $left.parent_hash == $right.process_hash
     | make-graph process_hash --> process_hash1 with hashedProcessEvents on process_hash
     | graph-match (parent)<-[spawnedBy*1..100]-(child)
-        where parent.FileName startswith "obas-implant" or child.FileName startswith "obas-implant"
         project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine)
-    | extend PathLength = array_length(Path);
+    | extend PathLength = array_length(Path)
+    | where parent_FileName startswith "obas-implant" or child_FileName startswith "obas-implant";
 fileEvidence
 | union processEvidence
 | join kind=inner tree on $left.process_hash == $right.child_process_hash
