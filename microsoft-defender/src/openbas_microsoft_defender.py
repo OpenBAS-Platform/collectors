@@ -264,8 +264,9 @@ class OpenBASMicrosoftDefender:
             alert_data[signature_type] = {}
             if signature_type == "parent_process_name":
                 alert_data[signature_type] = {
-                    "type": "simple",
+                    "type": "fuzzy",
                     "data": self._extract_parent_process_names(evidences),
+                    "score": 95,
                 }
             elif signature_type == "process_name":
                 alert_data[signature_type] = {
