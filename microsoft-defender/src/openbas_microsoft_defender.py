@@ -56,41 +56,43 @@ from pyobas.helpers import (
 #   In the sandbox UI: two backslashes: replace_string(pathString, "\\", "/")
 #
 TH_API_QUERY = """
-let normalisePath = (pathString:string) { trim_end("/", replace_string(pathString, "\\\\", "/")); };
+let normalisePath = (pathString:string) { tolower(trim_end("/", replace_string(pathString, "\\\\", "/"))); };
 let augmentedDeviceEvents = DeviceEvents
     | where isnotnull(InitiatingProcessId) and InitiatingProcessId != 0
-    | extend normalised_folder_path=normalisePath(FolderPath),
-             process_hash=hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime))
-    | project DeviceId, FileName, normalised_folder_path, process_hash;
+    | extend normalised_filename=normalisePath(FileName),
+             normalised_folder_path=normalisePath(FolderPath),
+             process_hash=hash(strcat(DeviceId, InitiatingProcessId, normalisePath(InitiatingProcessFileName), InitiatingProcessCreationTime))
+    | project DeviceId, normalised_filename, normalised_folder_path, process_hash;
 let augmentedFileEvents = DeviceFileEvents
-    | extend normalised_folder_path=normalisePath(parse_path(FolderPath).DirectoryPath),
-             process_hash=hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime))
-    | project DeviceId, FileName, normalised_folder_path, process_hash;
+    | extend normalised_filename=normalisePath(FileName),
+             normalised_folder_path=normalisePath(parse_path(FolderPath).DirectoryPath),
+             process_hash=hash(strcat(DeviceId, InitiatingProcessId, normalisePath(InitiatingProcessFileName), InitiatingProcessCreationTime))
+    | project DeviceId, normalised_filename, normalised_folder_path, process_hash;
 let augmentedAllFilesEvents = augmentedDeviceEvents
     | union augmentedFileEvents
-    | distinct DeviceId, FileName, normalised_folder_path, process_hash;
+    | distinct DeviceId, normalised_filename, normalised_folder_path, process_hash;
 let singleMachinePerAlert = AlertEvidence
     | where EntityType has "Machine" and EvidenceRole has "Impacted"
     | summarize max(TimeGenerated) by AlertId, DeviceId, DeviceName;
 let fileEvidence = singleMachinePerAlert
     | join AlertEvidence on $left.AlertId == $right.AlertId
     | where EntityType has "File"
-    | extend normalised_folder_path=normalisePath(FolderPath), d=parse_json(AdditionalFields)
-    | join kind=inner augmentedAllFilesEvents on $left.DeviceId == $right.DeviceId and $left.FileName == $right.FileName and $left.normalised_folder_path == $right.normalised_folder_path
-    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=FileName, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path, process_hash;
+    | extend normalised_filename=normalisePath(FileName), normalised_folder_path=normalisePath(FolderPath), d=parse_json(AdditionalFields)
+    | join kind=inner augmentedAllFilesEvents on $left.DeviceId == $right.DeviceId and $left.normalised_filename == $right.normalised_filename and $left.normalised_folder_path == $right.normalised_folder_path
+    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path, process_hash;
 let processEvidence = singleMachinePerAlert
     | join AlertEvidence on $left.AlertId == $right.AlertId
     | where EntityType has "Process"
-    | extend d=parse_json(AdditionalFields)
-    | extend process_hash=hash(strcat(DeviceId, d.ProcessId, FileName, todatetime(d.CreationTimeUtc)))
-    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=FileName, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path="<empty>", process_hash;
+    | extend normalised_filename=normalisePath(FileName), d=parse_json(AdditionalFields)
+    | extend process_hash=hash(strcat(DeviceId, d.ProcessId, normalised_filename, todatetime(d.CreationTimeUtc)))
+    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path="<empty>", process_hash;
 let hashedProcessEvents = DeviceProcessEvents
-    | extend process_hash = hash(strcat(DeviceId, ProcessId, FileName, ProcessCreationTime)), parent_hash = hash(strcat(DeviceId, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessCreationTime));
+    | extend process_hash = hash(strcat(DeviceId, ProcessId, normalisePath(FileName), ProcessCreationTime)), parent_hash = hash(strcat(DeviceId, InitiatingProcessId, normalisePath(InitiatingProcessFileName), InitiatingProcessCreationTime));
 let tree = hashedProcessEvents
-    | join kind=inner hashedProcessEvents on $left.parent_hash == $right.process_hash
+    | join kind=leftouter hashedProcessEvents on $left.parent_hash == $right.process_hash
     | make-graph process_hash --> process_hash1 with hashedProcessEvents on process_hash
     | graph-match (parent)<-[spawnedBy*1..100]-(child)
-        where parent.FileName startswith "obas-implant"
+        where parent.FileName startswith "obas-implant" or child.FileName startswith "obas-implant"
         project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine)
     | extend PathLength = array_length(Path);
 fileEvidence
@@ -159,6 +161,12 @@ class OpenBASMicrosoftDefender:
         # Initialize signatures helper
         self.relevant_signatures_types = [
             "parent_process_name",
+            "process_name",
+            "command_line",
+            "file_name",
+            "hostname",
+            "ipv4_address",
+            "ipv6_address",
         ]
         self.openbas_detection_helper = OpenBASDetectionHelper(
             self.helper.collector_logger, self.relevant_signatures_types
@@ -172,6 +180,49 @@ class OpenBASMicrosoftDefender:
             evidence.get("ParentProcessImageFileName")
             for evidence in evidences
             if evidence.get("EntityType") in ["Process", "File"]
+        ]
+
+    def _extract_process_names(self, evidences):
+        # Return both the actual process name and those of the found parents.
+        # Some executors are intercepted with the signature process name
+        # either being a child process ("process_name") or a parent process.
+        # Apparently this may happen if the inject is detected but not prevented
+        return [
+            process_name
+            for evidence in evidences
+            if evidence.get("EntityType") in ["Process", "File"]
+            for process_name in [
+                evidence.get("Identifier"),
+                evidence.get("ParentProcessImageFileName"),
+            ]
+        ]
+
+    def _extract_command_lines(self, evidences):
+        return [
+            evidence.get("CommandLine")
+            for evidence in evidences
+            if evidence.get("EntityType") == "Process"
+        ]
+
+    def _extract_file_names(self, evidences):
+        return [
+            evidence.get("Identifier")
+            for evidence in evidences
+            if evidence.get("EntityType") == "File"
+        ]
+
+    def _extract_hostnames(self, evidences):
+        return [
+            evidence.get("Identifier")
+            for evidence in evidences
+            if evidence.get("EntityType") == "Url"
+        ]
+
+    def _extract_ip_addresses(self, evidences):
+        return [
+            evidence.get("Identifier")
+            for evidence in evidences
+            if evidence.get("EntityType") == "Ip"
         ]
 
     def _is_prevented(self, evidences):
@@ -213,12 +264,48 @@ class OpenBASMicrosoftDefender:
             alert_data[signature_type] = {}
             if signature_type == "parent_process_name":
                 alert_data[signature_type] = {
-                    "type": "fuzzy",
+                    "type": "simple",
                     "data": self._extract_parent_process_names(evidences),
+                }
+            elif signature_type == "process_name":
+                alert_data[signature_type] = {
+                    "type": "simple",
+                    "data": self._extract_process_names(evidences),
+                }
+            elif signature_type in ["command_line", "command_line_base64"]:
+                alert_data[signature_type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_command_lines(evidences),
+                    "score": 60,
+                }
+            elif signature_type == "file_name":
+                alert_data[signature_type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_file_names(evidences),
+                    "score": 80,
+                }
+            elif signature_type == "hostname":
+                alert_data[signature_type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_hostnames(evidences),
+                    "score": 80,
+                }
+            elif signature_type in ["ipv4_address", "ipv6_address"]:
+                alert_data[signature_type] = {
+                    "type": "fuzzy",
+                    "data": self._extract_ip_addresses(evidences),
                     "score": 80,
                 }
         match_result = self.openbas_detection_helper.match_alert_elements(
-            signatures=expectation["inject_expectation_signatures"],
+            signatures=[
+                {
+                    "type": expectation.get("type"),
+                    # the KQL query lowers all, filenames due to limitation in data source
+                    # therefore we need to compare to lowercased strings
+                    "value": expectation.get("value").lower(),
+                }
+                for expectation in expectation["inject_expectation_signatures"]
+            ],
             alert_data=alert_data,
         )
         if match_result:
@@ -240,7 +327,9 @@ class OpenBASMicrosoftDefender:
         )
 
         if not any(expectations):
-            self.helper.collector_logger.info("No work: skipping iteration.")
+            self.helper.collector_logger.info(
+                "No expectations found: skipping iteration."
+            )
             return
 
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
