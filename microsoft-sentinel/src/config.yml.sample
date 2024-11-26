@@ -13,3 +13,4 @@ collector:
   microsoft_sentinel_subscription_id: ''
   microsoft_sentinel_workspace_id: ''
   microsoft_sentinel_resource_group: ''
+  microsoft_sentinel_edr_collectors: ''
