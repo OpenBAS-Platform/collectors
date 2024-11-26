@@ -276,3 +276,5 @@ class OpenBASMicrosoftSentinel:
 if __name__ == "__main__":
     openBASMicrosoftSentinel = OpenBASMicrosoftSentinel()
     openBASMicrosoftSentinel.start()
+
+# Avoir un bandeau pour limiter la casse: quand on a Sentinel qui tourne sans Defender -> ça ne marche pas
