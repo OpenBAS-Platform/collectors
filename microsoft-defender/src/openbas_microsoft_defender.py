@@ -393,7 +393,7 @@ class OpenBASMicrosoftDefender:
                                 "collector_id": self.config.get_conf("collector_id"),
                                 "result": "Detected",
                                 "is_success": True,
-                                "metadata": {"alertId": alert.id},
+                                "metadata": {"alertId": alert.get("AlertId")},
                             },
                         )
                     elif (
@@ -406,7 +406,7 @@ class OpenBASMicrosoftDefender:
                                 "collector_id": self.config.get_conf("collector_id"),
                                 "result": "Prevented",
                                 "is_success": True,
-                                "metadata": {"alertId": alert.id},
+                                "metadata": {"alertId": alert.get("AlertId")},
                             },
                         )
 
