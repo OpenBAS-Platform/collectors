@@ -376,9 +376,8 @@ class OpenBASMicrosoftDefender:
                 expectation["inject_expectation_asset"]
             )
             for alert in alerts.results:
-                if result := self._match_alert(
-                    endpoint, alert.additional_data, expectation
-                ):
+                alert_data = alert.additional_data
+                if result := self._match_alert(endpoint, alert_data, expectation):
                     self.helper.collector_logger.info(
                         "Expectation matched, fulfilling expectation "
                         + expectation["inject_expectation_inject"]
@@ -393,7 +392,7 @@ class OpenBASMicrosoftDefender:
                                 "collector_id": self.config.get_conf("collector_id"),
                                 "result": "Detected",
                                 "is_success": True,
-                                "metadata": {"alertId": alert.get("AlertId")},
+                                "metadata": {"alertId": alert_data.get("AlertId")},
                             },
                         )
                     elif (
@@ -406,7 +405,7 @@ class OpenBASMicrosoftDefender:
                                 "collector_id": self.config.get_conf("collector_id"),
                                 "result": "Prevented",
                                 "is_success": True,
-                                "metadata": {"alertId": alert.get("AlertId")},
+                                "metadata": {"alertId": alert_data.get("AlertId")},
                             },
                         )
 
