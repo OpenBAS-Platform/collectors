@@ -56,6 +56,7 @@ from pyobas.helpers import (
 #   In the sandbox UI: two backslashes: replace_string(pathString, "\\", "/")
 #
 TH_API_QUERY = """
+let null_if_not_implant_sig = (sig:string) { iff((sig startswith "obas-implant"), sig, ""); };
 let normalisePath = (pathString:string) { tolower(trim_end("/", replace_string(pathString, "\\\\", "/"))); };
 let augmentedDeviceEvents = DeviceEvents
     | where isnotnull(InitiatingProcessId) and InitiatingProcessId != 0
@@ -92,13 +93,13 @@ let tree = hashedProcessEvents
     | join kind=inner hashedProcessEvents on $left.parent_hash == $right.process_hash
     | make-graph process_hash --> process_hash1 with hashedProcessEvents on process_hash
     | graph-match (parent)<-[spawnedBy*1..100]-(child)
-        project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine)
+        project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine), sig=coalesce(null_if_not_implant_sig(child.FileName), null_if_not_implant_sig(parent.FileName))
     | extend PathLength = array_length(Path)
-    | where parent_FileName startswith "obas-implant" or child_FileName startswith "obas-implant";
+    | where isnotempty(sig);
 fileEvidence
 | union processEvidence
 | join kind=inner tree on $left.process_hash == $right.child_process_hash
-| project-rename ParentProcessImageFileName=parent_FileName, CommandLine=child_ProcessCommandLine
+| project-rename ParentProcessImageFileName=sig, CommandLine=child_ProcessCommandLine
 | extend data=bag_pack_columns(EntityType, Identifier, LastRemediationState, DetectionStatus, ParentProcessImageFileName, CommandLine)
 | summarize evidence=make_list(data) by AlertId, DeviceName
 """
