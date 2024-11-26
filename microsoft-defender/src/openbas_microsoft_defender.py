@@ -377,9 +377,7 @@ class OpenBASMicrosoftDefender:
             )
             for alert in alerts.results:
                 alert_data = alert.additional_data
-                if result := self._match_alert(
-                    endpoint, alert_data, expectation
-                ):
+                if result := self._match_alert(endpoint, alert_data, expectation):
                     self.helper.collector_logger.info(
                         "Expectation matched, fulfilling expectation "
                         + expectation["inject_expectation_inject"]
