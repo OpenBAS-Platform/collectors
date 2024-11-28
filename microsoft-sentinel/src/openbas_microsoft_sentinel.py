@@ -5,9 +5,11 @@ import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from pyobas.helpers import (OpenBASCollectorHelper, OpenBASConfigHelper,
-                            OpenBASDetectionHelper)
-
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 from sentinel_api_handler import SentinelApiHandler
 
 
@@ -127,7 +129,6 @@ class OpenBASMicrosoftSentinel:
         # Extract expectation alert link
         alert_id_expectation = None
         for item in expectation["inject_expectation_results"]:
-            self.helper.collector_logger.info(item["sourceName"])
             attached_collectors = ast.literal_eval(
                 self.config.get_conf("microsoft_sentinel_edr_collectors", default="[]")
             )
