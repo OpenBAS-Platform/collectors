@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a bug report to help us improve OpenBAS
 title: ''
-labels: bug, needs triage, question
+labels: bug, needs triage
 assignees: ''
 
 ---

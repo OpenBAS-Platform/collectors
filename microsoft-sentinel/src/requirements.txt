@@ -1,2 +1,2 @@
 pyobas @ git+https://github.com/OpenBAS-Platform/client-python@main
-msal==1.28.0
+msal==1.31.0
