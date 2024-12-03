@@ -1,0 +1,2 @@
+pyobas @ git+https://github.com/OpenBAS-Platform/client-python@main
+crowdstrike-falconpy==1.4.5

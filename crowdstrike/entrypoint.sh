@@ -4,4 +4,4 @@
 cd /opt/openbas-collector-crowdstrike
 
 # Start the collector
-python3 main.py
+python3 openbas_crowdstrike.py
