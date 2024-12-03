@@ -146,6 +146,68 @@ jobs:
       - ms-teams/report:
           only_on_fail: true
           webhook_url: $MS_TEAMS_WEBHOOK_URL
+  build_prerelease_1:
+    working_directory: ~/openbas
+    docker:
+      - image: cimg/base:stable-20.04
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: sudo apt-get update -qq && sudo apt install curl gettext-base
+      - run:
+          working_directory: ~/openbas/mitre-attack
+          name: Build Docker image openbas/collector-mitre-attack
+          command: docker build -t openbas/collector-mitre-attack:prerelease .
+      - run:
+          working_directory: ~/openbas/microsoft-entra
+          name: Build Docker image openbas/collector-microsoft-entra
+          command: docker build -t openbas/collector-microsoft-entra:prerelease .
+      - run:
+          working_directory: ~/openbas/tanium-threat-response
+          name: Build Docker image openbas/collector-tanium-threat-response
+          command: docker build -t openbas/collector-tanium-threat-response:prerelease .
+      - run:
+          working_directory: ~/openbas/microsoft-defender
+          name: Build Docker image openbas/collector-microsoft-defender
+          command: docker build -t openbas/collector-microsoft-defender:prerelease .
+      - run:
+          working_directory: ~/openbas/microsoft-sentinel
+          name: Build Docker image openbas/collector-microsoft-sentinel
+          command: docker build -t openbas/collector-microsoft-sentinel:prerelease .
+      - run:
+          working_directory: ~/openbas/atomic-red-team
+          name: Build Docker image openbas/collector-atomic-red-team
+          command: docker build -t openbas/collector-atomic-red-team:prerelease .
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push openbas/collector-mitre-attack:prerelease
+            docker push openbas/collector-microsoft-entra:prerelease
+            docker push openbas/collector-tanium-threat-response:prerelease
+            docker push openbas/collector-microsoft-defender:prerelease
+            docker push openbas/collector-microsoft-sentinel:prerelease
+            docker push openbas/collector-atomic-red-team:prerelease
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      - ms-teams/report:
+          only_on_fail: true
+          webhook_url: $MS_TEAMS_WEBHOOK_URL
+  deploy_testing:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN -n customer-testing rollout restart deployment -l app=openbas-collector
+  deploy_prerelease:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-openbas rollout restart deployment -l app=openbas-collector
   notify_rolling:
     docker:
       - image: "cimg/base:stable"
@@ -188,9 +250,24 @@ workflows:
             branches:
               only:
                 - main
-      - notify_rolling:
+      - build_prerelease_1:
+          requires:
+            - ensure_formatting
+            - linter
+          filters:
+            branches:
+              only:
+                - release/*
+      - deploy_testing:
           requires:
             - build_rolling_1
+      - deploy_prerelease:
+          requires:
+            - build_prerelease_1
+      - notify_rolling:
+          requires:
+            - deploy_testing
+            - deploy_prerelease
       - notify:
           requires:
             - build_1
