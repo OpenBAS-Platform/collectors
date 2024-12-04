@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from pyobas.signatures.types import SignatureTypes
-
 from crowdstrike.query_strategy.base import Base
+from pyobas.signatures.types import SignatureTypes
 
 
 class Alert(Base):
