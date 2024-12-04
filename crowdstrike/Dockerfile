@@ -2,18 +2,16 @@ FROM python:3.12-alpine
 ENV CONNECTOR_TYPE=EXTERNAL_IMPORT
 
 # Copy the connector
-ADD src /opt/openbas-collector-crowdstrike
+ADD crowdstrike /opt/openbas-collector-crowdstrike/crowdstrike
+WORKDIR /opt/openbas-collector-crowdstrike
+ADD requirements.txt .
 
 # Install Python modules
 # hadolint ignore=DL3003
 RUN apk update && apk upgrade && \
     apk --no-cache add git build-base libmagic libffi-dev libxslt libxslt-dev libxml2 libxml2-dev && \
-    cd /opt/openbas-collector-crowdstrike && \
     pip install --no-cache-dir -r requirements.txt && \
     apk del git build-base && \
     rm -rf /var/cache/apk/*
 
-# Expose and entrypoint
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["python3", "-m", "crowdstrike.openbas_crowdstrike"]

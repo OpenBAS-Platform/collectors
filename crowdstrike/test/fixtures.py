@@ -1,10 +1,10 @@
 from unittest.mock import Mock, patch
 
-from helpers import OpenBASCollectorHelper, OpenBASConfigHelper, OpenBASDetectionHelper
+from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper, OpenBASDetectionHelper
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
-from crowdstrike.crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
+from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
 
 DEFAULT_COLLECTOR_CONFIG = {
     "openbas_url": {"data": "http://fake_openbas_base_url"},

@@ -10,8 +10,8 @@ from pyobas.helpers import (
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
-from crowdstrike.crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
-from crowdstrike.crowdstrike.query_strategy import Alert, Base
+from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
+from crowdstrike.query_strategy import Alert, Base
 
 
 class OpenBASCrowdStrike:
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     helper = OpenBASCollectorHelper(
         config=config,
-        icon="img/icon-crowdstrike.png",
+        icon="crowdstrike/img/icon-crowdstrike.png",
         security_platform_type=config.get_conf("collector_platform"),
     )
 

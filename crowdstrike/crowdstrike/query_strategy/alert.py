@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pyobas.signatures.types import SignatureTypes
 
-from crowdstrike.crowdstrike.query_strategy.base import Base
+from crowdstrike.query_strategy.base import Base
 
 
 class Alert(Base):

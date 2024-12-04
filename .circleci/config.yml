@@ -44,6 +44,21 @@ jobs:
       - ms-teams/report:
           only_on_fail: true
           webhook_url: $MS_TEAMS_WEBHOOK_URL
+  test:
+    working_directory: ~/openbas
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Install dependencies for crowdstrike collector
+          command: pip install -r requirements.txt
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Tests for crowdstrike collector
+          command: python -m unittest
   build_1:
     working_directory: ~/openbas
     docker:
