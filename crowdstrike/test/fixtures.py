@@ -1,6 +1,10 @@
 from unittest.mock import Mock, patch
 
-from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper, OpenBASDetectionHelper
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 

@@ -35,7 +35,7 @@ class TestAlert(unittest.TestCase):
                     expected_alert_1_process_name,
                     expected_alert_1_parent_process_name,
                     expected_alert_1_grandparent_process_name,
-                ]
+                ],
             },
             expected_alert_2_id: {
                 "hostname": expected_alert_2_hostname,
@@ -43,8 +43,8 @@ class TestAlert(unittest.TestCase):
                     expected_alert_2_process_name,
                     expected_alert_2_parent_process_name,
                     expected_alert_2_grandparent_process_name,
-                ]
-            }
+                ],
+            },
         }
         mockGetAlerts.return_value = {
             "status_code": 200,
@@ -82,8 +82,13 @@ class TestAlert(unittest.TestCase):
 
         for alert in actual_data:
             self.assertIsNotNone(expected_values.get(alert.get_id()))
-            self.assertEqual(alert.get_hostname(), expected_values[alert.get_id()]["hostname"])
-            self.assertEqual(alert.get_process_image_names(), expected_values[alert.get_id()]["process_names"])
+            self.assertEqual(
+                alert.get_hostname(), expected_values[alert.get_id()]["hostname"]
+            )
+            self.assertEqual(
+                alert.get_process_image_names(),
+                expected_values[alert.get_id()]["process_names"],
+            )
 
 
 if __name__ == "__main__":
