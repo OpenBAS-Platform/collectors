@@ -1,1 +1,1 @@
-pyobas @ git+https://github.com/OpenBAS-Platform/client-python@main
+pyobas==1.9.0
