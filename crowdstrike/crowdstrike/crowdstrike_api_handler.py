@@ -36,5 +36,7 @@ class CrowdstrikeApiHandler:
             if alerts_response["status_code"] == 200:
                 return alerts_response["body"]["resources"]
 
-        print("Failed to query alerts:", response)
+        self.helper.collector_logger.error(
+            "Could not fetch alerts from the Crowdstrike backend."
+        )
         return []

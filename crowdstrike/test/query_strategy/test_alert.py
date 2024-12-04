@@ -46,6 +46,10 @@ class TestAlert(unittest.TestCase):
                 ],
             },
         }
+
+        # note that this is a truncated structure matching only a subset of keys present
+        # in a returned json from the crowdstrike API.
+        # Here are only the keys that are relevant to our collector
         mockGetAlerts.return_value = {
             "status_code": 200,
             "body": {
@@ -89,6 +93,17 @@ class TestAlert(unittest.TestCase):
                 alert.get_process_image_names(),
                 expected_values[alert.get_id()]["process_names"],
             )
+
+    @patch("falconpy.alerts.Alerts.query_alerts_v2")
+    def test_when_query_alerts_v2_error_return_no_items(self, mockQueryAlerts):
+        mockQueryAlerts.return_value = {
+            "status_code": 400,
+            "body": {"errors": ["something wrong"], "resources": []},
+        }
+
+        actual_data = TestAlert.strategy.get_raw_data(start_time=datetime.now())
+
+        self.assertEqual(len(actual_data), 0)
 
 
 if __name__ == "__main__":

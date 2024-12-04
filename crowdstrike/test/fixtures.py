@@ -40,8 +40,6 @@ FAKE_DOCUMENT = {"document_id": "fake_document_id"}
 
 FAKE_SECURITY_PLATFORM = {"asset_id": "fake_asset_id"}
 
-default_fixtures = {}
-
 
 def get_default_openbas_config_helper(
     config: dict = DEFAULT_COLLECTOR_CONFIG,
