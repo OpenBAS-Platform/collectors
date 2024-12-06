@@ -9,6 +9,9 @@ from pyobas.helpers import (
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
+from crowdstrike.openbas_crowdstrike import OpenBASCrowdStrike
+from crowdstrike.query_strategy.base import Base
+
 DEFAULT_COLLECTOR_CONFIG = {
     "openbas_url": {"data": "http://fake_openbas_base_url"},
     "openbas_token": {"data": "openbas_uuid_token"},
@@ -71,13 +74,13 @@ def get_default_openbas_collector_helper(
 
 def get_default_signature_types(
     signature_types: [SignatureTypes] = DEFAULT_SIGNATURE_TYPES,
-) -> [SignatureType]:
+) -> list[SignatureType]:
     return signature_types
 
 
 def get_default_detection_helper(
     helper: OpenBASCollectorHelper = get_default_openbas_collector_helper(),
-    signature_types: [SignatureType] = get_default_signature_types(),
+    signature_types: list[SignatureType] = get_default_signature_types(),
 ):
     return OpenBASDetectionHelper(
         logger=helper.collector_logger,
@@ -96,3 +99,41 @@ def get_default_api_handler(
         client_secret=helper.config_helper.get_conf("crowdstrike_client_secret"),
         base_url=helper.config_helper.get_conf("crowdstrike_api_base_url"),
     )
+
+def get_default_collector(
+    strategy,
+    config: OpenBASConfigHelper=get_default_openbas_config_helper(),
+    helper: OpenBASCollectorHelper=get_default_openbas_collector_helper(),
+    detection_helper: OpenBASDetectionHelper=get_default_detection_helper(),
+    signature_types: list[SignatureType]=get_default_signature_types()
+):
+    return OpenBASCrowdStrike(
+        strategy=strategy,
+        config=config,
+        helper=helper,
+        detection_helper=detection_helper,
+        signature_types=signature_types,
+    )
+
+class TestStrategy(Base):
+    def __init__(self, raw_data_callback, signature_data_callback, is_prevented_callback,
+                 api_handler=get_default_api_handler()):
+        super().__init__(api_handler)
+        self.raw_data_callback = raw_data_callback
+        self.signature_data_callback = signature_data_callback
+        self.is_prevented_callback = is_prevented_callback
+
+    def get_raw_data(self, start_time):
+        return self.raw_data_callback()
+
+    def get_signature_data(self, data_item, signature_types: list[SignatureType]):
+        return self.signature_data_callback()
+
+    def is_prevented(self, data_item) -> bool:
+        return self.is_prevented_callback()
+
+    # implement to placate the linter but not useful as we are
+    # shadowing the get_signature_data method
+    def extract_signature_data(self, data_item, signature_type: SignatureTypes):
+        pass
+
