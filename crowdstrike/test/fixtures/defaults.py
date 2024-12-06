@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
 from pyobas.helpers import (
     OpenBASCollectorHelper,
     OpenBASConfigHelper,
@@ -8,6 +7,8 @@ from pyobas.helpers import (
 )
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
+
+from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
 
 DEFAULT_COLLECTOR_CONFIG = {
     "openbas_url": {"data": "http://fake_openbas_base_url"},
@@ -52,15 +53,15 @@ def get_default_openbas_config_helper(
 @patch("pyobas.mixins.CreateMixin.create")
 @patch("builtins.open")
 def get_default_openbas_collector_helper(
-    mockOpen,
+    mock_open,
     mockMixinCreate,
-    mockSecurityPlatformUpsert,
-    mockDocumentUpsert,
+    mock_security_platform_upsert,
+    mock_document_upsert,
     config: OpenBASConfigHelper = get_default_openbas_config_helper(),
 ) -> OpenBASCollectorHelper:
-    mockDocumentUpsert.return_value = FAKE_DOCUMENT
-    mockSecurityPlatformUpsert.return_value = FAKE_SECURITY_PLATFORM
-    mockOpen.return_value = None
+    mock_document_upsert.return_value = FAKE_DOCUMENT
+    mock_security_platform_upsert.return_value = FAKE_SECURITY_PLATFORM
+    mock_open.return_value = None
     return OpenBASCollectorHelper(
         config=config,
         icon="some.png",

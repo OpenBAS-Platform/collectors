@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
 
+from pyobas.exceptions import OpenBASError
+from pyobas.signatures.signature_type import SignatureType
+from pyobas.signatures.types import SignatureTypes
+
 
 class Base(ABC):
     def __init__(self, api_handler):
@@ -10,13 +14,17 @@ class Base(ABC):
         pass
 
     @abstractmethod
-    def extract_signature_data(self, data_item, signature_type):
+    def extract_signature_data(self, data_item, signature_type: SignatureTypes):
         pass
 
-    def get_signature_data(self, data_item, signature_types):
-        return {
-            signature_type.label: signature_type.make_struct_for_matching(
-                self.extract_signature_data(data_item, signature_type.label)
-            )
-            for signature_type in signature_types
-        }
+    def get_signature_data(self, data_item, signature_types: list[SignatureType]):
+        data = {}
+        for signature_type in signature_types:
+            try:
+                data[signature_type.label] = signature_type.make_struct_for_matching(
+                    self.extract_signature_data(data_item, signature_type.label)
+                )
+            except OpenBASError as oe:
+                self.api.helper.collector_logger.warning(f"Skipping signature type: {oe}")
+                continue
+        return data

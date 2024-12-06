@@ -1,86 +1,39 @@
 import unittest
 from datetime import datetime
-from test.fixtures import get_default_api_handler
+from test.fixtures.crowdstrike_alerts_v2 import (
+    ALERT_DATA,
+    GET_ALERTS_V2_FAILURE_RESPONSE,
+    GET_ALERTS_V2_SUCCESS_RESPONSE,
+    GET_ALERTS_V2_SUCCESS_RESPONSE_NO_ITEMS,
+    GET_ALERTS_V2_SUCCESS_RESPONSE_WITH_MALFORMED_DATA,
+    QUERY_ALERTS_V2_FAILURE_RESPONSE,
+    QUERY_ALERTS_V2_SUCCESS_RESPONSE,
+)
+from test.fixtures.defaults import DEFAULT_SIGNATURE_TYPES, get_default_api_handler
 from unittest.mock import patch
 
-from crowdstrike.query_strategy.alert import Alert
+from pydantic import ValidationError
+from pyobas.exceptions import OpenBASError
+from pyobas.signatures.signature_type import SignatureType
+from pyobas.signatures.types import MatchTypes, SignatureTypes
+
+from crowdstrike.query_strategy.alert import Alert, Item
 
 
 class TestAlert(unittest.TestCase):
-    strategy = Alert(api_handler=get_default_api_handler())
+    STRATEGY = Alert(api_handler=get_default_api_handler())
 
     @patch("falconpy.alerts.Alerts.query_alerts_v2")
     @patch("falconpy.alerts.Alerts.get_alerts_v2")
-    def test_raw_data_from_api_is_correctly_formatted(
-        self, mockGetAlerts, mockQueryAlerts
+    def test_when_alerts_returned_they_are_correctly_formatted(
+        self, mock_get_alerts, mock_query_alerts
     ):
-        mockQueryAlerts.return_value = {
-            "status_code": 200,
-            "body": {"resources": ["alert_id_1", "alert_id_2"]},
-        }
-        expected_alert_1_id = "alert_id_1"
-        expected_alert_1_hostname = "endpoint"
-        expected_alert_1_process_name = "some.exe"
-        expected_alert_1_parent_process_name = "parent.exe"
-        expected_alert_1_grandparent_process_name = "grandparent.exe"
-        expected_alert_2_id = "alert_id_2"
-        expected_alert_2_hostname = "endpoint"
-        expected_alert_2_process_name = "other.exe"
-        expected_alert_2_parent_process_name = "other_parent.exe"
-        expected_alert_2_grandparent_process_name = "other_grandparent.exe"
-        expected_values = {
-            expected_alert_1_id: {
-                "hostname": expected_alert_1_hostname,
-                "process_names": [
-                    expected_alert_1_process_name,
-                    expected_alert_1_parent_process_name,
-                    expected_alert_1_grandparent_process_name,
-                ],
-            },
-            expected_alert_2_id: {
-                "hostname": expected_alert_2_hostname,
-                "process_names": [
-                    expected_alert_2_process_name,
-                    expected_alert_2_parent_process_name,
-                    expected_alert_2_grandparent_process_name,
-                ],
-            },
-        }
+        mock_query_alerts.return_value = QUERY_ALERTS_V2_SUCCESS_RESPONSE
+        mock_get_alerts.return_value = GET_ALERTS_V2_SUCCESS_RESPONSE
 
-        # note that this is a truncated structure matching only a subset of keys present
-        # in a returned json from the crowdstrike API.
-        # Here are only the keys that are relevant to our collector
-        mockGetAlerts.return_value = {
-            "status_code": 200,
-            "body": {
-                "resources": [
-                    {
-                        "id": expected_alert_1_id,
-                        "device": {"hostname": expected_alert_1_hostname},
-                        "filename": expected_alert_1_process_name,
-                        "parent_details": {
-                            "filename": expected_alert_1_parent_process_name
-                        },
-                        "grandparent_details": {
-                            "filename": expected_alert_1_grandparent_process_name
-                        },
-                    },
-                    {
-                        "id": expected_alert_2_id,
-                        "device": {"hostname": expected_alert_2_hostname},
-                        "filename": expected_alert_2_process_name,
-                        "parent_details": {
-                            "filename": expected_alert_2_parent_process_name
-                        },
-                        "grandparent_details": {
-                            "filename": expected_alert_2_grandparent_process_name
-                        },
-                    },
-                ]
-            },
-        }
+        expected_values = ALERT_DATA
 
-        actual_data = TestAlert.strategy.get_raw_data(start_time=datetime.now())
+        actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
 
         self.assertEqual(len(actual_data), len(expected_values))
 
@@ -95,15 +48,171 @@ class TestAlert(unittest.TestCase):
             )
 
     @patch("falconpy.alerts.Alerts.query_alerts_v2")
-    def test_when_query_alerts_v2_error_return_no_items(self, mockQueryAlerts):
-        mockQueryAlerts.return_value = {
-            "status_code": 400,
-            "body": {"errors": ["something wrong"], "resources": []},
-        }
+    @patch("falconpy.alerts.Alerts.get_alerts_v2")
+    def test_when_alerts_returned_malformed_they_are_skipped(
+        self, mock_get_alerts, mock_query_alerts
+    ):
+        mock_query_alerts.return_value = QUERY_ALERTS_V2_SUCCESS_RESPONSE
+        mock_get_alerts.return_value = (
+            GET_ALERTS_V2_SUCCESS_RESPONSE_WITH_MALFORMED_DATA
+        )
 
-        actual_data = TestAlert.strategy.get_raw_data(start_time=datetime.now())
+        actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
 
-        self.assertEqual(len(actual_data), 0)
+        self.assertFalse(any(actual_data))
+
+    @patch("falconpy.alerts.Alerts.query_alerts_v2")
+    def test_when_query_alerts_v2_error_return_no_items(self, mock_query_alerts):
+        mock_query_alerts.return_value = QUERY_ALERTS_V2_FAILURE_RESPONSE
+
+        actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
+
+        self.assertFalse(any(actual_data))
+
+    @patch("falconpy.alerts.Alerts.query_alerts_v2")
+    @patch("falconpy.alerts.Alerts.get_alerts_v2")
+    def test_when_get_alerts_v2_error_return_no_items(
+        self, mock_get_alerts, mock_query_alerts
+    ):
+        mock_query_alerts.return_value = QUERY_ALERTS_V2_SUCCESS_RESPONSE
+        mock_get_alerts.return_value = GET_ALERTS_V2_FAILURE_RESPONSE
+
+        actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
+
+        self.assertFalse(any(actual_data))
+
+    @patch("falconpy.alerts.Alerts.query_alerts_v2")
+    @patch("falconpy.alerts.Alerts.get_alerts_v2")
+    def test_when_get_alerts_v2_returns_no_resource_return_no_items(
+        self, mock_get_alerts, mock_query_alerts
+    ):
+        mock_query_alerts.return_value = QUERY_ALERTS_V2_SUCCESS_RESPONSE
+        mock_get_alerts.return_value = GET_ALERTS_V2_SUCCESS_RESPONSE_NO_ITEMS
+
+        actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
+
+        self.assertFalse(any(actual_data))
+
+    # this test is arguably not extremely useful,
+    # it effectively tests that we can't instantiate an invalid Item
+    # therefore it's virtually impossible to accidentally pass an object
+    # that would not respond to the contract
+    def test_when_instantiating_invalid_item_throw(self):
+        with self.assertRaises(ValidationError):
+            Item(**{})
+
+    def test_when_valid_alert_item_extract_hostname_as_expected(self):
+        expected_hostname = "hostname.domain"
+        item = Item(
+            **{
+                "id": "alert id",
+                "device": {"hostname": expected_hostname},
+                "filename": "process.exe",
+                "parent_details": {"filename": "parent.exe"},
+                "grandparent_details": {"filename": "grandparent.exe"},
+            }
+        )
+
+        actual = TestAlert.STRATEGY.extract_signature_data(
+            item, SignatureTypes.SIG_TYPE_HOSTNAME
+        )
+
+        self.assertEqual(actual, expected_hostname)
+
+    def test_when_valid_alert_item_extract_process_names_as_expected(self):
+        expected_process_name = "process.exe"
+        expected_parent_process_name = "parent.exe"
+        expected_grandparent_process_name = "grandparent.exe"
+        expected_process_names = [
+            expected_process_name,
+            expected_parent_process_name,
+            expected_grandparent_process_name,
+        ]
+        item = Item(
+            **{
+                "id": "alert_id",
+                "device": {"hostname": "hostname.domain"},
+                "filename": expected_process_name,
+                "parent_details": {"filename": expected_parent_process_name},
+                "grandparent_details": {"filename": expected_grandparent_process_name},
+            }
+        )
+
+        actual = TestAlert.STRATEGY.extract_signature_data(
+            item, SignatureTypes.SIG_TYPE_PARENT_PROCESS_NAME
+        )
+
+        self.assertEqual(actual, expected_process_names)
+
+    def test_when_valid_alert_item_extract_unknown_signature_type_throws(self):
+        item = Item(
+            **{
+                "id": "alert_id",
+                "device": {"hostname": "hostname.domain"},
+                "filename": "process.exe",
+                "parent_details": {"filename": "parent.exe"},
+                "grandparent_details": {"filename": "grandparent.exe"},
+            }
+        )
+
+        with self.assertRaises(OpenBASError):
+            TestAlert.STRATEGY.extract_signature_data(
+                # purposefully pass an arbitrary string instead of SignatureTypes enum item
+                item,
+                "deliberately unknown sig type",
+            )
+
+    def test_when_valid_alert_item_get_signature_data_as_expected(self):
+        item = Item(
+            **{
+                "id": "alert id",
+                "device": {"hostname": "hostname.domain"},
+                "filename": "process.exe",
+                "parent_details": {"filename": "parent.exe"},
+                "grandparent_details": {"filename": "grandparent.exe"},
+            }
+        )
+
+        expected_signature_types = DEFAULT_SIGNATURE_TYPES
+
+        actual = TestAlert.STRATEGY.get_signature_data(
+            item, expected_signature_types
+        )
+
+        self.assertEqual(len(actual), len(expected_signature_types))
+        for signature_type in expected_signature_types:
+            self.assertIsNotNone(actual.get(signature_type.label))
+
+    def test_when_valid_alert_item_with_unsupported_signature_type_skips(self):
+        item = Item(
+            **{
+                "id": "alert id",
+                "device": {"hostname": "hostname.domain"},
+                "filename": "process.exe",
+                "parent_details": {"filename": "parent.exe"},
+                "grandparent_details": {"filename": "grandparent.exe"},
+            }
+        )
+
+        unknown_type_label = "UNKNOWN_SIGNATURE_TYPE"
+        expected_signature_types = DEFAULT_SIGNATURE_TYPES + [
+            SignatureType(
+                unknown_type_label,
+                match_type=MatchTypes.MATCH_TYPE_SIMPLE
+            )
+        ]
+
+        actual = TestAlert.STRATEGY.get_signature_data(
+            item, expected_signature_types
+        )
+
+        self.assertNotEqual(len(actual), len(expected_signature_types))
+        for signature_type in expected_signature_types:
+            signature_data = actual.get(signature_type.label)
+            if signature_type.label != unknown_type_label:
+                self.assertIsNotNone(signature_data)
+            else:
+                self.assertIsNone(signature_data)
 
 
 if __name__ == "__main__":
