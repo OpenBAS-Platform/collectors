@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
 import pytz
+from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
+from crowdstrike.pattern_disposition import is_prevented
+from crowdstrike.query_strategy.alert import Alert
+from crowdstrike.query_strategy.base import Base
 from dateutil.parser import parse
 from pyobas.helpers import (
     OpenBASCollectorHelper,
@@ -9,11 +13,6 @@ from pyobas.helpers import (
 )
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
-
-from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
-from crowdstrike.pattern_disposition import is_prevented
-from crowdstrike.query_strategy.alert import Alert
-from crowdstrike.query_strategy.base import Base
 
 
 class OpenBASCrowdStrike:
@@ -85,11 +84,10 @@ class OpenBASCrowdStrike:
             expectation_signatures = expectation.get("inject_expectation_signatures")
 
             if (
-                    (endpoint_hostname := self.helper.api.endpoint.get(
+                endpoint_hostname := self.helper.api.endpoint.get(
                     expectation["inject_expectation_asset"]
-                ).get("endpoint_hostname"))
-                is not None
-            ):
+                ).get("endpoint_hostname")
+            ) is not None:
                 expectation_signatures += [
                     {
                         "type": SignatureTypes.SIG_TYPE_HOSTNAME.value,

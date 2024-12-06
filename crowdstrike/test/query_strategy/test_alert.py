@@ -12,12 +12,11 @@ from test.fixtures.crowdstrike_alerts_v2 import (
 from test.fixtures.defaults import DEFAULT_SIGNATURE_TYPES, get_default_api_handler
 from unittest.mock import patch
 
+from crowdstrike.query_strategy.alert import Alert, Item
 from pydantic import ValidationError
 from pyobas.exceptions import OpenBASError
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
-
-from crowdstrike.query_strategy.alert import Alert, Item
 
 
 class TestAlert(unittest.TestCase):
@@ -110,7 +109,7 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
-                "pattern_disposition": 0
+                "pattern_disposition": 0,
             }
         )
 
@@ -136,7 +135,7 @@ class TestAlert(unittest.TestCase):
                 "filename": expected_process_name,
                 "parent_details": {"filename": expected_parent_process_name},
                 "grandparent_details": {"filename": expected_grandparent_process_name},
-                "pattern_disposition": 0
+                "pattern_disposition": 0,
             }
         )
 
@@ -154,7 +153,7 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
-                "pattern_disposition": 0
+                "pattern_disposition": 0,
             }
         )
 
@@ -173,7 +172,7 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
-                "pattern_disposition": 0
+                "pattern_disposition": 0,
             }
         )
 
@@ -193,18 +192,22 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
-                "pattern_disposition": 0
+                "pattern_disposition": 0,
             }
         )
 
         class _fake_signature:
             value: str
+
             def __init__(self, value):
                 self.value = value
 
         unknown_type_label = "UNKNOWN_SIGNATURE_TYPE"
         expected_signature_types = DEFAULT_SIGNATURE_TYPES + [
-            SignatureType(_fake_signature(value=unknown_type_label), match_type=MatchTypes.MATCH_TYPE_SIMPLE)
+            SignatureType(
+                _fake_signature(value=unknown_type_label),
+                match_type=MatchTypes.MATCH_TYPE_SIMPLE,
+            )
         ]
 
         actual = TestAlert.STRATEGY.get_signature_data(item, expected_signature_types)

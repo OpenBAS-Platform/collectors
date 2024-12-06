@@ -55,7 +55,7 @@ def make_test_alert_data():
                     "grandparent_details": {
                         "filename": expected_alert_1_grandparent_process_name
                     },
-                    "pattern_disposition": 0
+                    "pattern_disposition": 0,
                 },
                 {
                     "id": expected_alert_2_id,
@@ -67,7 +67,7 @@ def make_test_alert_data():
                     "grandparent_details": {
                         "filename": expected_alert_2_grandparent_process_name
                     },
-                    "pattern_disposition": 0
+                    "pattern_disposition": 0,
                 },
             ]
         },
