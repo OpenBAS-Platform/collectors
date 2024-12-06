@@ -55,27 +55,27 @@ jobs:
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
-          command: docker build -t openbas/collector-mitre-attack:latest . && docker tag openbas/collector-mitre-attack:latest openbas/collector-mitre-attack:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-mitre-attack:latest . && docker tag openbas/collector-mitre-attack:latest openbas/collector-mitre-attack:${CIRCLE_TAG}
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build -t openbas/collector-microsoft-entra:latest . && docker tag openbas/collector-microsoft-entra:latest openbas/collector-microsoft-entra:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-microsoft-entra:latest . && docker tag openbas/collector-microsoft-entra:latest openbas/collector-microsoft-entra:${CIRCLE_TAG}
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build -t openbas/collector-tanium-threat-response:latest . && docker tag openbas/collector-tanium-threat-response:latest openbas/collector-tanium-threat-response:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:latest . && docker tag openbas/collector-tanium-threat-response:latest openbas/collector-tanium-threat-response:${CIRCLE_TAG}
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build -t openbas/collector-microsoft-defender:latest . && docker tag openbas/collector-microsoft-defender:latest openbas/collector-microsoft-defender:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-microsoft-defender:latest . && docker tag openbas/collector-microsoft-defender:latest openbas/collector-microsoft-defender:${CIRCLE_TAG}
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build -t openbas/collector-microsoft-sentinel:latest . && docker tag openbas/collector-microsoft-sentinel:latest openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:latest . && docker tag openbas/collector-microsoft-sentinel:latest openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build -t openbas/collector-atomic-red-team:latest . && docker tag openbas/collector-atomic-red-team:latest openbas/collector-atomic-red-team:${CIRCLE_TAG}
+          command: docker build --progress=plain -t openbas/collector-atomic-red-team:latest . && docker tag openbas/collector-atomic-red-team:latest openbas/collector-atomic-red-team:${CIRCLE_TAG}
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
@@ -109,27 +109,27 @@ jobs:
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
-          command: docker build -t openbas/collector-mitre-attack:rolling .
+          command: docker build --progress=plain -t openbas/collector-mitre-attack:rolling .
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build -t openbas/collector-microsoft-entra:rolling .
+          command: docker build --progress=plain -t openbas/collector-microsoft-entra:rolling .
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build -t openbas/collector-tanium-threat-response:rolling .
+          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:rolling .
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build -t openbas/collector-microsoft-defender:rolling .
+          command: docker build --progress=plain -t openbas/collector-microsoft-defender:rolling .
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build -t openbas/collector-microsoft-sentinel:rolling .
+          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:rolling .
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build -t openbas/collector-atomic-red-team:rolling .
+          command: docker build --progress=plain -t openbas/collector-atomic-red-team:rolling .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
