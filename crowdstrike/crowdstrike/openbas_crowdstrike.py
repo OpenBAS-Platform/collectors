@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import pytz
 from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
-from crowdstrike.pattern_disposition import is_prevented
 from crowdstrike.query_strategy.alert import Alert
 from crowdstrike.query_strategy.base import Base
 from dateutil.parser import parse
