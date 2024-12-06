@@ -110,6 +110,7 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
+                "pattern_disposition": 0
             }
         )
 
@@ -135,6 +136,7 @@ class TestAlert(unittest.TestCase):
                 "filename": expected_process_name,
                 "parent_details": {"filename": expected_parent_process_name},
                 "grandparent_details": {"filename": expected_grandparent_process_name},
+                "pattern_disposition": 0
             }
         )
 
@@ -152,6 +154,7 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
+                "pattern_disposition": 0
             }
         )
 
@@ -170,18 +173,17 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
+                "pattern_disposition": 0
             }
         )
 
         expected_signature_types = DEFAULT_SIGNATURE_TYPES
 
-        actual = TestAlert.STRATEGY.get_signature_data(
-            item, expected_signature_types
-        )
+        actual = TestAlert.STRATEGY.get_signature_data(item, expected_signature_types)
 
         self.assertEqual(len(actual), len(expected_signature_types))
         for signature_type in expected_signature_types:
-            self.assertIsNotNone(actual.get(signature_type.label))
+            self.assertIsNotNone(actual.get(signature_type.label.value))
 
     def test_when_valid_alert_item_with_unsupported_signature_type_skips(self):
         item = Item(
@@ -191,25 +193,26 @@ class TestAlert(unittest.TestCase):
                 "filename": "process.exe",
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
+                "pattern_disposition": 0
             }
         )
 
+        class _fake_signature:
+            value: str
+            def __init__(self, value):
+                self.value = value
+
         unknown_type_label = "UNKNOWN_SIGNATURE_TYPE"
         expected_signature_types = DEFAULT_SIGNATURE_TYPES + [
-            SignatureType(
-                unknown_type_label,
-                match_type=MatchTypes.MATCH_TYPE_SIMPLE
-            )
+            SignatureType(_fake_signature(value=unknown_type_label), match_type=MatchTypes.MATCH_TYPE_SIMPLE)
         ]
 
-        actual = TestAlert.STRATEGY.get_signature_data(
-            item, expected_signature_types
-        )
+        actual = TestAlert.STRATEGY.get_signature_data(item, expected_signature_types)
 
         self.assertNotEqual(len(actual), len(expected_signature_types))
         for signature_type in expected_signature_types:
-            signature_data = actual.get(signature_type.label)
-            if signature_type.label != unknown_type_label:
+            signature_data = actual.get(signature_type.label.value)
+            if signature_type.label.value != unknown_type_label:
                 self.assertIsNotNone(signature_data)
             else:
                 self.assertIsNone(signature_data)

@@ -11,6 +11,7 @@ from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
 from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
+from crowdstrike.pattern_disposition import is_prevented
 from crowdstrike.query_strategy.alert import Alert
 from crowdstrike.query_strategy.base import Base
 
@@ -73,20 +74,29 @@ class OpenBASCrowdStrike:
 
         return valid_expectations
 
-    def _match_expectations(self, valid_expectations, start_time):
-        alerts = self.strategy.get_raw_data(start_time)
-        # Logic to match expectations
-        for expectation in valid_expectations:
-            endpoint = self.helper.api.endpoint.get(
-                expectation["inject_expectation_asset"]
-            )
+    def _match_expectations(self, alerts, expectations):
+        for expectation in expectations:
+            if expectation.get("inject_expectation_signatures") is None:
+                self.helper.collector_logger.warning(
+                    f"No expected signatures found in expectation #{expectation.get('id')}"
+                )
+                continue
+
             expectation_signatures = expectation.get("inject_expectation_signatures")
-            expectation_signatures.append(
-                {
-                    "type": SignatureTypes.SIG_TYPE_HOSTNAME,
-                    "value": endpoint.get("endpoint_hostname").lower(),
-                }
-            )
+
+            if (
+                    (endpoint_hostname := self.helper.api.endpoint.get(
+                    expectation["inject_expectation_asset"]
+                ).get("endpoint_hostname"))
+                is not None
+            ):
+                expectation_signatures += [
+                    {
+                        "type": SignatureTypes.SIG_TYPE_HOSTNAME.value,
+                        "value": endpoint_hostname.lower(),
+                    }
+                ]
+
             for alert in alerts:
                 if self.detection_helper.match_alert_elements(
                     signatures=expectation_signatures,
@@ -94,28 +104,39 @@ class OpenBASCrowdStrike:
                         alert, self.signature_types
                     ),
                 ):
+                    result: str
+                    success_or_failure: bool
                     if expectation.get("inject_expectation_type") == "DETECTION":
-                        self.helper.api.inject_expectation.update(
-                            expectation["inject_expectation_id"],
-                            {
-                                "collector_id": self.config.get_conf("collector_id"),
-                                "result": "Detected",
-                                "is_success": True,
-                                "metadata": {"alertId": alert.get_id()},
-                            },
-                        )
+                        success_or_failure = True
+                        result = "Detected"
+                    elif expectation.get("inject_expectation_type") == "PREVENTION":
+                        success_or_failure = self.strategy.is_prevented(alert)
+                        result = "Prevented" if success_or_failure else "Not prevented"
                     else:
                         self.helper.collector_logger.warning(
                             f"Unsupported expectation type for now: {expectation.get('inject_expectation_type')}"
                         )
+                        continue
+
+                    self.helper.api.inject_expectation.update(
+                        expectation["inject_expectation_id"],
+                        {
+                            "collector_id": self.config.get_conf("collector_id"),
+                            "result": result,
+                            "is_success": success_or_failure,
+                            "metadata": {"alertId": alert.get_id()},
+                        },
+                    )
 
     def _process(self):
         """Fetch and match expectations with data from cs"""
         now = datetime.now(pytz.UTC)
         start_time = now - timedelta(days=15)
 
-        valid_expectations = self._fetch_expectations(start_time)
-        self._match_expectations(valid_expectations, start_time)
+        self._match_expectations(
+            alerts=self.strategy.get_raw_data(start_time),
+            expectations=self._fetch_expectations(start_time),
+        )
 
     def start(self):
         period = self.config.get_conf("collector_period", True, 60)
