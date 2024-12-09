@@ -37,13 +37,13 @@ class TestAlert(unittest.TestCase):
         self.assertEqual(len(actual_data), len(expected_values))
 
         for alert in actual_data:
-            self.assertIsNotNone(expected_values.get(alert.get_id()))
+            self.assertIsNotNone(expected_values.get(alert.id))
             self.assertEqual(
-                alert.get_hostname(), expected_values[alert.get_id()]["hostname"]
+                alert.get_hostname(), expected_values[alert.id]["hostname"]
             )
             self.assertEqual(
                 alert.get_process_image_names(),
-                expected_values[alert.get_id()]["process_names"],
+                expected_values[alert.id]["process_names"],
             )
 
     @patch("falconpy.alerts.Alerts.query_alerts_v2")

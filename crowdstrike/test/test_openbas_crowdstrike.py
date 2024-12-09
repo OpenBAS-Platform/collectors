@@ -13,7 +13,8 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
         strategy = TestStrategy(
             raw_data_callback=lambda: alerts,
             signature_data_callback=lambda: [],
-            is_prevented_callback=lambda: True
+            is_prevented_callback=lambda: True,
+            get_alert_id_callback=lambda: ""
         )
         collector = get_default_collector(strategy)
 
@@ -23,7 +24,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
     @patch("pyobas.apis.EndpointManager.get")
     @patch("pyobas.apis.InjectExpectationManager.update")
-    def test_when_alert_matches_expectation(self, mock_expectation_update, mock_endpoint_get):
+    def test_when_alert_matches_update_prevention_expectation(self, mock_expectation_update, mock_endpoint_get):
         mock_endpoint_get.return_value = { "endpoint_hostname": "some_host" }
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -51,17 +52,13 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
                 "data": ["grandparent.exe", "some_process.exe"],
                 "score": 95
             },
-            "hostname":
-            {
-                "type": "simple",
-                "data": ["some_host"]
-            }
         }
 
         strategy = TestStrategy(
             raw_data_callback=lambda: None,
             signature_data_callback=lambda: signature_data,
-            is_prevented_callback=lambda: True
+            is_prevented_callback=lambda: True,
+            get_alert_id_callback=lambda: expected_expectation_id
         )
 
         collector = get_default_collector(strategy)
@@ -70,11 +67,209 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         mock_endpoint_get.assert_called_once()
         mock_expectation_update.assert_called_once_with(expected_expectation_id, {
-                            "collector_id": "collector_id",
+                            "collector_id": collector.config.get_conf("collector_id"),
                             "result": "Prevented",
                             "is_success": True,
-                            "metadata": {"alertId": "some_id"},
+                            "metadata": {"alertId": expected_expectation_id},
                         })
+
+    @patch("pyobas.apis.EndpointManager.get")
+    @patch("pyobas.apis.InjectExpectationManager.update")
+    def test_when_alert_matches_update_detection_expectation(self, mock_expectation_update, mock_endpoint_get):
+        mock_endpoint_get.return_value = {"endpoint_hostname": "some_host"}
+        expected_expectation_id = "expectation_id"
+        expectations = [
+            {
+                "inject_expectation_type": "DETECTION",
+                "inject_expectation_id": expected_expectation_id,
+                "inject_expectation_asset": "some_host",
+                "inject_expectation_signatures": [
+                    {
+                        "type": "parent_process_name",
+                        "value": "grandparent.exe"
+                    },
+                ]
+            }
+        ]
+
+        signature_data = {
+            "parent_process_name":
+                {
+                    "type": "fuzzy",
+                    "data": ["grandparent.exe", "some_process.exe"],
+                    "score": 95
+                },
+            "hostname":
+                {
+                    "type": "simple",
+                    "data": ["some_host"]
+                }
+        }
+
+        strategy = TestStrategy(
+            raw_data_callback=lambda: None,
+            signature_data_callback=lambda: signature_data,
+            is_prevented_callback=lambda: True,
+            get_alert_id_callback=lambda: expected_expectation_id
+        )
+
+        collector = get_default_collector(strategy)
+
+        collector._match_expectations(["alert"], expectations)
+
+        mock_endpoint_get.assert_called_once()
+        mock_expectation_update.assert_called_once_with(expected_expectation_id, {
+            "collector_id": collector.config.get_conf("collector_id"),
+            "result": "Detected",
+            "is_success": True,
+            "metadata": {"alertId": expected_expectation_id},
+        })
+
+    @patch("pyobas.apis.EndpointManager.get")
+    @patch("pyobas.apis.InjectExpectationManager.update")
+    def test_when_alert_fails_to_match_update_prevention_expectation(self, mock_expectation_update, mock_endpoint_get):
+        mock_endpoint_get.return_value = {"endpoint_hostname": "remote_host"}
+        expected_expectation_id = "expectation_id"
+        expectations = [
+            {
+                "inject_expectation_type": "PREVENTION",
+                "inject_expectation_id": expected_expectation_id,
+                "inject_expectation_asset": "some_host",
+                "inject_expectation_signatures": [
+                    {
+                        "type": "parent_process_name",
+                        "value": "unknown_process.exe"
+                    },
+                ]
+            }
+        ]
+
+        signature_data = {
+            "parent_process_name":
+                {
+                    "type": "fuzzy",
+                    "data": ["grandparent.exe", "some_process.exe"],
+                    "score": 95
+                },
+            "hostname":
+                {
+                    "type": "simple",
+                    "data": ["some_host"]
+                }
+        }
+
+        strategy = TestStrategy(
+            raw_data_callback=lambda: None,
+            signature_data_callback=lambda: signature_data,
+            is_prevented_callback=lambda: False,
+            get_alert_id_callback=lambda: expected_expectation_id
+        )
+
+        collector = get_default_collector(strategy)
+
+        collector._match_expectations(["alert"], expectations)
+
+        mock_endpoint_get.assert_called_once()
+        mock_expectation_update.assert_called_once_with(expected_expectation_id, {
+            "collector_id": collector.config.get_conf("collector_id"),
+            "result": "Not prevented",
+            "is_success": False,
+            "metadata": {"alertId": expected_expectation_id},
+        })
+
+    @patch("pyobas.apis.EndpointManager.get")
+    @patch("pyobas.apis.InjectExpectationManager.update")
+    def test_when_signatures_match_when_unknown_expectation_type_skip_updating_expectation(self, mock_expectation_update, mock_endpoint_get):
+        mock_endpoint_get.return_value = {"endpoint_hostname": "some_host"}
+        expected_expectation_id = "expectation_id"
+        expectations = [
+            {
+                "inject_expectation_type": "SOME UNKNOWN EXPECTATION TYPE",
+                "inject_expectation_id": expected_expectation_id,
+                "inject_expectation_asset": "some_host",
+                "inject_expectation_signatures": [
+                    {
+                        "type": "parent_process_name",
+                        "value": "grandparent.exe"
+                    },
+                ]
+            }
+        ]
+
+        signature_data = {
+            "parent_process_name":
+                {
+                    "type": "fuzzy",
+                    "data": ["grandparent.exe", "some_process.exe"],
+                    "score": 95
+                },
+            "hostname":
+                {
+                    "type": "simple",
+                    "data": ["some_host"]
+                }
+        }
+
+        strategy = TestStrategy(
+            raw_data_callback=lambda: None,
+            signature_data_callback=lambda: signature_data,
+            is_prevented_callback=lambda: True,
+            get_alert_id_callback=lambda: expected_expectation_id
+        )
+
+        collector = get_default_collector(strategy)
+
+        collector._match_expectations(["alert"], expectations)
+
+        mock_endpoint_get.assert_called_once()
+        mock_expectation_update.assert_not_called()
+
+    @patch("pyobas.apis.EndpointManager.get")
+    @patch("pyobas.apis.InjectExpectationManager.update")
+    def test_when_alert_matches_when_endpoint_is_none_update_detection_expectation(self, mock_expectation_update, mock_endpoint_get):
+        mock_endpoint_get.return_value = {}
+        expected_expectation_id = "expectation_id"
+        expectations = [
+            {
+                "inject_expectation_type": "DETECTION",
+                "inject_expectation_id": expected_expectation_id,
+                "inject_expectation_asset": "some_host",
+                "inject_expectation_signatures": [
+                    {
+                        "type": "parent_process_name",
+                        "value": "grandparent.exe"
+                    },
+                ]
+            }
+        ]
+
+        signature_data = {
+            "parent_process_name":
+                {
+                    "type": "fuzzy",
+                    "data": ["grandparent.exe", "some_process.exe"],
+                    "score": 95
+                },
+        }
+
+        strategy = TestStrategy(
+            raw_data_callback=lambda: None,
+            signature_data_callback=lambda: signature_data,
+            is_prevented_callback=lambda: True,
+            get_alert_id_callback=lambda: expected_expectation_id
+        )
+
+        collector = get_default_collector(strategy)
+
+        collector._match_expectations(["alert"], expectations)
+
+        mock_endpoint_get.assert_called_once()
+        mock_expectation_update.assert_called_once_with(expected_expectation_id, {
+            "collector_id": collector.config.get_conf("collector_id"),
+            "result": "Detected",
+            "is_success": True,
+            "metadata": {"alertId": expected_expectation_id},
+        })
 
 
 if __name__ == '__main__':

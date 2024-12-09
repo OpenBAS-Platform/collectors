@@ -21,6 +21,10 @@ class Base(ABC):
     def is_prevented(self, data_item) -> bool:
         pass
 
+    @abstractmethod
+    def get_alert_id(self, data_item) -> str:
+        pass
+
     def get_signature_data(self, data_item, signature_types: list[SignatureType]):
         data = {}
         for signature_type in signature_types:

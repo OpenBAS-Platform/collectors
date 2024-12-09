@@ -116,12 +116,13 @@ def get_default_collector(
     )
 
 class TestStrategy(Base):
-    def __init__(self, raw_data_callback, signature_data_callback, is_prevented_callback,
+    def __init__(self, raw_data_callback: callable, signature_data_callback: callable, is_prevented_callback: callable, get_alert_id_callback: callable,
                  api_handler=get_default_api_handler()):
         super().__init__(api_handler)
         self.raw_data_callback = raw_data_callback
         self.signature_data_callback = signature_data_callback
         self.is_prevented_callback = is_prevented_callback
+        self.get_alert_id_callback = get_alert_id_callback
 
     def get_raw_data(self, start_time):
         return self.raw_data_callback()
@@ -131,6 +132,9 @@ class TestStrategy(Base):
 
     def is_prevented(self, data_item) -> bool:
         return self.is_prevented_callback()
+
+    def get_alert_id(self, data_item) -> str:
+        return self.get_alert_id_callback()
 
     # implement to placate the linter but not useful as we are
     # shadowing the get_signature_data method

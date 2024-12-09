@@ -121,7 +121,7 @@ class OpenBASCrowdStrike:
                             "collector_id": self.config.get_conf("collector_id"),
                             "result": result,
                             "is_success": success_or_failure,
-                            "metadata": {"alertId": alert.get_id()},
+                            "metadata": {"alertId": self.strategy.get_alert_id(alert)},
                         },
                     )
 

@@ -23,9 +23,6 @@ class Item(BaseModel):
     device: DeviceDetails
     pattern_disposition: int
 
-    def get_id(self) -> str:
-        return self.id
-
     def get_process_image_names(self) -> list[str]:
         return [
             self.filename,
@@ -70,3 +67,6 @@ class Alert(Base):
 
     def is_prevented(self, data_item: Item) -> bool:
         return data_item.is_prevented()
+
+    def get_alert_id(self, data_item) -> str:
+        return data_item.id
