@@ -56,42 +56,67 @@ jobs:
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
-          command: docker build --progress=plain -t openbas/collector-mitre-attack:latest . && docker tag openbas/collector-mitre-attack:latest openbas/collector-mitre-attack:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-mitre-attack:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-mitre-attack:latest"
+            docker build --progress=plain -t openbas/collector-mitre-attack:latest . && docker tag $TAGS
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build --progress=plain -t openbas/collector-microsoft-entra:latest . && docker tag openbas/collector-microsoft-entra:latest openbas/collector-microsoft-entra:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-microsoft-entra:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-microsoft-entra:latest"
+            docker build --progress=plain -t openbas/collector-microsoft-entra:latest . && docker tag $TAGS
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:latest . && docker tag openbas/collector-tanium-threat-response:latest openbas/collector-tanium-threat-response:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-tanium-threat-response:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-tanium-threat-response:latest"
+            docker build --progress=plain -t openbas/collector-tanium-threat-response:latest . && docker tag $TAGS
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build --progress=plain -t openbas/collector-microsoft-defender:latest . && docker tag openbas/collector-microsoft-defender:latest openbas/collector-microsoft-defender:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-microsoft-defender:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-microsoft-defender:latest"
+            docker build --progress=plain -t openbas/collector-microsoft-defender:latest . && docker tag $TAGS
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:latest . && docker tag openbas/collector-microsoft-sentinel:latest openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-microsoft-sentinel:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-microsoft-sentinel:latest"
+            docker build --progress=plain -t openbas/collector-microsoft-sentinel:latest . && docker tag $TAGS
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build --progress=plain -t openbas/collector-atomic-red-team:latest . && docker tag openbas/collector-atomic-red-team:latest openbas/collector-atomic-red-team:${CIRCLE_TAG}
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="openbas/collector-atomic-red-team:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-atomic-red-team:latest"
+            docker build --progress=plain -t openbas/collector-atomic-red-team:latest . && docker tag $TAGS
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push openbas/collector-mitre-attack:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-mitre-attack:latest
             docker push openbas/collector-mitre-attack:${CIRCLE_TAG}
-            docker push openbas/collector-microsoft-entra:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-microsoft-entra:latest
             docker push openbas/collector-microsoft-entra:${CIRCLE_TAG}
-            docker push openbas/collector-tanium-threat-response:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-tanium-threat-response:latest
             docker push openbas/collector-tanium-threat-response:${CIRCLE_TAG}
-            docker push openbas/collector-microsoft-defender:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-microsoft-defender:latest
             docker push openbas/collector-microsoft-defender:${CIRCLE_TAG}
-            docker push openbas/collector-microsoft-sentinel:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-microsoft-sentinel:latest
             docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
-            docker push openbas/collector-atomic-red-team:latest
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-atomic-red-team:latest
             docker push openbas/collector-atomic-red-team:${CIRCLE_TAG}
       - slack/notify:
           event: fail
@@ -166,27 +191,27 @@ jobs:
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
-          command: docker build -t openbas/collector-mitre-attack:prerelease .
+          command: docker build --progress=plain -t openbas/collector-mitre-attack:prerelease .
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build -t openbas/collector-microsoft-entra:prerelease .
+          command: docker build --progress=plain -t openbas/collector-microsoft-entra:prerelease .
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build -t openbas/collector-tanium-threat-response:prerelease .
+          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:prerelease .
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build -t openbas/collector-microsoft-defender:prerelease .
+          command: docker build --progress=plain -t openbas/collector-microsoft-defender:prerelease .
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build -t openbas/collector-microsoft-sentinel:prerelease .
+          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:prerelease .
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build -t openbas/collector-atomic-red-team:prerelease .
+          command: docker build --progress=plain -t openbas/collector-atomic-red-team:prerelease .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
