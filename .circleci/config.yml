@@ -187,7 +187,8 @@ jobs:
       - run:
          working_directory: ~/openbas
          name: Replace pyobas requirement of stable version with latest release branch code
-         command: find . -name requirements.txt -exec sed 's|^pyobas==.*$|pyobas @ git+https://github.com/OpenBAS-Platform/client-python@${CIRCLE_BRANCH}|' -i {} \;
+         # We safely expand the CIRCLE_BRANCH variable because the CircleCI filters already enforce a strict release/x.x.x pattern using regex
+         command: find . -name requirements.txt -exec sed "s|^pyobas==.*$|pyobas @ git+https://github.com/OpenBAS-Platform/client-python@${CIRCLE_BRANCH}|" -i {} \;
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
@@ -291,7 +292,7 @@ workflows:
           filters:
             branches:
               only:
-                - release/*
+                - /^release\/\d+\.\d+\.\d+$/
       - deploy_testing:
           requires:
             - build_rolling_1
