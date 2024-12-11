@@ -12,10 +12,16 @@ Get a local copy
 git checkout https://github.com/OpenBAS-Platform/collectors
 ```
 
-Install the crodwstrike collector module
+Install the crowdstrike collector dependencies
 ```commandline
-cd crowdstrike
-pip install -r requirements.txt .
+cd collectors/crowdstrike
+pip install -r requirements.txt
+```
+
+## Usage
+```commandline
+cd collectors/crowdstrike
+python -m crowdstrike.openbas_crowdstrike
 ```
 
 ## Configuration
@@ -35,3 +41,20 @@ The connector can be configured with the following variables:
 | `crowdstrike`.`base_url`      | `CROWDSTRIKE_BASE_URL`      | `https://api.crowdstrike.com` | The base URL for the CrowdStrike APIs.       |
 | `crowdstrike`.`client_id`     | `CROWDSTRIKE_CLIENT_ID`     | `CHANGEME`                    | The CrowdStrike API client ID.               |
 | `crowdstrike`.`client_secret` | `CROWDSTRIKE_CLIENT_SECRET` | `CHANGEME`                    | The CrowdStrike API client secret.           |
+
+## Development
+
+### JetBrains PyCharm configuration
+To run the collector from within PyCharm, you must:
+
+1. Ensure the requirements are installed correctly:
+```commandline
+pip install -r requirements.txt
+```
+
+2. Create a run configuration in PyCharm with the following settings:
+* **Run**: module `crowdstrike.openbas_crowdstrike`
+* **Working directory**: `...[path]\collectors\crowdstrike`
+* **Deactivate options**: `Add source roots to PYTHONPATH` and `Add content roots to PYTHONPATH`
+
+You may now run or debug the module.
