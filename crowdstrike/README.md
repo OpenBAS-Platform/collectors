@@ -44,6 +44,13 @@ The connector can be configured with the following variables:
 
 ## Development
 
+### Run the tests
+In a terminal:
+```commandline
+cd collectors/crowdstrike
+python -m unittest
+```
+
 ### JetBrains PyCharm configuration
 To run the collector from within PyCharm, you must:
 
@@ -57,4 +64,4 @@ pip install -r requirements.txt
 * **Working directory**: `...[path]\collectors\crowdstrike`
 * **Deactivate options**: `Add source roots to PYTHONPATH` and `Add content roots to PYTHONPATH`
 
-You may now run or debug the module.
+You may now run or debug the module, run tests...
