@@ -74,7 +74,7 @@ let augmentedAllFilesEvents = augmentedDeviceEvents
     | distinct DeviceId, normalised_filename, normalised_folder_path, process_hash;
 let singleMachinePerAlert = AlertEvidence
     | where EntityType has "Machine" and EvidenceRole has "Impacted"
-    | summarize max(TimeGenerated) by AlertId, DeviceId, DeviceName;
+    | distinct AlertId, DeviceId, DeviceName;
 let fileEvidence = singleMachinePerAlert
     | join AlertEvidence on $left.AlertId == $right.AlertId
     | where EntityType has "File"
