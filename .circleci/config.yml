@@ -35,7 +35,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: apk update && apk upgrade && apk --no-cache add curl gettext
+      - run: apk update && apk upgrade && apk --no-cache add curl gettext bash
       - run:
           name: flake8
           command: flake8 --ignore=E,W ~/repo
