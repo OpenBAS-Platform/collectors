@@ -80,11 +80,9 @@ class OpenBASCrowdStrike:
                 )
                 continue
 
-            expectation_signatures = expectation.get("inject_expectation_signatures")
-
             for alert in alerts:
                 if self.detection_helper.match_alert_elements(
-                    signatures=expectation_signatures,
+                    signatures=expectation.get("inject_expectation_signatures"),
                     alert_data=self.strategy.get_signature_data(
                         alert, self.signature_types
                     ),

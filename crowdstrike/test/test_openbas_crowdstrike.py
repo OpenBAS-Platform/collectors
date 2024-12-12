@@ -50,7 +50,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_alert_matches_but_not_prevented_update_prevention_expectation(
-            self, mock_expectation_update
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -138,7 +138,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_expectation_has_expected_hostname_signature_ignore_it(
-            self, mock_expectation_update
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
