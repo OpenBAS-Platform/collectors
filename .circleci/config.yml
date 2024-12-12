@@ -45,6 +45,21 @@ jobs:
       - ms-teams/report:
           only_on_fail: true
           webhook_url: $MS_TEAMS_WEBHOOK_URL
+  test:
+    working_directory: ~/openbas
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Install dependencies for crowdstrike collector
+          command: pip install -r requirements.txt
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Tests for crowdstrike collector
+          command: python -m unittest
   build_1:
     working_directory: ~/openbas
     docker:
@@ -102,6 +117,10 @@ jobs:
             [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS openbas/collector-atomic-red-team:latest"
             docker build --progress=plain -t openbas/collector-atomic-red-team:latest . && docker tag $TAGS
       - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Build Docker image openbas/collector-crowdstrike
+          command: docker build -t openbas/collector-crowdstrike:latest . && docker tag openbas/collector-crowdstrike:latest openbas/collector-crowdstrike:${CIRCLE_TAG}
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             LATEST_VERSION=$(git describe --tags --abbrev=0)
@@ -118,6 +137,8 @@ jobs:
             docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
             [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && docker push openbas/collector-atomic-red-team:latest
             docker push openbas/collector-atomic-red-team:${CIRCLE_TAG}
+            docker push openbas/collector-crowdstrike:latest
+            docker push openbas/collector-crowdstrike:${CIRCLE_TAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -161,6 +182,10 @@ jobs:
           name: Build Docker image openbas/collector-atomic-red-team
           command: docker build --progress=plain -t openbas/collector-atomic-red-team:rolling .
       - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Build Docker image openbas/collector-crowdstrike
+          command: docker build -t openbas/collector-crowdstrike:rolling .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -170,6 +195,7 @@ jobs:
             docker push openbas/collector-microsoft-defender:rolling
             docker push openbas/collector-microsoft-sentinel:rolling
             docker push openbas/collector-atomic-red-team:rolling
+            docker push openbas/collector-crowdstrike:rolling
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -271,6 +297,7 @@ workflows:
     jobs:
       - ensure_formatting
       - linter
+      - test
       - build_1:
           filters:
             tags:

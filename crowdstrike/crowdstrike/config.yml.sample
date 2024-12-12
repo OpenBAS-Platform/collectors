@@ -1,0 +1,16 @@
+openbas:
+  url: 'http://localhost:8080'
+  token: 'ChangeMe'
+
+collector:
+  id: 'ChangeMe'
+  type: 'ChangeMe'
+  name: 'CrowdStrike Endpoint Security'
+  period: 60
+  log_level: 'info'
+  platform: 'ChangeMe'
+
+crowdstrike:
+  api_base_url: 'ChangeMe'
+  client_id: 'ChangeMe'
+  client_secret: 'ChangeMe'
