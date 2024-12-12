@@ -29,9 +29,6 @@ DEFAULT_COLLECTOR_CONFIG = {
 
 DEFAULT_SIGNATURE_TYPES = [
     SignatureType(
-        SignatureTypes.SIG_TYPE_HOSTNAME, match_type=MatchTypes.MATCH_TYPE_SIMPLE
-    ),
-    SignatureType(
         SignatureTypes.SIG_TYPE_PARENT_PROCESS_NAME,
         match_type=MatchTypes.MATCH_TYPE_FUZZY,
         match_score=95,
@@ -84,7 +81,7 @@ def get_default_detection_helper(
     return OpenBASDetectionHelper(
         logger=helper.collector_logger,
         relevant_signatures_types=[
-            signature_type.label for signature_type in signature_types
+            signature_type.label.value for signature_type in signature_types
         ],
     )
 

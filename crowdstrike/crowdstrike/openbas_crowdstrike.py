@@ -82,18 +82,6 @@ class OpenBASCrowdStrike:
 
             expectation_signatures = expectation.get("inject_expectation_signatures")
 
-            if (
-                endpoint_hostname := self.helper.api.endpoint.get(
-                    expectation["inject_expectation_asset"]
-                ).get("endpoint_hostname")
-            ) is not None:
-                expectation_signatures += [
-                    {
-                        "type": SignatureTypes.SIG_TYPE_HOSTNAME.value,
-                        "value": endpoint_hostname.lower(),
-                    }
-                ]
-
             for alert in alerts:
                 if self.detection_helper.match_alert_elements(
                     signatures=expectation_signatures,
@@ -108,7 +96,7 @@ class OpenBASCrowdStrike:
                         result = "Detected"
                     elif expectation.get("inject_expectation_type") == "PREVENTION":
                         success_or_failure = self.strategy.is_prevented(alert)
-                        result = "Prevented" if success_or_failure else "Not prevented"
+                        result = "Prevented" if success_or_failure else "Not Prevented"
                     else:
                         self.helper.collector_logger.warning(
                             f"Unsupported expectation type for now: {expectation.get('inject_expectation_type')}"
@@ -203,9 +191,6 @@ if __name__ == "__main__":
 
     signature_types = [
         SignatureType(
-            SignatureTypes.SIG_TYPE_HOSTNAME, match_type=MatchTypes.MATCH_TYPE_SIMPLE
-        ),
-        SignatureType(
             SignatureTypes.SIG_TYPE_PARENT_PROCESS_NAME,
             match_type=MatchTypes.MATCH_TYPE_FUZZY,
             match_score=95,
@@ -214,7 +199,7 @@ if __name__ == "__main__":
 
     detection_helper = OpenBASDetectionHelper(
         helper.collector_logger,
-        [signature_type.label for signature_type in signature_types],
+        [signature_type.label.value for signature_type in signature_types],
     )
 
     api_handler = CrowdstrikeApiHandler(
