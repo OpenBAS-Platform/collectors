@@ -148,7 +148,7 @@ if __name__ == "__main__":
             "collector_type": {
                 "env": "COLLECTOR_TYPE",
                 "file_path": ["collector", "type"],
-                "default": "openbas_crowdstream",
+                "default": "openbas_crowdstrike",
             },
             "collector_period": {
                 "env": "COLLECTOR_PERIOD",

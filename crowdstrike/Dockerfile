@@ -1,5 +1,4 @@
-FROM python:3.12-alpine
-ENV CONNECTOR_TYPE=EXTERNAL_IMPORT
+FROM python:3.13-alpine
 
 # Copy the connector
 ADD crowdstrike /opt/openbas-collector-crowdstrike/crowdstrike
