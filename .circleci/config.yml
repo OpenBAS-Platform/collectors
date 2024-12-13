@@ -240,6 +240,10 @@ jobs:
           name: Build Docker image openbas/collector-atomic-red-team
           command: docker build --progress=plain -t openbas/collector-atomic-red-team:prerelease .
       - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Build Docker image openbas/collector-crowdstrike
+          command: docker build --progress=plain -t openbas/collector-crowdstrike:prerelease .
+      - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -249,6 +253,7 @@ jobs:
             docker push openbas/collector-microsoft-defender:prerelease
             docker push openbas/collector-microsoft-sentinel:prerelease
             docker push openbas/collector-atomic-red-team:prerelease
+            docker push openbas/collector-crowdstrike:prerelease
       - slack/notify:
           event: fail
           template: basic_fail_1
