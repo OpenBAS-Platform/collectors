@@ -42,6 +42,9 @@ The connector can be configured with the following variables:
 | `crowdstrike`.`client_id`     | `CROWDSTRIKE_CLIENT_ID`     | `CHANGEME`                    | The CrowdStrike API client ID.               |
 | `crowdstrike`.`client_secret` | `CROWDSTRIKE_CLIENT_SECRET` | `CHANGEME`                    | The CrowdStrike API client secret.           |
 
+**Note**: the Crowdstrike credentials must have been granted the following privilege for this to work: `Alerts: Read and Write`
+(as per https://falcon.us-2.crowdstrike.com/documentation/page/d02475a5/converting-from-detects-api-to-alerts-api#s4c83596)
+
 ## Development
 
 ### Run the tests
