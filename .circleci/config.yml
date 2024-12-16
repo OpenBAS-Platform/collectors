@@ -60,44 +60,44 @@ jobs:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
-            TAGS="openbas/collector-mitre-attack:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-mitre-attack:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-mitre-attack:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-mitre-attack:latest"
+            docker build --progress=plain $TAGS .
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
           command: |
-            TAGS="openbas/collector-microsoft-entra:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-microsoft-entra:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-microsoft-entra:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-entra:latest"
+            docker build --progress=plain $TAGS .
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
           command: |
-            TAGS="openbas/collector-tanium-threat-response:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-tanium-threat-response:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-tanium-threat-response:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-tanium-threat-response:latest"
+            docker build --progress=plain $TAGS .
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
           command: |
-            TAGS="openbas/collector-microsoft-defender:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-microsoft-defender:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-microsoft-defender:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-defender:latest"
+            docker build --progress=plain $TAGS .
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: |
-            TAGS="openbas/collector-microsoft-sentinel:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-microsoft-sentinel:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-microsoft-sentinel:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-sentinel:latest"
+            docker build --progress=plain $TAGS .
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
           command: |
-            TAGS="openbas/collector-atomic-red-team:${CIRCLE_TAG}"
-            $IS_LATEST && TAGS="$TAGS openbas/collector-atomic-red-team:latest"
-            docker build --progress=plain . && docker tag $TAGS
+            TAGS="-t openbas/collector-atomic-red-team:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-atomic-red-team:latest"
+            docker build --progress=plain $TAGS .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
