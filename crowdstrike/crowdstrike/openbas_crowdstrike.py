@@ -184,7 +184,7 @@ if __name__ == "__main__":
     helper = OpenBASCollectorHelper(
         config=config,
         icon="crowdstrike/img/icon-crowdstrike.png",
-        security_platform_type=config.get_conf("collector_platform"),
+        security_platform_type=config.get_conf("collector_platform") or "EDR",
     )
 
     signature_types = [
