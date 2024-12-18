@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime
 
 import pytz
@@ -128,9 +129,8 @@ class OpenBASMicrosoftSentinel:
         # Extract expectation alert link
         alert_id_expectation = None
         for item in expectation["inject_expectation_results"]:
-            self.helper.collector_logger.info(item["sourceName"])
-            attached_collectors = self.config.get_conf(
-                "microsoft_sentinel_edr_collectors"
+            attached_collectors = ast.literal_eval(
+                self.config.get_conf("microsoft_sentinel_edr_collectors", default="[]")
             )
             if item["sourceId"] in attached_collectors:
                 alert_id_expectation = item["metadata"]["alertId"]
