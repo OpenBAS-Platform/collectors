@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-tanium-threat-response:
-    image: openbas/collector-tanium-threat-response:1.9.2
+    image: openbas/collector-tanium-threat-response:1.10.0
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
