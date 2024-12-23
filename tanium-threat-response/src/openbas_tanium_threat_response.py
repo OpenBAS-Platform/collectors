@@ -120,19 +120,20 @@ class OpenBASTaniumThreatResponse:
 
     # Recursive function
     def _extract_tree_commands(self, artifact, commands):
-        if "process" in artifact and "arguments" in artifact["process"]:
+        if (
+            "process" in artifact
+            and "arguments" in artifact["process"]
+            and isinstance(artifact["process"]["arguments"], str)
+        ):
             file_path = ""
             if "file" in artifact["process"] and "file" in artifact["process"]["file"]:
                 file_path = artifact["process"]["file"]["file"]["path"]
-            command = ""
-            # sometimes artifact is a dict?
-            if isinstance(artifact, str):
-                command = (
-                    artifact["process"]["arguments"]
-                    .replace(file_path, "")
-                    .replace('""', "")
-                    .strip()
-                )
+            command = (
+                artifact["process"]["arguments"]
+                .replace(file_path, "")
+                .replace('""', "")
+                .strip()
+            )
             if len(command) > 0:
                 commands.append(command)
         if "process" in artifact and "parent" in artifact["process"]:
