@@ -248,17 +248,6 @@ class OpenBASMicrosoftDefender:
         if expectation["inject_expectation_asset"] is None:
             return False
 
-        # Check hostname
-        hostname = self._extract_device(alert)
-        if (
-            hostname is None
-            or hostname.lower() != endpoint["endpoint_hostname"].lower()
-        ):
-            return False
-        self.helper.collector_logger.info(
-            "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
-        )
-
         alert_data = {}
         evidences = [json.loads(evidence) for evidence in alert.get("evidence")]
         for signature_type in self.relevant_signatures_types:
