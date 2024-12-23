@@ -131,8 +131,7 @@ class OpenBASTaniumThreatResponse:
                 .strip()
                 # sometimes it is a dict ?
                 if isinstance(artifact, str)
-                else
-                ""
+                else ""
             )
             if len(command) > 0:
                 commands.append(command)
