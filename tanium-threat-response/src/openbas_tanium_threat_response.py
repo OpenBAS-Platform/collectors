@@ -80,6 +80,7 @@ class OpenBASTaniumThreatResponse:
         # Initialize signatures helper
         self.relevant_signatures_types = [
             "process_name",
+            "parent_process_name",
             "command_line",
             "file_name",
             "hostname",
@@ -119,7 +120,11 @@ class OpenBASTaniumThreatResponse:
 
     # Recursive function
     def _extract_tree_commands(self, artifact, commands):
-        if "process" in artifact and "arguments" in artifact["process"]:
+        if (
+            "process" in artifact
+            and "arguments" in artifact["process"]
+            and isinstance(artifact["process"]["arguments"], str)
+        ):
             file_path = ""
             if "file" in artifact["process"] and "file" in artifact["process"]["file"]:
                 file_path = artifact["process"]["file"]["file"]["path"]
@@ -164,21 +169,15 @@ class OpenBASTaniumThreatResponse:
         # Defender / Deep Instinct (dedicated collectors)
         if alert["matchType"] in ["windows_defender", "deep_instinct"]:
             return False
-        # Check hostname
-        if endpoint["endpoint_hostname"] != alert["computerName"]:
-            return False
-        self.helper.collector_logger.info(
-            "Endpoint is matching (" + endpoint["endpoint_hostname"] + ")"
-        )
 
         alert_data = {}
         for type in self.relevant_signatures_types:
             alert_data[type] = {}
-            if type == "process_name":
+            if type in ["parent_process_name", "process_name"]:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert_details),
-                    "score": 80,
+                    "score": 95,
                 }
             elif type == "command_line":
                 alert_data[type] = {
