@@ -124,15 +124,15 @@ class OpenBASTaniumThreatResponse:
             file_path = ""
             if "file" in artifact["process"] and "file" in artifact["process"]["file"]:
                 file_path = artifact["process"]["file"]["file"]["path"]
-            command = (
-                artifact["process"]["arguments"]
-                .replace(file_path, "")
-                .replace('""', "")
-                .strip()
-                # sometimes it is a dict ?
-                if isinstance(artifact, str)
-                else ""
-            )
+            command = ""
+            # sometimes artifact is a dict?
+            if isinstance(artifact, str):
+                command = (
+                    artifact["process"]["arguments"]
+                    .replace(file_path, "")
+                    .replace('""', "")
+                    .strip()
+                )
             if len(command) > 0:
                 commands.append(command)
         if "process" in artifact and "parent" in artifact["process"]:
@@ -226,7 +226,7 @@ class OpenBASTaniumThreatResponse:
         self.helper.collector_logger.info(
             "Found " + str(len(alerts)) + " alerts (taking first 200)"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=2)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
         # For each expectation, try to find the proper alert
         for expectation in expectations:
             # Check expired expectation
