@@ -172,17 +172,11 @@ class OpenBASTaniumThreatResponse:
         alert_data = {}
         for type in self.relevant_signatures_types:
             alert_data[type] = {}
-            if type == "process_name":
+            if type in ["parent_process_name", "process_name"]:
                 alert_data[type] = {
                     "type": "fuzzy",
                     "data": self._extract_process_names(alert_details),
-                    "score": 80,
-                }
-            if type == "parent_process_name":
-                alert_data[type] = {
-                    "type": "fuzzy",
-                    "data": self._extract_process_names(alert_details),
-                    "score": 80,
+                    "score": 95,
                 }
             elif type == "command_line":
                 alert_data[type] = {
@@ -232,7 +226,7 @@ class OpenBASTaniumThreatResponse:
         self.helper.collector_logger.info(
             "Found " + str(len(alerts)) + " alerts (taking first 200)"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=2)
         # For each expectation, try to find the proper alert
         for expectation in expectations:
             # Check expired expectation
