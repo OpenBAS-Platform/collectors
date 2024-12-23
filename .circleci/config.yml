@@ -116,7 +116,10 @@ jobs:
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Build Docker image openbas/collector-crowdstrike
-          command: docker build -t openbas/collector-crowdstrike:latest . && docker tag openbas/collector-crowdstrike:latest openbas/collector-crowdstrike:${CIRCLE_TAG}
+          command: |
+            TAGS="-t openbas/collector-crowdstrike:${CIRCLE_TAG}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-crowdstrike:latest"
+            docker build --progress=plain $TAGS .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
@@ -133,7 +136,7 @@ jobs:
             docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
             $IS_LATEST && docker push openbas/collector-atomic-red-team:latest
             docker push openbas/collector-atomic-red-team:${CIRCLE_TAG}
-            docker push openbas/collector-crowdstrike:latest
+            $IS_LATEST && docker push openbas/collector-crowdstrike:latest
             docker push openbas/collector-crowdstrike:${CIRCLE_TAG}
       - slack/notify:
           event: fail
@@ -180,7 +183,7 @@ jobs:
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Build Docker image openbas/collector-crowdstrike
-          command: docker build -t openbas/collector-crowdstrike:rolling .
+          command: docker build --progress=plain -t openbas/collector-crowdstrike:rolling .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
