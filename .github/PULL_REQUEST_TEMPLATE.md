@@ -26,6 +26,7 @@ By doing this, you are actively helping us to improve the quality of the entire 
 - [ ] I tested the code for its functionality using different use cases
 - [ ] I added/update the relevant documentation (either on github or on notion)
 - [ ] Where necessary I refactored code to improve the overall quality
+- [ ] For bug fix -> I implemented a test that covers the bug
 
 <!-- For completed items, change [ ] to [x]. -->
 
