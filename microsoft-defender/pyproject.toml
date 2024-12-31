@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "openbas-microsoft-defender-collector"
+version = "1.11.0"
+description = "A Collector for the Microsoft Defender security software"
+authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = "1.10.0"
+msgraph-sdk = "1.14.0"
+msal = "1.31.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
