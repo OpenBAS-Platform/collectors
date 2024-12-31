@@ -24,7 +24,7 @@ class CrowdstrikeApiHandler:
 
     def get_alerts_v2(self, start_time: datetime):
         parameters = {
-            "filter": f"timestamp:>'{start_time.isoformat()}'+type:'ldt'",
+            "filter": f"timestamp:>'{start_time.isoformat()}'",
         }
         response = self.alerts.query_alerts_v2(parameters=parameters)
 

@@ -114,7 +114,7 @@ class OpenBASCrowdStrike:
     def _process(self):
         """Fetch and match expectations with data from cs"""
         now = datetime.now(pytz.UTC)
-        start_time = now - timedelta(minutes=45)
+        start_time = now - timedelta(days=7)
 
         self._match_expectations(
             alerts=self.strategy.get_raw_data(start_time),
