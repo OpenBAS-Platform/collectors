@@ -18,6 +18,10 @@ Table of Contents
 To use this collector, you need to create an application in your Azure portal with the following permissions:
 **Log Analytics API > Data.Read**
 
+This Sentinel collector works only if your Sentinel is powered by your Defender. To make it work, you also need to
+activate the Defender collector.
+Indeed, this relies on Defender matchings to validate Sentinel alerts.
+
 ## Configuration variables
 
 There are a number of configuration options, which are set either in `docker-compose.yml` (for Docker) or
