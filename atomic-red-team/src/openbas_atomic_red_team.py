@@ -55,16 +55,17 @@ def get_argument_name_by_path(arguments, fullpath):
     file_name = os.path.basename(fullpath)
 
     for ar in arguments:
+        default_value_file_name = os.path.basename(str(ar["default_value"]))
         if (
             isinstance(ar["default_value"], str)
-            and file_name in ar["default_value"]
+            and file_name == default_value_file_name
             and "http" not in ar["default_value"]
         ):
 
             return ar["key"]
 
     path_without_prefix = fullpath.replace("PathToAtomicsFolder", "").replace("$", "")
-    new_key = f"{file_name.replace('.', '_')}_path"
+    new_key = f"{file_name.replace('.', '_')}_atomicredteam_path"
     new_argument = {
         "type": "text",
         "key": new_key,
