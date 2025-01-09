@@ -49,11 +49,11 @@ Below are the parameters you'll need to set for running the connector properly:
 
 Below are the parameters you'll need to set for the connector:
 
-| Parameter                 | config.yml                       | Docker environment variable      | Default | Mandatory | Description |
-|---------------------------|----------------------------------|----------------------------------|---------|-----------|-------------|
-| Application Tenant ID     | microsoft_defender_tenant_id     | MICROSOFT_DEFENDER_TENANT_ID     |         | Yes       |             |
-| Application Client ID     | microsoft_defender_client_id     | MICROSOFT_DEFENDER_CLIENT_ID     |         | Yes       |             |
-| Application Client Secret | microsoft_defender_client_secret | MICROSOFT_DEFENDER_CLIENT_SECRET |         | Yes       |             |
+| Parameter                 | config.yml                       | Docker environment variable                | Default | Mandatory | Description |
+|---------------------------|----------------------------------|--------------------------------------------|---------|-----------|-------------|
+| Application Tenant ID     | microsoft_defender_tenant_id     | COLLECTOR_MICROSOFT_DEFENDER_TENANT_ID     |         | Yes       |             |
+| Application Client ID     | microsoft_defender_client_id     | COLLECTOR_MICROSOFT_DEFENDER_CLIENT_ID     |         | Yes       |             |
+| Application Client Secret | microsoft_defender_client_secret | COLLECTOR_MICROSOFT_DEFENDER_CLIENT_SECRET |         | Yes       |             |
 
 ## Deployment
 
