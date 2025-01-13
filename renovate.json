@@ -8,10 +8,21 @@
     "filigran team"
   ],
   "prConcurrentLimit": 2,
+  "baseBranches": ["release/current", "main"],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor"],
       "prPriority": 5
+    },
+    {
+      "matchJsonata": ["$exists(isVulnerabilityAlert)"],
+      "matchBaseBranches": ["release/current"],
+      "enabled": false
+    },
+    {
+      "matchJsonata": ["$not($exists(isVulnerabilityAlert))"],
+      "matchBaseBranches": ["main"],
+      "enabled": false
     }
   ]
 }

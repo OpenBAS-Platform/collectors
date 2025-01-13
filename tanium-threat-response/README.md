@@ -1,8 +1,8 @@
-# OpenBAS Microsoft Sentinel Collector
+# OpenBAS Tanium Threat Response Collector
 
 Table of Contents
 
-- [OpenBAS Microsoft Sentinel Collector](#openbas-microsoft-sentinel-collector)
+- [OpenBAS Tanium Threat Response Collector](#openbas-tanium-threat-response-collector)
     - [Prerequisites](#prerequisites)
     - [Configuration variables](#configuration-variables)
         - [OpenBAS environment variables](#openbas-environment-variables)
@@ -15,12 +15,7 @@ Table of Contents
 
 ## Prerequisites
 
-To use this collector, you need to create an application in your Azure portal with the following permissions:
-**Log Analytics API > Data.Read**
-
-This Sentinel collector works only if your Sentinel is powered by your Defender. To make it work, you also need to
-activate the Defender collector.
-Indeed, this relies on Defender matchings to validate Sentinel alerts.
+To use this collector, you need to have a Tanium instance and create an API token.
 
 ## Configuration variables
 
@@ -51,15 +46,11 @@ Below are the parameters you'll need to set for running the connector properly:
 
 Below are the parameters you'll need to set for the connector:
 
-| Parameter                 | config.yml                         | Docker environment variable                  | Default | Mandatory | Description                                        |
-|---------------------------|------------------------------------|----------------------------------------------|---------|-----------|----------------------------------------------------|
-| Application Tenant ID     | microsoft_sentinel_tenant_id       | COLLECTOR_MICROSOFT_SENTINEL_TENANT_ID       |         | Yes       |                                                    |
-| Application Client ID     | microsoft_sentinel_client_id       | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_ID       |         | Yes       |                                                    |
-| Application Client Secret | microsoft_sentinel_client_secret   | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_SECRET   |         | Yes       |                                                    |
-| Subscription ID           | microsoft_sentinel_subscription_id | COLLECTOR_MICROSOFT_SENTINEL_SUBSCRIPTION_ID |         | Yes       |                                                    |
-| Workspace ID              | microsoft_sentinel_workspace_id    | COLLECTOR_MICROSOFT_SENTINEL_WORKSPACE_ID    |         | Yes       |                                                    |
-| Resource group            | microsoft_sentinel_resource_group  | COLLECTOR_MICROSOFT_SENTINEL_RESOURCE_GROUP  |         | Yes       |                                                    |
-| UUID linked collectors    | microsoft_sentinel_edr_collectors  | COLLECTOR_MICROSOFT_SENTINEL_EDR_COLLECTORS  |         | Yes       | List of collector EDR link to your collector SIEM. |
+| Parameter                 | config.yml                 | Docker environment variable  | Default | Mandatory | Description                          |
+|---------------------------|----------------------------|------------------------------|---------|-----------|--------------------------------------|
+| Tanium URL                | tanium_url                 | COLLECTOR_TANIUM_URL         |         | Yes       | URL of your Tanium instance.         |
+| Tanium URL Console        | tanium_url_console         | COLLECTOR_TANIUM_URL_CONSOLE |         | Yes       | URL of your Tanium console instance. |
+| Tanium API Token          | tanium_token               | COLLECTOR_TANIUM_TOKEN       |         | Yes       | API Token.                           |
 
 ## Deployment
 
@@ -98,10 +89,13 @@ pip3 install -r requirements.txt
 Then, start the connector:
 
 ```shell
-python3 openbas_microsoft_sentinel.py
+python3 openbas_microsoft_defender.py
 ```
 
 ## Behavior
 
-By searching in your tool's logs and based on connected EDRs, the collector tries to match the attack launched with the
-logs reported in your SIEM and validate prevention or expectation type expectations.
+The collector retrieves recent alerts (last 45 minutes) from Tanium Threat Response d matches them with attacks executed
+by OpenBAS agents to validate prevention and detection expectations.
+
+The collector identifies matches using the parent process name. OpenBAS attacks are
+recognized by the parent process name format: `openbas-implant-INJECT_ID.exe`.
