@@ -323,7 +323,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^release\/\d+\.\d+\.\d+$/
+                - release/current
       - deploy_testing:
           requires:
             - build_rolling_1
