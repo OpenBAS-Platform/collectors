@@ -1,9 +1,9 @@
-# OpenBAS CrowdStrike Collector
+# OpenBAS CrowdStrike Endpoint Security Collector
 
-The CrowdStrike connector.
+The CrowdStrike Endpoint Security collector.
 
 **Note**: Requires subscription to the CrowdStrike Falcon platform. The subscription
-details dictate what data is actually available to the connector.
+details dictate what data is actually available to the collector.
 
 ## Installation
 
@@ -12,7 +12,7 @@ Get a local copy
 git checkout https://github.com/OpenBAS-Platform/collectors
 ```
 
-Install the crowdstrike collector dependencies
+Install the CrowdStrike Endpoint Security collector dependencies
 ```commandline
 cd collectors/crowdstrike
 pip install -r requirements.txt
