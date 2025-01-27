@@ -51,15 +51,15 @@ Below are the parameters you'll need to set for running the connector properly:
 
 Below are the parameters you'll need to set for the connector:
 
-| Parameter                 | config.yml                         | Docker environment variable                  | Default | Mandatory | Description                                        |
-|---------------------------|------------------------------------|----------------------------------------------|---------|-----------|----------------------------------------------------|
-| Application Tenant ID     | microsoft_sentinel_tenant_id       | COLLECTOR_MICROSOFT_SENTINEL_TENANT_ID       |         | Yes       |                                                    |
-| Application Client ID     | microsoft_sentinel_client_id       | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_ID       |         | Yes       |                                                    |
-| Application Client Secret | microsoft_sentinel_client_secret   | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_SECRET   |         | Yes       |                                                    |
-| Subscription ID           | microsoft_sentinel_subscription_id | COLLECTOR_MICROSOFT_SENTINEL_SUBSCRIPTION_ID |         | Yes       |                                                    |
-| Workspace ID              | microsoft_sentinel_workspace_id    | COLLECTOR_MICROSOFT_SENTINEL_WORKSPACE_ID    |         | Yes       |                                                    |
-| Resource group            | microsoft_sentinel_resource_group  | COLLECTOR_MICROSOFT_SENTINEL_RESOURCE_GROUP  |         | Yes       |                                                    |
-| UUID linked collectors    | microsoft_sentinel_edr_collectors  | COLLECTOR_MICROSOFT_SENTINEL_EDR_COLLECTORS  |         | Yes       | List of collector EDR link to your collector SIEM. |
+| Parameter                 | config.yml                         | Docker environment variable                  | Default | Mandatory | Description                                                                |
+|---------------------------|------------------------------------|----------------------------------------------|---------|-----------|----------------------------------------------------------------------------|
+| Application Tenant ID     | microsoft_sentinel_tenant_id       | COLLECTOR_MICROSOFT_SENTINEL_TENANT_ID       |         | Yes       |                                                                            |
+| Application Client ID     | microsoft_sentinel_client_id       | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_ID       |         | Yes       |                                                                            |
+| Application Client Secret | microsoft_sentinel_client_secret   | COLLECTOR_MICROSOFT_SENTINEL_CLIENT_SECRET   |         | Yes       |                                                                            |
+| Subscription ID           | microsoft_sentinel_subscription_id | COLLECTOR_MICROSOFT_SENTINEL_SUBSCRIPTION_ID |         | Yes       |                                                                            |
+| Workspace ID              | microsoft_sentinel_workspace_id    | COLLECTOR_MICROSOFT_SENTINEL_WORKSPACE_ID    |         | Yes       |                                                                            |
+| Resource group            | microsoft_sentinel_resource_group  | COLLECTOR_MICROSOFT_SENTINEL_RESOURCE_GROUP  |         | Yes       |                                                                            |
+| UUID linked collectors    | microsoft_sentinel_edr_collectors  | COLLECTOR_MICROSOFT_SENTINEL_EDR_COLLECTORS  |         | Yes       | The list of collector UUIDs is sourced from the EDR collector deployments. |
 
 ## Deployment
 
