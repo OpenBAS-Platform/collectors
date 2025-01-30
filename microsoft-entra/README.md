@@ -89,5 +89,5 @@ python3 openbas_microsoft_defender.py
 
 ## Behavior
 
-This collector retrieves the Atomic Red Team GitHub repository to extract payloads and import them into your OpenBAS
+This collector retrieves your users and teams from your Microsoft Entra instance and import them into your OpenBAS
 instance.
