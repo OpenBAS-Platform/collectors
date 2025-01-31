@@ -26,7 +26,7 @@ python -m crowdstrike.openbas_crowdstrike
 
 ## Configuration
 
-The connector can be configured with the following variables:
+The collector can be configured with the following variables:
 
 | Config Parameter              | Docker env var              | Default                       | Description                                                                                  |
 |-------------------------------|-----------------------------|-------------------------------|----------------------------------------------------------------------------------------------|

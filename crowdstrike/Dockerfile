@@ -1,6 +1,6 @@
 FROM python:3.13-alpine
 
-# Copy the connector
+# Copy the collector
 ADD crowdstrike /opt/openbas-collector-crowdstrike/crowdstrike
 WORKDIR /opt/openbas-collector-crowdstrike
 ADD requirements.txt .
