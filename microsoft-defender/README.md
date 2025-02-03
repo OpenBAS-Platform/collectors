@@ -36,7 +36,7 @@ Below are the parameters you'll need to set for OpenBAS:
 
 ### Base collector environment variables
 
-Below are the parameters you'll need to set for running the connector properly:
+Below are the parameters you'll need to set for running the collector properly:
 
 | Parameter        | config.yml | Docker environment variable | Default | Mandatory | Description                                                                            |
 |------------------|------------|-----------------------------|---------|-----------|----------------------------------------------------------------------------------------|
@@ -47,7 +47,7 @@ Below are the parameters you'll need to set for running the connector properly:
 
 ### Collector extra parameters environment variables
 
-Below are the parameters you'll need to set for the connector:
+Below are the parameters you'll need to set for the collector:
 
 | Parameter                 | config.yml                       | Docker environment variable                | Default | Mandatory | Description |
 |---------------------------|----------------------------------|--------------------------------------------|---------|-----------|-------------|
@@ -89,7 +89,7 @@ Install the required python dependencies (preferably in a virtual environment):
 pip3 install -r requirements.txt
 ```
 
-Then, start the connector:
+Then, start the collector:
 
 ```shell
 python3 openbas_microsoft_defender.py
