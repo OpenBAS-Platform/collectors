@@ -1,0 +1,10 @@
+services:
+  collector-openbas-payload:
+    image: openbas/collector-openbas-payload:latest
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - "COLLECTOR_NAME=OpenBAS payload"
+      - COLLECTOR_LOG_LEVEL=error
+    restart: always
