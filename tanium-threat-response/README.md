@@ -46,11 +46,11 @@ Below are the parameters you'll need to set for running the collector properly:
 
 Below are the parameters you'll need to set for the collector:
 
-| Parameter                 | config.yml                 | Docker environment variable  | Default | Mandatory | Description                          |
-|---------------------------|----------------------------|------------------------------|---------|-----------|--------------------------------------|
-| Tanium URL                | tanium_url                 | COLLECTOR_TANIUM_URL         |         | Yes       | URL of your Tanium instance.         |
-| Tanium URL Console        | tanium_url_console         | COLLECTOR_TANIUM_URL_CONSOLE |         | Yes       | URL of your Tanium console instance. |
-| Tanium API Token          | tanium_token               | COLLECTOR_TANIUM_TOKEN       |         | Yes       | API Token.                           |
+| Parameter                 | config.yml                 | Docker environment variable | Default | Mandatory | Description                          |
+|---------------------------|----------------------------|-----------------------------|---------|-----------|--------------------------------------|
+| Tanium URL                | tanium_url                 | TANIUM_URL                  |         | Yes       | URL of your Tanium instance.         |
+| Tanium URL Console        | tanium_url_console         | TANIUM_URL_CONSOLE          |         | Yes       | URL of your Tanium console instance. |
+| Tanium API Token          | tanium_token               | TANIUM_TOKEN                |         | Yes       | API Token.                           |
 
 ## Deployment
 
