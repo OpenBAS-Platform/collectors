@@ -1,2 +1,2 @@
-pyobas==1.11.5
+pyobas==1.12.0
 thefuzz==0.22.1
