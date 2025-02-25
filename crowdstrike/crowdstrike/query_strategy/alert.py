@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from crowdstrike.pattern_disposition import is_prevented
-from crowdstrike.query_strategy.base import Base
 from pydantic import BaseModel, ValidationError
 from pyobas.exceptions import OpenBASError
 from pyobas.signatures.types import SignatureTypes
+
+from crowdstrike.pattern_disposition import is_prevented
+from crowdstrike.query_strategy.base import Base
 
 
 class ProcessDetails(BaseModel):
