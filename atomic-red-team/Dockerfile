@@ -1,17 +1,21 @@
-FROM python:3.13-alpine
+FROM python:3.13-alpine AS builder
 
-# Copy the collector
-COPY atomic-red-team /opt/openbas-collector-atomic-red-team
+# poetry version available on Ubuntu 24.04
+RUN pip3 install poetry==1.8.2
 
-# Install Python modules
-# hadolint ignore=DL3003
-RUN apk update && apk upgrade && \
-    apk --no-cache add git build-base libmagic libffi-dev libxslt libxslt-dev libxml2 libxml2-dev && \
-    cd /opt/openbas-collector-atomic-red-team && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    apk del git build-base
+RUN apk update && apk upgrade
 
-# Expose and entrypoint
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ARG installdir=/collector
+ADD . ${installdir}
+RUN cd ${installdir} && poetry build
+
+FROM python:3.13-alpine AS runner
+
+ARG installdir=/collector
+COPY --from=builder ${installdir} ${installdir}
+RUN cd ${installdir}/dist && pip3 install *.whl
+
+# necessary for icon location
+WORKDIR ${installdir}/atomic_red_team
+
+CMD ["python3", "-m", "atomic_red_team.openbas_atomic_red_team"]

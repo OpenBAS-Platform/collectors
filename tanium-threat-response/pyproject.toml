@@ -6,7 +6,7 @@ authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-    { include = "tanium-threat-response" }
+    { include = "tanium_threat_response" }
 ]
 
 [tool.poetry.dependencies]
