@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "openbas-atomic-red-team"
-version = "1.11.0"
+name = "openbas-atomic-red-team-collector"
+version = "1.12.2"
 description = "A Collector for fetching Atomic Red Team payloads; https://www.atomicredteam.io/"
 authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
 license = "Apache-2.0"

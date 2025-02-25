@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openbas-crowdstrike-collector"
-version = "1.11.0"
+version = "1.12.2"
 description = "Collector for Crowdstrike Falcon"
 authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
 license = "Apache-2.0"
@@ -11,9 +11,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pyobas = "1.10.0"
-crowdstrike-falconpy = "1.4.5"
-pydantic = "2.10.0"
+pyobas = "1.12.2"
+crowdstrike-falconpy = "1.4.6"
+pydantic = "2.10.6"
 
 [build-system]
 requires = ["poetry-core"]

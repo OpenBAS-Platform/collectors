@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "openbas-microsoft-defender-collector"
+name = "openbas-microsoft-sentinel-collector"
 version = "1.12.2"
-description = "A Collector for the Microsoft Defender security software"
+description = "A Collector for Microsoft Sentinel SIEM solution"
 authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -12,7 +12,6 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11"
 pyobas = "1.12.2"
-msgraph-sdk = "1.18.0"
 msal = "1.31.1"
 
 [build-system]
