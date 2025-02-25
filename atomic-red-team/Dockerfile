@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-atomic-red-team
+COPY atomic-red-team /opt/openbas-collector-atomic-red-team
 
 # Install Python modules
 # hadolint ignore=DL3003

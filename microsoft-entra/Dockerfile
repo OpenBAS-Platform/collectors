@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-microsoft-entra
+COPY microsoft-entra /opt/openbas-collector-microsoft-entra
 
 # Install Python modules
 # hadolint ignore=DL3003

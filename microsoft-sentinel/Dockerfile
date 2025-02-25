@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-microsoft-sentinel
+COPY microsoft-sentinel /opt/openbas-collector-microsoft-sentinel
 
 # Install Python modules
 # hadolint ignore=DL3003

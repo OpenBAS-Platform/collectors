@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-microsoft-defender
+COPY microsoft-defender /opt/openbas-collector-microsoft-defender
 
 # Install Python modules
 # hadolint ignore=DL3003

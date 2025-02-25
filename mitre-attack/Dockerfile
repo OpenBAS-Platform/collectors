@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-mitre-attack
+COPY mitre-attack /opt/openbas-collector-mitre-attack
 
 # Install Python modules
 # hadolint ignore=DL3003

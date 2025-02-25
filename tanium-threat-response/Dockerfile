@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
 # Copy the collector
-COPY src /opt/openbas-collector-tanium-threat-response
+COPY tanium-threat-response /opt/openbas-collector-tanium-threat-response
 
 # Install Python modules
 # hadolint ignore=DL3003
