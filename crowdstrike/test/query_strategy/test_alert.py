@@ -12,11 +12,12 @@ from test.fixtures.crowdstrike_alerts_v2 import (
 from test.fixtures.defaults import DEFAULT_SIGNATURE_TYPES, get_default_api_handler
 from unittest.mock import patch
 
-from crowdstrike.query_strategy.alert import Alert, Item
 from pydantic import ValidationError
 from pyobas.exceptions import OpenBASError
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
+
+from crowdstrike.query_strategy.alert import Alert, Item
 
 
 class TestAlert(unittest.TestCase):

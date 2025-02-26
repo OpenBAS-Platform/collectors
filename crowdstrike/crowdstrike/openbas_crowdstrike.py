@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
 
 import pytz
-from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
-from crowdstrike.query_strategy.alert import Alert
-from crowdstrike.query_strategy.base import Base
 from dateutil.parser import parse
 from pyobas.helpers import (
     OpenBASCollectorHelper,
@@ -12,6 +9,10 @@ from pyobas.helpers import (
 )
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
+
+from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
+from crowdstrike.query_strategy.alert import Alert
+from crowdstrike.query_strategy.base import Base
 
 
 class OpenBASCrowdStrike:

@@ -1,16 +1,21 @@
-FROM python:3.13-alpine
+FROM python:3.13-alpine AS builder
 
-# Copy the collector
-ADD crowdstrike /opt/openbas-collector-crowdstrike/crowdstrike
-WORKDIR /opt/openbas-collector-crowdstrike
-ADD requirements.txt .
+# poetry version available on Ubuntu 24.04
+RUN pip3 install poetry==1.8.2
 
-# Install Python modules
-# hadolint ignore=DL3003
-RUN apk update && apk upgrade && \
-    apk --no-cache add git build-base libmagic libffi-dev libxslt libxslt-dev libxml2 libxml2-dev && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apk del git build-base && \
-    rm -rf /var/cache/apk/*
+RUN apk update && apk upgrade
+
+ARG installdir=/collector
+ADD . ${installdir}
+RUN cd ${installdir} && poetry build
+
+FROM python:3.13-alpine AS runner
+
+ARG installdir=/collector
+COPY --from=builder ${installdir} ${installdir}
+RUN cd ${installdir}/dist && pip3 install *.whl
+
+# necessary for icon location
+WORKDIR ${installdir}/crowdstrike
 
 CMD ["python3", "-m", "crowdstrike.openbas_crowdstrike"]
