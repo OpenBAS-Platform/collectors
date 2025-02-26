@@ -74,7 +74,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: pwd
       - run:
           name: Install environment
           command: |
