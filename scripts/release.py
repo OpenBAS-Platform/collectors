@@ -18,6 +18,9 @@ parser.add_argument(
     "new_version", help="The new version number of the release.", type=str
 )
 parser.add_argument(
+    "github_token", help="The github token to use for the release note.", type=str
+)
+parser.add_argument(
     "--dev", help="Flag to prevent pushing the release.", action="store_false"
 )
 args = parser.parse_args()
@@ -25,8 +28,7 @@ args = parser.parse_args()
 previous_version = args.previous_version
 new_version = args.new_version
 branch_collectors = args.branch_collectors
-
-github_token = os.environ["GREN_GITHUB_TOKEN"]
+github_token = args.github_token
 
 os.environ["DRONE_COMMIT_AUTHOR"] = "Filigran-Automation"
 os.environ["GIT_AUTHOR_NAME"] = "Filigran Automation"
