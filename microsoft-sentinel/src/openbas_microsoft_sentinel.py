@@ -114,6 +114,18 @@ class OpenBASMicrosoftSentinel:
                     alert_link.append(link["Href"])
         return alert_link
 
+    def _extract_alert_name(self, columns_index, alert):
+        display_name = [alert[columns_index["DisplayName"]]]
+        return display_name
+
+    def _extract_alert_detection_date(self, columns_index, alert):
+        detection_date = [alert[columns_index["StartTime"]]]
+        return detection_date
+
+    def _extract_alert_prevention_date(self, columns_index, alert):
+        prevention_date = [alert[columns_index["EndTime"]]]
+        return prevention_date
+
     # --- MATCHING ---
 
     def _is_prevented(self, columns_index, alert):
@@ -176,13 +188,14 @@ class OpenBASMicrosoftSentinel:
 
         # Retrieve alerts
         url = (
-            self.log_analytics_url
-            + "/workspaces/"
-            + self.config.get_conf("microsoft_sentinel_workspace_id")
-            + "/query"
+                self.log_analytics_url
+                + "/workspaces/"
+                + self.config.get_conf("microsoft_sentinel_workspace_id")
+                + "/query"
         )
         body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 200"}
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
+
         if len(data["tables"]) == 0:
             return
         self.helper.collector_logger.info(
@@ -249,9 +262,20 @@ class OpenBASMicrosoftSentinel:
                                     "is_success": True,
                                 },
                             )
+                            self.helper.api.inject_expectation_trace.create(
+                                data={
+                                    "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
+                                    "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                                    "inject_expectation_trace_alert_name":
+                                        self._extract_alert_name(columns_index, alert)[0],
+                                    "inject_expectation_trace_alert_link":
+                                        self._extract_alert_link(columns_index, alert)[0],
+                                    "inject_expectation_trace_date":
+                                        self._extract_alert_detection_date(columns_index, alert)[0]
+                                })
                         elif (
-                            expectation["inject_expectation_type"] == "PREVENTION"
-                            and result == "PREVENTED"
+                                expectation["inject_expectation_type"] == "PREVENTION"
+                                and result == "PREVENTED"
                         ):
                             self.helper.api.inject_expectation.update(
                                 expectation["inject_expectation_id"],
@@ -263,6 +287,17 @@ class OpenBASMicrosoftSentinel:
                                     "is_success": True,
                                 },
                             )
+                            self.helper.api.inject_expectation_trace.create(
+                                data={
+                                    "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
+                                    "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                                    "inject_expectation_trace_alert_name":
+                                        self._extract_alert_name(columns_index, alert)[0],
+                                    "inject_expectation_trace_alert_link":
+                                        self._extract_alert_link(columns_index, alert)[0],
+                                    "inject_expectation_trace_date":
+                                        self._extract_alert_prevention_date(columns_index, alert)[0]
+                                })
 
     def _process_message(self) -> None:
         self._process_alerts()
