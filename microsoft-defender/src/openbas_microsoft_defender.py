@@ -242,8 +242,8 @@ class OpenBASMicrosoftDefender:
             ]
         )
 
-    def _extract_alert_link(self, evidence):
-        return self.microsoft_defender_alert_details_url + evidence.get("AlertId")
+    def _extract_alert_link(self, alert_data):
+        return self.microsoft_defender_alert_details_url + alert_data.get("AlertId")
 
     def _extract_alert_name(self, evidence):
         return evidence.get("Title")
@@ -256,7 +256,7 @@ class OpenBASMicrosoftDefender:
 
     # --- MATCHING ---
 
-    def _match_alert(self, endpoint, alert, expectation):
+    def _match_alert(self, alert, evidences, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert.get("AlertId"))
@@ -269,7 +269,6 @@ class OpenBASMicrosoftDefender:
             return False
 
         alert_data = {}
-        evidences = [json.loads(evidence) for evidence in alert.get("evidence")]
         for signature_type in self.relevant_signatures_types:
             alert_data[signature_type] = {}
             if signature_type == "parent_process_name":
@@ -364,14 +363,8 @@ class OpenBASMicrosoftDefender:
         self.helper.collector_logger.info(
             "Found " + str(len(alerts.results)) + " alerts with signatures"
         )
-        endpoint_per_asset = {}
         # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
-            if expectation["inject_expectation_asset"] not in endpoint_per_asset:
-                endpoint_per_asset[expectation["inject_expectation_asset"]] = self.helper.api.endpoint.get(
-                    expectation["inject_expectation_asset"]
-                )
-
             if expectation in expectations_not_filled:
                 # Check expired expectation
                 expectation_date = parse(
@@ -402,7 +395,8 @@ class OpenBASMicrosoftDefender:
 
             for alert in alerts.results:
                 alert_data = alert.additional_data
-                if result := self._match_alert(endpoint_per_asset[expectation["inject_expectation_asset"]], alert_data, expectation):
+                evidences = [json.loads(evidence) for evidence in alert_data.get("evidence")]
+                if result := self._match_alert(alert_data, evidences, expectation):
                     if expectation in expectations_not_filled:
                         self.helper.collector_logger.info(
                             "Expectation matched, fulfilling expectation "
@@ -444,17 +438,18 @@ class OpenBASMicrosoftDefender:
                         + expectation["inject_expectation_type"]
                         + ")"
                     )
-                    self.helper.api.inject_expectation_trace.create(
-                        data={
-                            "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                            "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
-                            "inject_expectation_trace_alert_name":
-                                self._extract_alert_name(alert_data),
-                            "inject_expectation_trace_alert_link":
-                                self._extract_alert_link(alert_data),
-                            "inject_expectation_trace_date":
-                                self._extract_alert_detection_date(alert_data)
-                        })
+                    for evidence in evidences:
+                        self.helper.api.inject_expectation_trace.create(
+                            data={
+                                "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
+                                "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                                "inject_expectation_trace_alert_name":
+                                    self._extract_alert_name(evidence),
+                                "inject_expectation_trace_alert_link":
+                                    self._extract_alert_link(alert_data),
+                                "inject_expectation_trace_date":
+                                    self._extract_alert_detection_date(evidence)
+                            })
 
     def _process_message(self) -> None:
         # Auth
