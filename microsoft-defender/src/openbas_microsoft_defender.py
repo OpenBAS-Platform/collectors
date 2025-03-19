@@ -80,13 +80,13 @@ let fileEvidence = singleMachinePerAlert
     | where EntityType has "File"
     | extend normalised_filename=normalisePath(FileName), normalised_folder_path=normalisePath(FolderPath), d=parse_json(AdditionalFields)
     | join kind=inner augmentedAllFilesEvents on $left.DeviceId == $right.DeviceId and $left.normalised_filename == $right.normalised_filename and $left.normalised_folder_path == $right.normalised_folder_path
-    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path, process_hash;
+    | project AlertId, FirstActivityTimestamp = d.CreatedTimeUtc, LastActivityTimestamp = Timestamp, Title, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path, process_hash;
 let processEvidence = singleMachinePerAlert
     | join AlertEvidence on $left.AlertId == $right.AlertId
     | where EntityType has "Process"
     | extend normalised_filename=normalisePath(FileName), d=parse_json(AdditionalFields)
     | extend process_hash=hash(strcat(DeviceId, d.ProcessId, normalised_filename, todatetime(d.CreationTimeUtc)))
-    | project AlertId, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path="<empty>", process_hash;
+    | project AlertId, FirstActivityTimestamp = d.CreatedTimeUtc, LastActivityTimestamp = Timestamp, Title, EntityType, DeviceId, DeviceName, Identifier=normalised_filename, LastRemediationState=d.LastRemediationState, DetectionStatus=d.DetectionStatus, normalised_folder_path="<empty>", process_hash;
 let hashedProcessEvents = DeviceProcessEvents
     | extend process_hash = hash(strcat(DeviceId, ProcessId, normalisePath(FileName), ProcessCreationTime)), parent_hash = hash(strcat(DeviceId, InitiatingProcessId, normalisePath(InitiatingProcessFileName), InitiatingProcessCreationTime));
 let tree = hashedProcessEvents
@@ -100,7 +100,7 @@ fileEvidence
 | union processEvidence
 | join kind=inner tree on $left.process_hash == $right.child_process_hash
 | project-rename ParentProcessImageFileName=sig, CommandLine=child_ProcessCommandLine
-| extend data=bag_pack_columns(EntityType, Identifier, LastRemediationState, DetectionStatus, ParentProcessImageFileName, CommandLine)
+| extend data=bag_pack_columns(EntityType, FirstActivityTimestamp, LastActivityTimestamp, Title, Identifier, LastRemediationState, DetectionStatus, ParentProcessImageFileName, CommandLine)
 | summarize evidence=make_list(data) by AlertId, DeviceName
 """
 
@@ -173,6 +173,12 @@ class OpenBASMicrosoftDefender:
             self.helper.collector_logger, self.relevant_signatures_types
         )
 
+        self.scanning_delta = 45
+        self.scopes = ["https://graph.microsoft.com/.default"]
+        self.microsoft_defender_alert_details_url = "https://security.microsoft.com/alerts/"
+
+    # --- EXTRACTOR ---
+
     def _extract_device(self, alert):
         return alert.get("DeviceName", None)
 
@@ -235,6 +241,20 @@ class OpenBASMicrosoftDefender:
                 in ["Prevented", "Blocked", "Remediated"]
             ]
         )
+
+    def _extract_alert_link(self, evidence):
+        return self.microsoft_defender_alert_details_url + evidence.get("AlertId")
+
+    def _extract_alert_name(self, evidence):
+        return evidence.get("Title")
+
+    def _extract_alert_detection_date(self, evidence):
+        return evidence.get("FirstActivityTimestamp")
+
+    def _extract_alert_prevention_date(self, evidence):
+        return evidence.get("LastActivityTimestamp")
+
+    # --- MATCHING ---
 
     def _match_alert(self, endpoint, alert, expectation):
         self.helper.collector_logger.info(
@@ -306,15 +326,25 @@ class OpenBASMicrosoftDefender:
                 return "DETECTED"
         return False
 
+    # --- PROCESS ---
+
+    def _is_expectation_filled(self, expectation) -> bool:
+        if not any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"]):
+            return False
+        return True
+
     async def _process_alerts(self, graph_client):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id")
+                self.config.get_conf("collector_id"),
+                self.scanning_delta,
             )
         )
+        self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
+        expectations_not_filled = list(filter(lambda expectation: self._is_expectation_filled(expectation), expectations))
         self.helper.collector_logger.info(
-            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+            "Found " + str(len(expectations_not_filled)) + " expectations waiting to be matched"
         )
 
         if not any(expectations):
@@ -323,7 +353,9 @@ class OpenBASMicrosoftDefender:
             )
             return
 
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=self.scanning_delta)
+
+        # Retrieve alerts
         alerts = (
             await graph_client.security.microsoft_graph_security_run_hunting_query.post(
                 body=RunHuntingQueryPostRequestBody(
@@ -334,79 +366,106 @@ class OpenBASMicrosoftDefender:
         self.helper.collector_logger.info(
             "Found " + str(len(alerts.results)) + " alerts with signatures"
         )
-        # For each expectation, try to find the proper alert
+        endpoint_per_asset = {}
+        # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
-            # Check expired expectation
-            expectation_date = parse(
-                expectation["inject_expectation_created_at"]
-            ).astimezone(pytz.UTC)
-            if expectation_date < limit_date:
-                self.helper.collector_logger.info(
-                    "Expectation expired, failing inject "
-                    + expectation["inject_expectation_inject"]
-                    + " ("
-                    + expectation["inject_expectation_type"]
-                    + ")"
+            if expectation["inject_expectation_asset"] not in endpoint_per_asset:
+                endpoint_per_asset[expectation["inject_expectation_asset"]] = self.helper.api.endpoint.get(
+                    expectation["inject_expectation_asset"]
                 )
-                self.helper.api.inject_expectation.update(
-                    expectation["inject_expectation_id"],
-                    {
-                        "collector_id": self.config.get_conf("collector_id"),
-                        "result": (
-                            "Not Detected"
-                            if expectation["inject_expectation_type"] == "DETECTION"
-                            else "Not Prevented"
-                        ),
-                        "is_success": False,
-                    },
-                )
-                continue
-            endpoint = self.helper.api.endpoint.get(
-                expectation["inject_expectation_asset"]
-            )
-            for alert in alerts.results:
-                alert_data = alert.additional_data
-                if result := self._match_alert(endpoint, alert_data, expectation):
+
+            if expectation in expectations_not_filled:
+                # Check expired expectation
+                expectation_date = parse(
+                    expectation["inject_expectation_created_at"]
+                ).astimezone(pytz.UTC)
+                if expectation_date < limit_date:
                     self.helper.collector_logger.info(
-                        "Expectation matched, fulfilling expectation "
+                        "Expectation expired, failing inject "
                         + expectation["inject_expectation_inject"]
                         + " ("
                         + expectation["inject_expectation_type"]
                         + ")"
                     )
-                    if expectation["inject_expectation_type"] == "DETECTION":
-                        self.helper.api.inject_expectation.update(
-                            expectation["inject_expectation_id"],
-                            {
-                                "collector_id": self.config.get_conf("collector_id"),
-                                "result": "Detected",
-                                "is_success": True,
-                                "metadata": {"alertId": alert_data.get("AlertId")},
-                            },
+                    self.helper.api.inject_expectation.update(
+                        expectation["inject_expectation_id"],
+                        {
+                            "collector_id": self.config.get_conf("collector_id"),
+                            "result": (
+                                "Not Detected"
+                                if expectation["inject_expectation_type"] == "DETECTION"
+                                else "Not Prevented"
+                            ),
+                            "is_success": False,
+                        },
+                    )
+                    expectations_not_filled.remove(expectation)
+                    continue
+
+            for alert in alerts.results:
+                alert_data = alert.additional_data
+                if result := self._match_alert(endpoint_per_asset[expectation["inject_expectation_asset"]], alert_data, expectation):
+                    if expectation in expectations_not_filled:
+                        self.helper.collector_logger.info(
+                            "Expectation matched, fulfilling expectation "
+                            + expectation["inject_expectation_inject"]
+                            + " ("
+                            + expectation["inject_expectation_type"]
+                            + ")"
                         )
-                    elif (
-                        expectation["inject_expectation_type"] == "PREVENTION"
-                        and result == "PREVENTED"
-                    ):
-                        self.helper.api.inject_expectation.update(
-                            expectation["inject_expectation_id"],
-                            {
-                                "collector_id": self.config.get_conf("collector_id"),
-                                "result": "Prevented",
-                                "is_success": True,
-                                "metadata": {"alertId": alert_data.get("AlertId")},
-                            },
-                        )
+                        if expectation["inject_expectation_type"] == "DETECTION":
+                            self.helper.api.inject_expectation.update(
+                                expectation["inject_expectation_id"],
+                                {
+                                    "collector_id": self.config.get_conf("collector_id"),
+                                    "result": "Detected",
+                                    "is_success": True,
+                                    "metadata": {"alertId": alert_data.get("AlertId")},
+                                },
+                            )
+                        elif (
+                            expectation["inject_expectation_type"] == "PREVENTION"
+                            and result == "PREVENTED"
+                        ):
+                            self.helper.api.inject_expectation.update(
+                                expectation["inject_expectation_id"],
+                                {
+                                    "collector_id": self.config.get_conf("collector_id"),
+                                    "result": "Prevented",
+                                    "is_success": True,
+                                    "metadata": {"alertId": alert_data.get("AlertId")},
+                                },
+                            )
+                        expectations_not_filled.remove(expectation)
+
+                    # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
+                    self.helper.collector_logger.info(
+                        "Expectation matched, adding trace for expectation "
+                        + expectation["inject_expectation_inject"]
+                        + " ("
+                        + expectation["inject_expectation_type"]
+                        + ")"
+                    )
+                    self.helper.api.inject_expectation_trace.create(
+                        data={
+                            "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
+                            "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                            "inject_expectation_trace_alert_name":
+                                self._extract_alert_name(alert_data),
+                            "inject_expectation_trace_alert_link":
+                                self._extract_alert_link(alert_data),
+                            "inject_expectation_trace_date":
+                                self._extract_alert_detection_date(alert_data)
+                        })
 
     def _process_message(self) -> None:
         # Auth
-        scopes = ["https://graph.microsoft.com/.default"]
         credential = ClientSecretCredential(
             tenant_id=self.config.get_conf("microsoft_defender_tenant_id"),
             client_id=self.config.get_conf("microsoft_defender_client_id"),
             client_secret=self.config.get_conf("microsoft_defender_client_secret"),
         )
-        graph_client = GraphServiceClient(credential, scopes=scopes)  # type: ignore
+        graph_client = GraphServiceClient(credential, scopes=self.scopes)  # type: ignore
 
         # Execute
         loop = asyncio.get_event_loop()
