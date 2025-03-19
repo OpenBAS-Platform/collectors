@@ -83,7 +83,7 @@ class OpenBASCrowdStrike:
     def _match_expectations(self, alerts: list[Item], expectations):
 
         self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
-        expectations_not_filled = list(filter(lambda expectation: self._is_expectation_filled(expectation), expectations))
+        expectations_not_filled = list(filter(lambda expectation: not self._is_expectation_filled(expectation), expectations))
 
         for expectation in expectations:
             if expectation.get("inject_expectation_signatures") is None:

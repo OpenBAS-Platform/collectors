@@ -177,9 +177,7 @@ class OpenBASMicrosoftSentinel:
     # --- PROCESS ---
 
     def _is_expectation_filled(self, expectation) -> bool:
-        if not any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"]):
-            return False
-        return True
+        return any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"])
 
     def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
@@ -190,7 +188,7 @@ class OpenBASMicrosoftSentinel:
             )
         )
         self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
-        expectations_not_filled = list(filter(lambda expectation: self._is_expectation_filled(expectation), expectations))
+        expectations_not_filled = list(filter(lambda expectation: not self._is_expectation_filled(expectation), expectations))
         self.helper.collector_logger.info(
             "Found " + str(len(expectations_not_filled)) + " expectations waiting to be matched"
         )
