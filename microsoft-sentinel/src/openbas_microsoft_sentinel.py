@@ -257,7 +257,7 @@ class OpenBASMicrosoftSentinel:
                 if alert_date > limit_date:
                     alert_link_datas = self._extract_alert_link(columns_index, alert)
                     result = self._match_alert_from_edr(
-                        endpoint_per_asset[expectation["inject_expectation_asset"]], columns_index, alert, expectation, alert_link_datas
+                        endpoint_per_asset[expectation["inject_expectation_asset"]], columns_index, alert, expectation
                     )
                     if result is not False:
                         if expectation in expectations_not_filled:
