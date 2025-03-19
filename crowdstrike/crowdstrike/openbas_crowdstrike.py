@@ -13,6 +13,8 @@ from pyobas.helpers import (
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
+from collectors.crowdstrike.crowdstrike.query_strategy.alert import Item
+
 
 class OpenBASCrowdStrike:
     def __init__(
@@ -28,12 +30,16 @@ class OpenBASCrowdStrike:
         self.helper = helper
         self.detection_helper = detection_helper
         self.signature_types = signature_types
+        self.scanning_delta = 45
+
+    # --- FETCHER ---
 
     def _fetch_expectations(self, start_time):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id")
+                self.config.get_conf("collector_id"),
+                self.scanning_delta,
             )
         )
         self.helper.collector_logger.info(
@@ -72,7 +78,13 @@ class OpenBASCrowdStrike:
 
         return valid_expectations
 
-    def _match_expectations(self, alerts, expectations):
+    # --- MATCHING ---
+
+    def _match_expectations(self, alerts: list[Item], expectations):
+
+        self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
+        expectations_not_filled = list(filter(lambda expectation: self._is_expectation_filled(expectation), expectations))
+
         for expectation in expectations:
             if expectation.get("inject_expectation_signatures") is None:
                 self.helper.collector_logger.warning(
@@ -100,21 +112,49 @@ class OpenBASCrowdStrike:
                             f"Unsupported expectation type for now: {expectation.get('inject_expectation_type')}"
                         )
                         continue
+                    if expectation in expectations_not_filled:
+                        self.helper.api.inject_expectation.update(
+                            expectation["inject_expectation_id"],
+                            {
+                                "collector_id": self.config.get_conf("collector_id"),
+                                "result": result,
+                                "is_success": success_or_failure,
+                                "metadata": {"alertId": self.strategy.get_alert_id(alert)},
+                            },
+                        )
+                        expectations_not_filled.remove(expectation)
 
-                    self.helper.api.inject_expectation.update(
-                        expectation["inject_expectation_id"],
-                        {
-                            "collector_id": self.config.get_conf("collector_id"),
-                            "result": result,
-                            "is_success": success_or_failure,
-                            "metadata": {"alertId": self.strategy.get_alert_id(alert)},
-                        },
+                    # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
+                    self.helper.collector_logger.info(
+                        "Expectation matched, adding trace for expectation "
+                        + expectation["inject_expectation_inject"]
+                        + " ("
+                        + expectation["inject_expectation_type"]
+                        + ")"
                     )
+                    self.helper.api.inject_expectation_trace.create(
+                        data={
+                            "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
+                            "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                            "inject_expectation_trace_alert_name":
+                               alert.display_name,
+                            "inject_expectation_trace_alert_link":
+                                config.get_conf("crowdstrike_api_base_url") + "/activity-v2/detections/" + alert.composite_id,
+                            "inject_expectation_trace_date":
+                                alert.updated_timestamp
+                        })
+
+    # --- PROCESS ---
+
+    def _is_expectation_filled(self, expectation) -> bool:
+        if not any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"]):
+            return False
+        return True
 
     def _process(self):
         """Fetch and match expectations with data from cs"""
         now = datetime.now(pytz.UTC)
-        start_time = now - timedelta(minutes=45)
+        start_time = now - timedelta(minutes=self.scanning_delta)
 
         self._match_expectations(
             alerts=self.strategy.get_raw_data(start_time),
@@ -177,6 +217,11 @@ if __name__ == "__main__":
                 "env": "CROWDSTRIKE_API_BASE_URL",
                 "file_path": ["crowdstrike", "api_base_url"],
                 "default": "https://api.crowdstrike.com",
+            },
+            "crowdstrike_ui_base_url": {
+                "env": "CROWDSTRIKE_UI_BASE_URL",
+                "file_path": ["crowdstrike", "ui_base_url"],
+                "default": "https://falcon.us-2.crowdstrike.com",
             },
         },
     )

@@ -12,5 +12,6 @@ collector:
 
 crowdstrike:
   api_base_url: 'ChangeMe'
+  ui_base_url: 'ChangeMe'
   client_id: 'ChangeMe'
   client_secret: 'ChangeMe'
