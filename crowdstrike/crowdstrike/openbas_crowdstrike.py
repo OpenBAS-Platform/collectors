@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
 import pytz
-from crowdstrike.crowdstrike_api_handler import CrowdstrikeApiHandler
-from crowdstrike.query_strategy.alert import Alert
-from crowdstrike.query_strategy.base import Base
+from crowdstrike_api_handler import CrowdstrikeApiHandler
+from query_strategy.alert import Alert
+from query_strategy.base import Base
 from dateutil.parser import parse
 from pyobas.helpers import (
     OpenBASCollectorHelper,
@@ -13,7 +13,7 @@ from pyobas.helpers import (
 from pyobas.signatures.signature_type import SignatureType
 from pyobas.signatures.types import MatchTypes, SignatureTypes
 
-from collectors.crowdstrike.crowdstrike.query_strategy.alert import Item
+from query_strategy.alert import Item
 
 
 class OpenBASCrowdStrike:
@@ -135,7 +135,7 @@ class OpenBASCrowdStrike:
                     self.helper.api.inject_expectation_trace.create(
                         data={
                             "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                            "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                            "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
                             "inject_expectation_trace_alert_name":
                                alert.display_name,
                             "inject_expectation_trace_alert_link":
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 
     helper = OpenBASCollectorHelper(
         config=config,
-        icon="crowdstrike/img/icon-crowdstrike.png",
+        icon="img/icon-crowdstrike.png",
         security_platform_type=config.get_conf("collector_platform") or "EDR",
     )
 

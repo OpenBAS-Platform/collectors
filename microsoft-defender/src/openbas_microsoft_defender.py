@@ -442,7 +442,7 @@ class OpenBASMicrosoftDefender:
                         self.helper.api.inject_expectation_trace.create(
                             data={
                                 "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                                "inject_expectation_trace_collector": self.config.get_conf("collector_id"),
+                                "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
                                 "inject_expectation_trace_alert_name":
                                     self._extract_alert_name(evidence),
                                 "inject_expectation_trace_alert_link":
