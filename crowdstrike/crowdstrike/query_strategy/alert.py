@@ -27,7 +27,6 @@ class Item(BaseModel):
     updated_timestamp: str
     composite_id: str
 
-
     def get_process_image_names(self) -> list[str]:
         return [
             self.filename,
