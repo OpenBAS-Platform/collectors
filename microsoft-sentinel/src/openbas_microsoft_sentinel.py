@@ -277,7 +277,6 @@ class OpenBASMicrosoftSentinel:
                                         ),
                                         "result": "Detected",
                                         "is_success": True,
-                                        "metadata": alert_link_datas,
                                     },
                                 )
                             elif (
@@ -292,7 +291,6 @@ class OpenBASMicrosoftSentinel:
                                         ),
                                         "result": "Prevented",
                                         "is_success": True,
-                                        "alert_link_datas": alert_link_datas,
                                     },
                                 )
                             expectations_not_filled.remove(expectation)
