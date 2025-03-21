@@ -22,6 +22,10 @@ class Item(BaseModel):
     grandparent_details: ProcessDetails
     device: DeviceDetails
     pattern_disposition: int
+    display_name: str
+    created_timestamp: str
+    updated_timestamp: str
+    composite_id: str
 
     def get_process_image_names(self) -> list[str]:
         return [
@@ -41,7 +45,7 @@ class Alert(Base):
     def get_strategy_name(self):
         return self.__class__
 
-    def get_raw_data(self, start_time: datetime):
+    def get_raw_data(self, start_time: datetime) -> list[Item]:
         items = []
         for dataframe in self.api.get_alerts_v2(start_time):
             try:
