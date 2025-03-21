@@ -159,16 +159,26 @@ class OpenBASTaniumThreatResponse:
                     )
         return command_lines
 
-    def _extract_alert_link(self, alert):
-        return self.config.get_conf("tanium_url") + "/ui/threatresponse/alerts?guid=" + alert["id"]
+    def _extract_alert_link(self, alert) -> str:
+        return self.config.get_conf("tanium_url_console") + "/ui/threatresponse/alerts?guid=" + str(alert["guid"])
 
-    def _extract_alert_name(self, alert):
-        return alert.get("intelName", None)
+    def _extract_alert_name(self, alert, alert_details) -> str:
+        # Retrieve intel details
+        alert_name = alert["guid"]
+        if "intel_id" in alert_details:
+            intel_id = alert_details["intel_id"]
+            intel = self.tanium_api_handler._query(
+                "get",
+                "/plugin/products/threat-response/api/v1/intels/" + str(intel_id),
+                {"sort": "-createdAt"},
+            )
+            alert_name = intel["type"]
+        return alert_name
 
-    def _extract_alert_detection_date(self, alert_details):
+    def _extract_alert_detection_date(self, alert_details) -> str:
         if "finding" in alert_details:
             return alert_details["finding"]["first_seen"]
-        return None
+        return ""
 
     # --- MATCHING ---
 
@@ -317,7 +327,7 @@ class OpenBASTaniumThreatResponse:
                                 "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
                                 "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
                                 "inject_expectation_trace_alert_name":
-                                    self._extract_alert_name(alert),
+                                    self._extract_alert_name(alert, alert_details),
                                 "inject_expectation_trace_alert_link":
                                     self._extract_alert_link(alert),
                                 "inject_expectation_trace_date":
