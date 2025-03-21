@@ -25,6 +25,7 @@ DEFAULT_COLLECTOR_CONFIG = {
     "crowdstrike_client_id": {"data": "some_client_id"},
     "crowdstrike_client_secret": {"data": "very_secret_token"},
     "crowdstrike_api_base_url": {"data": "http://fake_crowdstrike_api_base_url"},
+    "crowdstrike_ui_base_url": {"data": "http://fake_crowdstrike_ui_base_url"},
 }
 
 DEFAULT_SIGNATURE_TYPES = [

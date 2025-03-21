@@ -175,7 +175,9 @@ class OpenBASMicrosoftDefender:
 
         self.scanning_delta = 45
         self.scopes = ["https://graph.microsoft.com/.default"]
-        self.microsoft_defender_alert_details_url = "https://security.microsoft.com/alerts/"
+        self.microsoft_defender_alert_details_url = (
+            "https://security.microsoft.com/alerts/"
+        )
 
     # --- EXTRACTOR ---
 
@@ -328,20 +330,31 @@ class OpenBASMicrosoftDefender:
     # --- PROCESS ---
 
     def _is_expectation_filled(self, expectation) -> bool:
-        return any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"])
+        return any(
+            er.get("sourceId", "") == self.config.get_conf("collector_id")
+            for er in expectation["inject_expectation_results"]
+        )
 
     async def _process_alerts(self, graph_client):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id"),
-                self.scanning_delta
+                self.config.get_conf("collector_id"), self.scanning_delta
             )
         )
-        self.helper.collector_logger.info("Total expectations returned: " + str(len(expectations)))
-        expectations_not_filled = list(filter(lambda expectation: not self._is_expectation_filled(expectation), expectations))
         self.helper.collector_logger.info(
-            "Found " + str(len(expectations_not_filled)) + " expectations waiting to be matched"
+            "Total expectations returned: " + str(len(expectations))
+        )
+        expectations_not_filled = list(
+            filter(
+                lambda expectation: not self._is_expectation_filled(expectation),
+                expectations,
+            )
+        )
+        self.helper.collector_logger.info(
+            "Found "
+            + str(len(expectations_not_filled))
+            + " expectations waiting to be matched"
         )
 
         if not any(expectations):
@@ -350,7 +363,9 @@ class OpenBASMicrosoftDefender:
             )
             return
 
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=self.scanning_delta)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
+            minutes=self.scanning_delta
+        )
 
         # Retrieve alerts
         alerts = (
@@ -395,7 +410,9 @@ class OpenBASMicrosoftDefender:
 
             for alert in alerts.results:
                 alert_data = alert.additional_data
-                evidences = [json.loads(evidence) for evidence in alert_data.get("evidence")]
+                evidences = [
+                    json.loads(evidence) for evidence in alert_data.get("evidence")
+                ]
                 if result := self._match_alert(alert_data, evidences, expectation):
                     if expectation in expectations_not_filled:
                         self.helper.collector_logger.info(
@@ -409,7 +426,9 @@ class OpenBASMicrosoftDefender:
                             self.helper.api.inject_expectation.update(
                                 expectation["inject_expectation_id"],
                                 {
-                                    "collector_id": self.config.get_conf("collector_id"),
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
                                     "result": "Detected",
                                     "is_success": True,
                                     "metadata": {"alertId": alert_data.get("AlertId")},
@@ -422,7 +441,9 @@ class OpenBASMicrosoftDefender:
                             self.helper.api.inject_expectation.update(
                                 expectation["inject_expectation_id"],
                                 {
-                                    "collector_id": self.config.get_conf("collector_id"),
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
                                     "result": "Prevented",
                                     "is_success": True,
                                     "metadata": {"alertId": alert_data.get("AlertId")},
@@ -441,15 +462,23 @@ class OpenBASMicrosoftDefender:
                     for evidence in evidences:
                         self.helper.api.inject_expectation_trace.create(
                             data={
-                                "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                                "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
-                                "inject_expectation_trace_alert_name":
-                                    self._extract_alert_name(evidence),
-                                "inject_expectation_trace_alert_link":
-                                    self._extract_alert_link(alert_data),
-                                "inject_expectation_trace_date":
-                                    self._extract_alert_detection_date(evidence)
-                            })
+                                "inject_expectation_trace_expectation": expectation[
+                                    "inject_expectation_id"
+                                ],
+                                "inject_expectation_trace_source_id": self.config.get_conf(
+                                    "collector_id"
+                                ),
+                                "inject_expectation_trace_alert_name": self._extract_alert_name(
+                                    evidence
+                                ),
+                                "inject_expectation_trace_alert_link": self._extract_alert_link(
+                                    alert_data
+                                ),
+                                "inject_expectation_trace_date": self._extract_alert_detection_date(
+                                    evidence
+                                ),
+                            }
+                        )
 
     def _process_message(self) -> None:
         # Auth

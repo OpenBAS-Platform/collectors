@@ -177,7 +177,10 @@ class OpenBASMicrosoftSentinel:
     # --- PROCESS ---
 
     def _is_expectation_filled(self, expectation) -> bool:
-        return any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"])
+        return any(
+            er.get("sourceId", "") == self.config.get_conf("collector_id")
+            for er in expectation["inject_expectation_results"]
+        )
 
     def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
@@ -187,19 +190,30 @@ class OpenBASMicrosoftSentinel:
                 self.scanning_delta,
             )
         )
-        self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
-        expectations_not_filled = list(filter(lambda expectation: not self._is_expectation_filled(expectation), expectations))
-        self.helper.collector_logger.info(
-            "Found " + str(len(expectations_not_filled)) + " expectations waiting to be matched"
+        self.helper.collector_logger.debug(
+            "Total expectations returned: " + str(len(expectations))
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=self.scanning_delta)
+        expectations_not_filled = list(
+            filter(
+                lambda expectation: not self._is_expectation_filled(expectation),
+                expectations,
+            )
+        )
+        self.helper.collector_logger.info(
+            "Found "
+            + str(len(expectations_not_filled))
+            + " expectations waiting to be matched"
+        )
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
+            minutes=self.scanning_delta
+        )
 
         # Retrieve alerts
         url = (
-                self.log_analytics_url
-                + "/workspaces/"
-                + self.config.get_conf("microsoft_sentinel_workspace_id")
-                + "/query"
+            self.log_analytics_url
+            + "/workspaces/"
+            + self.config.get_conf("microsoft_sentinel_workspace_id")
+            + "/query"
         )
         body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 200"}
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
@@ -218,8 +232,10 @@ class OpenBASMicrosoftSentinel:
         # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
             if expectation["inject_expectation_asset"] not in endpoint_per_asset:
-                endpoint_per_asset[expectation["inject_expectation_asset"]] = self.helper.api.endpoint.get(
-                    expectation["inject_expectation_asset"]
+                endpoint_per_asset[expectation["inject_expectation_asset"]] = (
+                    self.helper.api.endpoint.get(
+                        expectation["inject_expectation_asset"]
+                    )
                 )
 
             if expectation in expectations_not_filled:
@@ -255,9 +271,11 @@ class OpenBASMicrosoftSentinel:
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
                 if alert_date > limit_date:
-                    alert_link_datas = self._extract_alert_link(columns_index, alert)
                     result = self._match_alert_from_edr(
-                        endpoint_per_asset[expectation["inject_expectation_asset"]], columns_index, alert, expectation
+                        endpoint_per_asset[expectation["inject_expectation_asset"]],
+                        columns_index,
+                        alert,
+                        expectation,
                     )
                     if result is not False:
                         if expectation in expectations_not_filled:
@@ -305,15 +323,29 @@ class OpenBASMicrosoftSentinel:
                         )
                         self.helper.api.inject_expectation_trace.create(
                             data={
-                                "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                                "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
-                                "inject_expectation_trace_alert_name":
-                                    self._extract_alert_name(columns_index, alert)[0],
-                                "inject_expectation_trace_alert_link":
-                                    self._extract_alert_link(columns_index, alert)[0],
-                                "inject_expectation_trace_date":
-                                    self._extract_alert_detection_date(columns_index, alert)[0]
-                            })
+                                "inject_expectation_trace_expectation": expectation[
+                                    "inject_expectation_id"
+                                ],
+                                "inject_expectation_trace_source_id": self.config.get_conf(
+                                    "collector_id"
+                                ),
+                                "inject_expectation_trace_alert_name": self._extract_alert_name(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                                "inject_expectation_trace_alert_link": self._extract_alert_link(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                                "inject_expectation_trace_date": self._extract_alert_detection_date(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                            }
+                        )
 
     def _process_message(self) -> None:
         self._process_alerts()

@@ -160,7 +160,11 @@ class OpenBASTaniumThreatResponse:
         return command_lines
 
     def _extract_alert_link(self, alert) -> str:
-        return self.config.get_conf("tanium_url_console") + "/ui/threatresponse/alerts?guid=" + str(alert["guid"])
+        return (
+            self.config.get_conf("tanium_url_console")
+            + "/ui/threatresponse/alerts?guid="
+            + str(alert["guid"])
+        )
 
     def _extract_alert_name(self, alert, alert_details) -> str:
         # Retrieve intel details
@@ -238,22 +242,35 @@ class OpenBASTaniumThreatResponse:
     # --- PROCESS ---
 
     def _is_expectation_filled(self, expectation) -> bool:
-        return any(er.get('sourceId', '') == self.config.get_conf("collector_id") for er in expectation["inject_expectation_results"])
+        return any(
+            er.get("sourceId", "") == self.config.get_conf("collector_id")
+            for er in expectation["inject_expectation_results"]
+        )
 
     def _process_message(self) -> None:
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.detection_expectations_for_source(
-                self.config.get_conf("collector_id"),
-                self.scanning_delta
+                self.config.get_conf("collector_id"), self.scanning_delta
             )
         )
-        self.helper.collector_logger.debug("Total expectations returned: " + str(len(expectations)))
-        expectations_not_filled = list(filter(lambda expectation: not self._is_expectation_filled(expectation), expectations))
-        self.helper.collector_logger.info(
-            "Found " + str(len(expectations_not_filled)) + " expectations waiting to be matched"
+        self.helper.collector_logger.debug(
+            "Total expectations returned: " + str(len(expectations))
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=self.scanning_delta)
+        expectations_not_filled = list(
+            filter(
+                lambda expectation: not self._is_expectation_filled(expectation),
+                expectations,
+            )
+        )
+        self.helper.collector_logger.info(
+            "Found "
+            + str(len(expectations_not_filled))
+            + " expectations waiting to be matched"
+        )
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
+            minutes=self.scanning_delta
+        )
 
         # Retrieve alerts
         alerts = self.tanium_api_handler._query(
@@ -307,7 +324,9 @@ class OpenBASTaniumThreatResponse:
                             self.helper.api.inject_expectation.update(
                                 expectation["inject_expectation_id"],
                                 {
-                                    "collector_id": self.config.get_conf("collector_id"),
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
                                     "result": "Detected",
                                     "is_success": True,
                                 },
@@ -324,15 +343,24 @@ class OpenBASTaniumThreatResponse:
                         )
                         self.helper.api.inject_expectation_trace.create(
                             data={
-                                "inject_expectation_trace_expectation": expectation["inject_expectation_id"],
-                                "inject_expectation_trace_source_id": self.config.get_conf("collector_id"),
-                                "inject_expectation_trace_alert_name":
-                                    self._extract_alert_name(alert, alert_details),
-                                "inject_expectation_trace_alert_link":
-                                    self._extract_alert_link(alert),
-                                "inject_expectation_trace_date":
-                                    self._extract_alert_detection_date(alert_details)
-                            })
+                                "inject_expectation_trace_expectation": expectation[
+                                    "inject_expectation_id"
+                                ],
+                                "inject_expectation_trace_source_id": self.config.get_conf(
+                                    "collector_id"
+                                ),
+                                "inject_expectation_trace_alert_name": self._extract_alert_name(
+                                    alert, alert_details
+                                ),
+                                "inject_expectation_trace_alert_link": self._extract_alert_link(
+                                    alert
+                                ),
+                                "inject_expectation_trace_date": self._extract_alert_detection_date(
+                                    alert_details
+                                ),
+                            }
+                        )
+
     # Start the main loop
     def start(self):
         period = self.config.get_conf("collector_period", default=120, is_number=True)
