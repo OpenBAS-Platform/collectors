@@ -101,6 +101,8 @@ class OpenBASMicrosoftSentinel:
             self.helper.collector_logger, self.relevant_signatures_types
         )
 
+        self.scanning_delta = 45
+
     # --- EXTRACTOR ---
 
     def _extract_alert_link(self, columns_index, alert):
@@ -114,6 +116,18 @@ class OpenBASMicrosoftSentinel:
                     alert_link.append(link["Href"])
         return alert_link
 
+    def _extract_alert_name(self, columns_index, alert):
+        display_name = [alert[columns_index["DisplayName"]]]
+        return display_name
+
+    def _extract_alert_detection_date(self, columns_index, alert):
+        detection_date = [alert[columns_index["StartTime"]]]
+        return detection_date
+
+    def _extract_alert_prevention_date(self, columns_index, alert):
+        prevention_date = [alert[columns_index["EndTime"]]]
+        return prevention_date
+
     # --- MATCHING ---
 
     def _is_prevented(self, columns_index, alert):
@@ -124,7 +138,7 @@ class OpenBASMicrosoftSentinel:
         )
         return result_alert_name
 
-    def _match_alert_link(self, expectation, alert_link_datas):
+    def _match_alert_link(self, expectation, alert_link_datas) -> bool:
         # Extract expectation alert link
         alert_id_expectation = None
         for item in expectation["inject_expectation_results"]:
@@ -162,17 +176,37 @@ class OpenBASMicrosoftSentinel:
 
     # --- PROCESS ---
 
+    def _is_expectation_filled(self, expectation) -> bool:
+        return any(
+            er.get("sourceId", "") == self.config.get_conf("collector_id")
+            for er in expectation["inject_expectation_results"]
+        )
+
     def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id")
+                self.config.get_conf("collector_id"),
+                self.scanning_delta,
+            )
+        )
+        self.helper.collector_logger.debug(
+            "Total expectations returned: " + str(len(expectations))
+        )
+        expectations_not_filled = list(
+            filter(
+                lambda expectation: not self._is_expectation_filled(expectation),
+                expectations,
             )
         )
         self.helper.collector_logger.info(
-            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+            "Found "
+            + str(len(expectations_not_filled))
+            + " expectations waiting to be matched"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
+            minutes=self.scanning_delta
+        )
 
         # Retrieve alerts
         url = (
@@ -183,6 +217,7 @@ class OpenBASMicrosoftSentinel:
         )
         body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 200"}
         data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
+
         if len(data["tables"]) == 0:
             return
         self.helper.collector_logger.info(
@@ -192,77 +227,125 @@ class OpenBASMicrosoftSentinel:
         columns_index = {}
         for idx, column in enumerate(columns):
             columns_index[column["name"]] = idx
-        # For each expectation, try to find the proper alert
+
+        endpoint_per_asset = {}
+        # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
-            # Check expired expectation
-            expectation_date = parse(
-                expectation["inject_expectation_created_at"]
-            ).astimezone(pytz.UTC)
-            if expectation_date < limit_date:
-                self.helper.collector_logger.info(
-                    "Expectation expired, failing inject "
-                    + expectation["inject_expectation_inject"]
-                    + " ("
-                    + expectation["inject_expectation_type"]
-                    + ")"
+            if expectation["inject_expectation_asset"] not in endpoint_per_asset:
+                endpoint_per_asset[expectation["inject_expectation_asset"]] = (
+                    self.helper.api.endpoint.get(
+                        expectation["inject_expectation_asset"]
+                    )
                 )
-                self.helper.api.inject_expectation.update(
-                    expectation["inject_expectation_id"],
-                    {
-                        "collector_id": self.config.get_conf("collector_id"),
-                        "result": (
-                            "Not Detected"
-                            if expectation["inject_expectation_type"] == "DETECTION"
-                            else "Not Prevented"
-                        ),
-                        "is_success": False,
-                    },
-                )
-                continue
-            endpoint = self.helper.api.endpoint.get(
-                expectation["inject_expectation_asset"]
-            )
+
+            if expectation in expectations_not_filled:
+                # Check expired expectation
+                expectation_date = parse(
+                    expectation["inject_expectation_created_at"]
+                ).astimezone(pytz.UTC)
+                if expectation_date < limit_date:
+                    self.helper.collector_logger.info(
+                        "Expectation expired, failing inject "
+                        + expectation["inject_expectation_inject"]
+                        + " ("
+                        + expectation["inject_expectation_type"]
+                        + ")"
+                    )
+                    self.helper.api.inject_expectation.update(
+                        expectation["inject_expectation_id"],
+                        {
+                            "collector_id": self.config.get_conf("collector_id"),
+                            "result": (
+                                "Not Detected"
+                                if expectation["inject_expectation_type"] == "DETECTION"
+                                else "Not Prevented"
+                            ),
+                            "is_success": False,
+                        },
+                    )
+                    expectations_not_filled.remove(expectation)
+                    continue
+
             for alert in data["tables"][0]["rows"]:
                 alert_date = parse(
                     str(alert[columns_index["TimeGenerated"]])
                 ).astimezone(pytz.UTC)
                 if alert_date > limit_date:
                     result = self._match_alert_from_edr(
-                        endpoint, columns_index, alert, expectation
+                        endpoint_per_asset[expectation["inject_expectation_asset"]],
+                        columns_index,
+                        alert,
+                        expectation,
                     )
                     if result is not False:
+                        if expectation in expectations_not_filled:
+                            self.helper.collector_logger.info(
+                                "Expectation matched, fulfilling expectation "
+                                + expectation["inject_expectation_inject"]
+                                + " ("
+                                + expectation["inject_expectation_type"]
+                                + ")"
+                            )
+                            if expectation["inject_expectation_type"] == "DETECTION":
+                                self.helper.api.inject_expectation.update(
+                                    expectation["inject_expectation_id"],
+                                    {
+                                        "collector_id": self.config.get_conf(
+                                            "collector_id"
+                                        ),
+                                        "result": "Detected",
+                                        "is_success": True,
+                                    },
+                                )
+                            elif (
+                                expectation["inject_expectation_type"] == "PREVENTION"
+                                and result == "PREVENTED"
+                            ):
+                                self.helper.api.inject_expectation.update(
+                                    expectation["inject_expectation_id"],
+                                    {
+                                        "collector_id": self.config.get_conf(
+                                            "collector_id"
+                                        ),
+                                        "result": "Prevented",
+                                        "is_success": True,
+                                    },
+                                )
+                            expectations_not_filled.remove(expectation)
+
+                        # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                         self.helper.collector_logger.info(
-                            "Expectation matched, fulfilling expectation "
+                            "Expectation matched, adding trace for expectation "
                             + expectation["inject_expectation_inject"]
                             + " ("
                             + expectation["inject_expectation_type"]
                             + ")"
                         )
-                        if expectation["inject_expectation_type"] == "DETECTION":
-                            self.helper.api.inject_expectation.update(
-                                expectation["inject_expectation_id"],
-                                {
-                                    "collector_id": self.config.get_conf(
-                                        "collector_id"
-                                    ),
-                                    "result": "Detected",
-                                    "is_success": True,
-                                },
-                            )
-                        elif (
-                            expectation["inject_expectation_type"] == "PREVENTION"
-                            and result == "PREVENTED"
-                        ):
-                            self.helper.api.inject_expectation.update(
-                                expectation["inject_expectation_id"],
-                                {
-                                    "collector_id": self.config.get_conf(
-                                        "collector_id"
-                                    ),
-                                    "result": "Prevented",
-                                    "is_success": True,
-                                },
-                            )
+                        self.helper.api.inject_expectation_trace.create(
+                            data={
+                                "inject_expectation_trace_expectation": expectation[
+                                    "inject_expectation_id"
+                                ],
+                                "inject_expectation_trace_source_id": self.config.get_conf(
+                                    "collector_id"
+                                ),
+                                "inject_expectation_trace_alert_name": self._extract_alert_name(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                                "inject_expectation_trace_alert_link": self._extract_alert_link(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                                "inject_expectation_trace_date": self._extract_alert_detection_date(
+                                    columns_index, alert
+                                )[
+                                    0
+                                ],
+                            }
+                        )
 
     def _process_message(self) -> None:
         self._process_alerts()

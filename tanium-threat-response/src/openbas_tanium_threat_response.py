@@ -91,6 +91,10 @@ class OpenBASTaniumThreatResponse:
             self.helper.collector_logger, self.relevant_signatures_types
         )
 
+        self.scanning_delta = 45
+
+    # --- EXTRACTOR ---
+
     # Recursive function
     def _extract_tree_names(self, artifact, names):
         if (
@@ -155,8 +159,34 @@ class OpenBASTaniumThreatResponse:
                     )
         return command_lines
 
-    def _match_alert(self, endpoint, alert, expectation):
-        alert_details = json.loads(alert["details"])
+    def _extract_alert_link(self, alert) -> str:
+        return (
+            self.config.get_conf("tanium_url_console")
+            + "/ui/threatresponse/alerts?guid="
+            + str(alert["guid"])
+        )
+
+    def _extract_alert_name(self, alert, alert_details) -> str:
+        # Retrieve intel details
+        alert_name = alert["guid"]
+        if "intel_id" in alert_details:
+            intel_id = alert_details["intel_id"]
+            intel = self.tanium_api_handler._query(
+                "get",
+                "/plugin/products/threat-response/api/v1/intels/" + str(intel_id),
+                {"sort": "-createdAt"},
+            )
+            alert_name = intel["type"]
+        return alert_name
+
+    def _extract_alert_detection_date(self, alert_details) -> str:
+        if "finding" in alert_details:
+            return alert_details["finding"]["first_seen"]
+        return ""
+
+    # --- MATCHING ---
+
+    def _match_alert(self, alert, alert_details, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
             + str(alert["id"])
@@ -209,16 +239,40 @@ class OpenBASTaniumThreatResponse:
             return True
         return False
 
+    # --- PROCESS ---
+
+    def _is_expectation_filled(self, expectation) -> bool:
+        return any(
+            er.get("sourceId", "") == self.config.get_conf("collector_id")
+            for er in expectation["inject_expectation_results"]
+        )
+
     def _process_message(self) -> None:
         self.helper.collector_logger.info("Gathering expectations for executed injects")
         expectations = (
             self.helper.api.inject_expectation.detection_expectations_for_source(
-                self.config.get_conf("collector_id")
+                self.config.get_conf("collector_id"), self.scanning_delta
+            )
+        )
+        self.helper.collector_logger.debug(
+            "Total expectations returned: " + str(len(expectations))
+        )
+        expectations_not_filled = list(
+            filter(
+                lambda expectation: not self._is_expectation_filled(expectation),
+                expectations,
             )
         )
         self.helper.collector_logger.info(
-            "Found " + str(len(expectations)) + " expectations waiting to be matched"
+            "Found "
+            + str(len(expectations_not_filled))
+            + " expectations waiting to be matched"
         )
+        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
+            minutes=self.scanning_delta
+        )
+
+        # Retrieve alerts
         alerts = self.tanium_api_handler._query(
             "get",
             "/plugin/products/threat-response/api/v1/alerts",
@@ -227,51 +281,84 @@ class OpenBASTaniumThreatResponse:
         self.helper.collector_logger.info(
             "Found " + str(len(alerts)) + " alerts (taking first 200)"
         )
-        limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(minutes=45)
-        # For each expectation, try to find the proper alert
+
+        # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
-            # Check expired expectation
-            expectation_date = parse(
-                expectation["inject_expectation_created_at"]
-            ).astimezone(pytz.UTC)
-            if expectation_date < limit_date:
-                self.helper.collector_logger.info(
-                    "Expectation expired, failing inject "
-                    + expectation["inject_expectation_inject"]
-                    + " ("
-                    + expectation["inject_expectation_type"]
-                    + ")"
-                )
-                self.helper.api.inject_expectation.update(
-                    expectation["inject_expectation_id"],
-                    {
-                        "collector_id": self.config.get_conf("collector_id"),
-                        "result": "Not Detected",
-                        "is_success": False,
-                    },
-                )
-                continue
-            endpoint = self.helper.api.endpoint.get(
-                expectation["inject_expectation_asset"]
-            )
+            if expectation in expectations_not_filled:
+                # Check expired expectation
+                expectation_date = parse(
+                    expectation["inject_expectation_created_at"]
+                ).astimezone(pytz.UTC)
+                if expectation_date < limit_date:
+                    self.helper.collector_logger.info(
+                        "Expectation expired, failing inject "
+                        + expectation["inject_expectation_inject"]
+                        + " ("
+                        + expectation["inject_expectation_type"]
+                        + ")"
+                    )
+                    self.helper.api.inject_expectation.update(
+                        expectation["inject_expectation_id"],
+                        {
+                            "collector_id": self.config.get_conf("collector_id"),
+                            "result": "Not Detected",
+                            "is_success": False,
+                        },
+                    )
+                    expectations_not_filled.remove(expectation)
+                    continue
+
             for alert in alerts[:200]:
                 alert_date = parse(alert["createdAt"]).astimezone(pytz.UTC)
                 if alert_date > limit_date and alert["state"] != "suppressed":
-                    if self._match_alert(endpoint, alert, expectation):
+                    alert_details = json.loads(alert["details"])
+                    if self._match_alert(alert, alert_details, expectation):
+                        if expectation in expectations_not_filled:
+                            self.helper.collector_logger.info(
+                                "Expectation matched, fulfilling expectation "
+                                + expectation["inject_expectation_inject"]
+                                + " ("
+                                + expectation["inject_expectation_type"]
+                                + ")"
+                            )
+                            self.helper.api.inject_expectation.update(
+                                expectation["inject_expectation_id"],
+                                {
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
+                                    "result": "Detected",
+                                    "is_success": True,
+                                },
+                            )
+                            expectations_not_filled.remove(expectation)
+
+                        # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                         self.helper.collector_logger.info(
-                            "Expectation matched, fulfilling expectation "
+                            "Expectation matched, adding trace for expectation "
                             + expectation["inject_expectation_inject"]
                             + " ("
                             + expectation["inject_expectation_type"]
                             + ")"
                         )
-                        self.helper.api.inject_expectation.update(
-                            expectation["inject_expectation_id"],
-                            {
-                                "collector_id": self.config.get_conf("collector_id"),
-                                "result": "Detected",
-                                "is_success": True,
-                            },
+                        self.helper.api.inject_expectation_trace.create(
+                            data={
+                                "inject_expectation_trace_expectation": expectation[
+                                    "inject_expectation_id"
+                                ],
+                                "inject_expectation_trace_source_id": self.config.get_conf(
+                                    "collector_id"
+                                ),
+                                "inject_expectation_trace_alert_name": self._extract_alert_name(
+                                    alert, alert_details
+                                ),
+                                "inject_expectation_trace_alert_link": self._extract_alert_link(
+                                    alert
+                                ),
+                                "inject_expectation_trace_date": self._extract_alert_detection_date(
+                                    alert_details
+                                ),
+                            }
                         )
 
     # Start the main loop

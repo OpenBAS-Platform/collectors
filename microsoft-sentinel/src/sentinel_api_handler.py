@@ -143,7 +143,7 @@ class SentinelApiHandler:
         if r.status_code == 200:
             try:
                 return r.json()
-            except:
+            except requests.exceptions.JSONDecodeError:
                 return r.text
         elif r.status_code == 401:
             raise ValueError("Query failed, permission denied")
