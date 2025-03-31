@@ -28,11 +28,15 @@ class TestAlert(unittest.TestCase):
         self, mock_get_alerts, mock_query_alerts
     ):
         mock_query_alerts.return_value = QUERY_ALERTS_V2_SUCCESS_RESPONSE
+        print("QUERY_ALERTS_V2_SUCCESS_RESPONSE", QUERY_ALERTS_V2_SUCCESS_RESPONSE)
         mock_get_alerts.return_value = GET_ALERTS_V2_SUCCESS_RESPONSE
+        print("GET_ALERTS_V2_SUCCESS_RESPONSE", GET_ALERTS_V2_SUCCESS_RESPONSE)
 
         expected_values = ALERT_DATA
 
+        print("expected_values", expected_values)
         actual_data = TestAlert.STRATEGY.get_raw_data(start_time=datetime.now())
+        print("actual_data", actual_data)
 
         self.assertEqual(len(actual_data), len(expected_values))
 
@@ -110,6 +114,10 @@ class TestAlert(unittest.TestCase):
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
                 "pattern_disposition": 0,
+                "display_name": "display name",
+                "created_timestamp": "2025-01-01T00:00:00Z",
+                "updated_timestamp": "2025-01-01T02:00:00Z",
+                "composite_id": "composite_id",
             }
         )
 
@@ -128,6 +136,10 @@ class TestAlert(unittest.TestCase):
             expected_parent_process_name,
             expected_grandparent_process_name,
         ]
+        expected_display_name = "display name"
+        expected_created_timestamp = "2025-01-01T00:00:00Z"
+        expected_updated_timestamp = "2025-01-01T02:00:00Z"
+        expected_composite_id = "composite_id"
         item = Item(
             **{
                 "id": "alert_id",
@@ -136,6 +148,10 @@ class TestAlert(unittest.TestCase):
                 "parent_details": {"filename": expected_parent_process_name},
                 "grandparent_details": {"filename": expected_grandparent_process_name},
                 "pattern_disposition": 0,
+                "display_name": expected_display_name,
+                "created_timestamp": expected_created_timestamp,
+                "updated_timestamp": expected_updated_timestamp,
+                "composite_id": expected_composite_id,
             }
         )
 
@@ -154,6 +170,10 @@ class TestAlert(unittest.TestCase):
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
                 "pattern_disposition": 0,
+                "display_name": "display name",
+                "created_timestamp": "2025-01-01T00:00:00Z",
+                "updated_timestamp": "2025-01-01T02:00:00Z",
+                "composite_id": "composite_id",
             }
         )
 
@@ -173,6 +193,10 @@ class TestAlert(unittest.TestCase):
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
                 "pattern_disposition": 0,
+                "display_name": "display name",
+                "created_timestamp": "2025-01-01T00:00:00Z",
+                "updated_timestamp": "2025-01-01T02:00:00Z",
+                "composite_id": "composite_id",
             }
         )
 
@@ -193,6 +217,10 @@ class TestAlert(unittest.TestCase):
                 "parent_details": {"filename": "parent.exe"},
                 "grandparent_details": {"filename": "grandparent.exe"},
                 "pattern_disposition": 0,
+                "display_name": "display name",
+                "created_timestamp": "2025-01-01T00:00:00Z",
+                "updated_timestamp": "2025-01-01T02:00:00Z",
+                "composite_id": "composite_id",
             }
         )
 

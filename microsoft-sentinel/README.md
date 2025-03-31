@@ -103,5 +103,5 @@ python3 openbas_microsoft_sentinel.py
 
 ## Behavior
 
-By searching in your tool's logs and based on connected EDRs, the collector tries to match the attack launched with the
+By searching in your tool's logs and based on connected EDRs for recent alerts (last 45 minutes), the collector tries to match the attack launched with the
 logs reported in your SIEM and validate prevention or expectation type expectations.
