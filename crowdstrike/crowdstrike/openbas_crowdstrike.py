@@ -78,7 +78,23 @@ class OpenBASCrowdStrike:
 
     # --- MATCHING ---
 
-    def _match_expectations(self, alerts: list[Item], expectations):
+    def _match_expectations(
+        self, alerts: list[Item], expectations
+    ) -> list[dict[str, str]]:
+        """
+        Match OpenBAS expectations with CS alerts.
+
+        Args:
+            alerts: The list of alerts received from CS.
+            expectations: The list of OpenBAS expectation to match to CS alerts.
+
+        Returns:
+            * A list of expectation traces that need to be created following all the matches, if any alerts matched any
+              of the given expectations.
+              OR
+            * [], otherwise.
+        """
+        traces_to_create: list[dict[str, str]] = []
 
         self.helper.collector_logger.debug(
             "Total expectations returned: " + str(len(expectations))
@@ -131,7 +147,7 @@ class OpenBASCrowdStrike:
                         )
                         expectations_not_filled.remove(expectation)
 
-                    # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
+                    # Save alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                     self.helper.collector_logger.info(
                         "Expectation matched, adding trace for expectation "
                         + expectation["inject_expectation_id"]
@@ -139,8 +155,8 @@ class OpenBASCrowdStrike:
                         + expectation["inject_expectation_type"]
                         + ")"
                     )
-                    self.helper.api.inject_expectation_trace.create(
-                        data={
+                    traces_to_create.append(
+                        {
                             "inject_expectation_trace_expectation": expectation[
                                 "inject_expectation_id"
                             ],
@@ -157,6 +173,8 @@ class OpenBASCrowdStrike:
                         }
                     )
 
+        return traces_to_create
+
     # --- PROCESS ---
 
     def _is_expectation_filled(self, expectation) -> bool:
@@ -172,9 +190,13 @@ class OpenBASCrowdStrike:
         now = datetime.now(pytz.UTC)
         start_time = now - timedelta(minutes=self.scanning_delta)
 
-        self._match_expectations(
+        traces = self._match_expectations(
             alerts=self.strategy.get_raw_data(start_time),
             expectations=self._fetch_expectations(start_time),
+        )
+
+        self.helper.api.inject_expectation_trace.bulk_create(
+            payload={"expectation_traces": traces}
         )
 
     def start(self):
