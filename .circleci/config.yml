@@ -290,6 +290,7 @@ workflows:
           requires:
             - ensure_formatting
             - linter
+            - test
           filters:
             branches:
               only:
@@ -298,6 +299,7 @@ workflows:
           requires:
             - ensure_formatting
             - linter
+            - test
           filters:
             branches:
               only:
