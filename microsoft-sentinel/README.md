@@ -44,7 +44,7 @@ Below are the parameters you'll need to set for running the collector properly:
 |------------------|------------|-----------------------------|---------|-----------|----------------------------------------------------------------------------------------|
 | Collector ID     | id         | `COLLECTOR_ID`              | /       | Yes       | A unique `UUIDv4` identifier for this collector instance.                              |
 | Collector Name   | name       | `COLLECTOR_NAME`            |         | Yes       | Name of the collector.                                                                 |
-| Collector Period | period     | `COLLECTOR_PERIOD`          |         | Yes       | The time interval at which your collector will run.                                    |
+| Collector Period | period     | `COLLECTOR_PERIOD`          |         | Yes       | The time interval at which your collector will run (int, seconds).                     |
 | Log Level        | log_level  | `COLLECTOR_LOG_LEVEL`       | info    | Yes       | Determines the verbosity of the logs. Options are `debug`, `info`, `warn`, or `error`. |
 
 ### Collector extra parameters environment variables
@@ -103,5 +103,6 @@ python3 openbas_microsoft_sentinel.py
 
 ## Behavior
 
-By searching in your tool's logs and based on connected EDRs for recent alerts (last 45 minutes), the collector tries to match the attack launched with the
+By searching in your tool's logs and based on connected EDRs for recent alerts (last 45 minutes), the collector tries to
+match the attack launched with the
 logs reported in your SIEM and validate prevention or expectation type expectations.
