@@ -247,14 +247,26 @@ class OpenBASMicrosoftDefender:
     def _extract_alert_link(self, alert_data):
         return self.microsoft_defender_alert_details_url + alert_data.get("AlertId")
 
-    def _extract_alert_name(self, evidence):
-        return evidence.get("Title")
+    def _extract_alert_name(self, evidence, alert_data):
+        return (
+            evidence.get("Title")
+            if evidence.get("Title")
+            else alert_data.get("AlertId")
+        )
 
     def _extract_alert_detection_date(self, evidence):
-        return evidence.get("FirstActivityTimestamp")
+        if evidence.get("FirstActivityTimestamp"):
+            return evidence.get("FirstActivityTimestamp")
+        if evidence.get("LastActivityTimestamp"):
+            return evidence.get("LastActivityTimestamp")
+        return datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     def _extract_alert_prevention_date(self, evidence):
-        return evidence.get("LastActivityTimestamp")
+        if evidence.get("LastActivityTimestamp"):
+            return evidence.get("LastActivityTimestamp")
+        if evidence.get("FirstActivityTimestamp"):
+            return evidence.get("FirstActivityTimestamp")
+        return datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     # --- MATCHING ---
 
@@ -469,7 +481,7 @@ class OpenBASMicrosoftDefender:
                                     "collector_id"
                                 ),
                                 "inject_expectation_trace_alert_name": self._extract_alert_name(
-                                    evidence
+                                    evidence, alert_data
                                 ),
                                 "inject_expectation_trace_alert_link": self._extract_alert_link(
                                     alert_data
