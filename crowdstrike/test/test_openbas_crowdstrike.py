@@ -7,10 +7,9 @@ from crowdstrike.query_strategy.alert import Item
 
 
 class TestOpenBASCrowdstrike(unittest.TestCase):
-    @patch("pyobas.apis.InjectExpectationTraceManager.create")
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_alert_matches_update_prevention_expectation(
-        self, mock_expectation_update, mock_traces_create
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -41,7 +40,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_called_once_with(
             expected_expectation_id,
@@ -52,9 +51,10 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
                 "metadata": {"alertId": expected_expectation_id},
             },
         )
-
-        mock_traces_create.assert_called_once_with(
-            data={
+        self.assertEqual(1, len(traces))
+        self.assertEqual(
+            traces[0],
+            {
                 "inject_expectation_trace_expectation": expected_expectation_id,
                 "inject_expectation_trace_source_id": collector.config.get_conf(
                     "collector_id"
@@ -69,10 +69,9 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-    @patch("pyobas.apis.InjectExpectationTraceManager.create")
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_alert_matches_but_not_prevented_update_prevention_expectation(
-        self, mock_expectation_update, mock_traces_create
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -103,7 +102,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_called_once_with(
             expected_expectation_id,
@@ -115,8 +114,10 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-        mock_traces_create.assert_called_once_with(
-            data={
+        self.assertEqual(1, len(traces))
+        self.assertEqual(
+            traces[0],
+            {
                 "inject_expectation_trace_expectation": expected_expectation_id,
                 "inject_expectation_trace_source_id": collector.config.get_conf(
                     "collector_id"
@@ -131,10 +132,9 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-    @patch("pyobas.apis.InjectExpectationTraceManager.create")
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_alert_matches_update_detection_expectation(
-        self, mock_expectation_update, mock_traces_create
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -165,7 +165,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_called_once_with(
             expected_expectation_id,
@@ -177,8 +177,10 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-        mock_traces_create.assert_called_once_with(
-            data={
+        self.assertEqual(1, len(traces))
+        self.assertEqual(
+            traces[0],
+            {
                 "inject_expectation_trace_expectation": expected_expectation_id,
                 "inject_expectation_trace_source_id": collector.config.get_conf(
                     "collector_id"
@@ -193,10 +195,9 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-    @patch("pyobas.apis.InjectExpectationTraceManager.create")
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_expectation_has_expected_hostname_signature_ignore_it(
-        self, mock_expectation_update, mock_traces_create
+        self, mock_expectation_update
     ):
         expected_expectation_id = "expectation_id"
         expectations = [
@@ -228,7 +229,7 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_called_once_with(
             expected_expectation_id,
@@ -240,8 +241,10 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
             },
         )
 
-        mock_traces_create.assert_called_once_with(
-            data={
+        self.assertEqual(1, len(traces))
+        self.assertEqual(
+            traces[0],
+            {
                 "inject_expectation_trace_expectation": expected_expectation_id,
                 "inject_expectation_trace_source_id": collector.config.get_conf(
                     "collector_id"
@@ -289,9 +292,10 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_not_called()
+        self.assertEqual(0, len(traces))
 
     @patch("pyobas.apis.InjectExpectationManager.update")
     def test_when_signatures_match_when_unknown_expectation_type_skip_updating_expectation(
@@ -326,9 +330,11 @@ class TestOpenBASCrowdstrike(unittest.TestCase):
 
         collector = get_default_collector(strategy)
 
-        collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
+        traces = collector._match_expectations([Item(**MOCKED_ALERT)], expectations)
 
         mock_expectation_update.assert_not_called()
+
+        self.assertEqual(0, len(traces))
 
 
 if __name__ == "__main__":
