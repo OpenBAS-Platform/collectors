@@ -25,6 +25,31 @@ jobs:
       - slack/notify:
           event: fail
           template: basic_fail_1
+  test:
+    working_directory: ~/openbas
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Install dependencies for crowdstrike collector
+          command: |
+            CIRCLE_BRANCH_EXISTS=$(git ls-remote --heads https://github.com/OpenBAS-Platform/client-python.git ${CIRCLE_BRANCH} | wc -l)
+
+            if [ "CIRCLE_BRANCH_EXISTS" -eq "1" ]; then
+              TARGET_BRANCH=${CIRCLE_BRANCH}
+            else
+              TARGET_BRANCH="release/current"
+            fi
+
+            sed -i "s|^pyobas.*$|pyobas @ git+https://github.com/OpenBAS-Platform/client-python.git@${TARGET_BRANCH}|" requirements.txt
+            pip install -r requirements.txt
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: Tests for crowdstrike collector
+          command: python -m unittest
   linter:
     docker:
       - image: alpine/flake8
@@ -38,21 +63,6 @@ jobs:
       - slack/notify:
           event: fail
           template: basic_fail_1
-  test:
-    working_directory: ~/openbas
-    docker:
-      - image: cimg/python:3.13
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Install dependencies for crowdstrike collector
-          command: pip install -r requirements.txt
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Tests for crowdstrike collector
-          command: python -m unittest
   build_1:
     working_directory: ~/openbas
     docker:
@@ -290,6 +300,7 @@ workflows:
           requires:
             - ensure_formatting
             - linter
+            - test
           filters:
             branches:
               only:
@@ -298,6 +309,7 @@ workflows:
           requires:
             - ensure_formatting
             - linter
+            - test
           filters:
             branches:
               only:
