@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-mitre-attack:
-    image: openbas/collector-mitre-attack:1.15.2
+    image: openbas/collector-mitre-attack:1.16.0
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
