@@ -4,7 +4,7 @@ openbas:
 
 collector:
   id: 'ChangeMe'
-  type: 'ChangeMe'
+  type: 'crowdStrike_endpoint_security'
   name: 'CrowdStrike Endpoint Security'
   period: 60
   log_level: 'info'
