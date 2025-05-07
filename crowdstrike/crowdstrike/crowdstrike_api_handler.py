@@ -37,6 +37,7 @@ class CrowdstrikeApiHandler:
                 return alerts_response["body"]["resources"]
 
         self.helper.collector_logger.error(
-            "Could not fetch alerts from the Crowdstrike backend: " + str((response.get('body') or {}).get('errors'))
+            "Could not fetch alerts from the Crowdstrike backend: "
+            + str((response.get("body") or {}).get("errors"))
         )
         return []
