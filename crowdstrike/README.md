@@ -33,8 +33,8 @@ The collector can be configured with the following variables:
 | `openbas`.`url`               | `OPENBAS_URL`               |                                       | The URL to the OpenBAS instance                                                               |
 | `openbas`.`token`             | `OPENBAS_TOKEN`             |                                       | The auth token to the OpenBAS instance                                                        |
 | `collector`.`id`              | `COLLECTOR_ID`              |                                       | Unique ID of the running collector instance                                                   |
-| `collector`.`name`            | `COLLECTOR_NAME`            |                                       | Name of the collector (visible in UI)                                                         |
-| `collector`.`type`            | `COLLECTOR_TYPE`            |                                       | Type of the collector                                                                         |
+| `collector`.`name`            | `COLLECTOR_NAME`            | `CrowdStrike Endpoint Security`       | Name of the collector (visible in UI)                                                         |
+| `collector`.`type`            | `COLLECTOR_TYPE`            | `crowdStrike_endpoint_security`       | Type of the collector                                                                         |
 | `collector`.`period`          | `COLLECTOR_PERIOD`          | 60                                    | Period for collection cycle (int, seconds)                                                    |
 | `collector`.`log_level`       | `COLLECTOR_LOG_LEVEL`       |                                       | Threshold for log severity in console output                                                  |
 | `collector`.`platform`        | `COLLECTOR_PLATFORM`        | `EDR`                                 | Type of security platform this collector works for. One of: `EDR, XDR, SIEM, SOAR, NDR, ISPM` |
