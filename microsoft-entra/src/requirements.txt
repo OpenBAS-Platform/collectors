@@ -1,2 +1,2 @@
-pyobas==1.16.1
+pyobas==1.16.2
 msgraph-sdk==1.29.0
