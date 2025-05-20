@@ -93,7 +93,7 @@ let tree = hashedProcessEvents
     | join kind=inner hashedProcessEvents on $left.parent_hash == $right.process_hash
     | make-graph process_hash --> process_hash1 with hashedProcessEvents on process_hash
     | graph-match (parent)<-[spawnedBy*1..100]-(child)
-        project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = strcat(spawnedBy.ProcessId, " ", spawnedBy.ProcessCommandLine), sig=normalisePath(coalesce(null_if_not_implant_sig(child.FileName), null_if_not_implant_sig(parent.FileName)))
+        project child.process_hash, child.ProcessId, child.FileName, child.ProcessCommandLine, child.ProcessCreationTime, parent.ProcessId, parent.FileName, parent.ProcessCommandLine, parent.ProcessCreationTime, Path = map(spawnedBy, strcat(ProcessId, " ", ProcessCommandLine)), sig=normalisePath(coalesce(null_if_not_implant_sig(child.FileName), null_if_not_implant_sig(parent.FileName)))
     | extend PathLength = array_length(Path)
     | where isnotempty(sig);
 fileEvidence
