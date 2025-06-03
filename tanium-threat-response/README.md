@@ -83,13 +83,13 @@ you environment.
 Install the required python dependencies (preferably in a virtual environment):
 
 ```shell
-pip3 install -r requirements.txt
+poetry install
 ```
 
 Then, start the collector:
 
 ```shell
-python3 openbas_tanium_threat_response.py
+poetry run python -m tanium_threat_response.openbas_tanium_threat_response
 ```
 
 ## Behavior

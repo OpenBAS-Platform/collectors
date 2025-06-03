@@ -79,13 +79,13 @@ you environment.
 Install the required python dependencies (preferably in a virtual environment):
 
 ```shell
-pip3 install -r requirements.txt
+poetry install
 ```
 
 Then, start the collector:
 
 ```shell
-python3 openbas_microsoft_entra.py
+poetry run python -m microsoft_entra.openbas_microsoft_entra
 ```
 
 ## Behavior
