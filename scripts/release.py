@@ -80,7 +80,7 @@ os.system(
     + previous_version
     + "\"' **/pyproject.toml | xargs -i@ sed -i 's/pyobas = \""
     + previous_version.replace(".", "\\.")
-    + "\"/pyobas = \""
+    + '"/pyobas = "'
     + new_version.replace(".", "\\.")
     + "\"/g' @"
 )
@@ -90,7 +90,7 @@ os.system(
     + previous_version
     + "\"' **/pyproject.toml | xargs -i@ sed -i 's/version = \""
     + previous_version.replace(".", "\\.")
-    + "\"/version = \""
+    + '"/version = "'
     + new_version.replace(".", "\\.")
     + "\"/g' @"
 )

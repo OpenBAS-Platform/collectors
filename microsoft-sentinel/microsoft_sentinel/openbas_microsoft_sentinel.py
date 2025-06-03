@@ -4,12 +4,12 @@ import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+from microsoft_sentinel.api_handler import SentinelApiHandler
 from pyobas.helpers import (
     OpenBASCollectorHelper,
     OpenBASConfigHelper,
     OpenBASDetectionHelper,
 )
-from microsoft_sentinel.api_handler import SentinelApiHandler
 
 
 class OpenBASMicrosoftSentinel:
