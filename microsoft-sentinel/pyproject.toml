@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "openbas-microsoft-sentinel-collector"
+version = "1.16.4"
+description = "A Collector for Microsoft Sentinel SIEM solution"
+authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "microsoft_sentinel" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = "1.16.4"
+msal = "1.32.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

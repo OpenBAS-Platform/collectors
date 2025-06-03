@@ -43,7 +43,7 @@ class OpenBASMitre:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            config=self.config, icon="img/icon-mitre-attack.png"
+            config=self.config, icon="mitre_attack/img/icon-mitre-attack.png"
         )
 
     def _kill_chain_phases(self, tactics):

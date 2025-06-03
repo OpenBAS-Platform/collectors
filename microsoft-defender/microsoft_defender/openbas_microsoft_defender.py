@@ -155,7 +155,7 @@ class OpenBASMicrosoftDefender:
         )
         self.helper = OpenBASCollectorHelper(
             self.config,
-            "img/icon-microsoft-defender.png",
+            "microsoft_defender/img/icon-microsoft-defender.png",
             security_platform_type="EDR",
         )
 

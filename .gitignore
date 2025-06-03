@@ -133,3 +133,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# any poetry.lock in subdirs; let's only maintain the main one
+**/poetry.lock

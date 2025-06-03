@@ -10,7 +10,7 @@ from pyobas.helpers import (
     OpenBASConfigHelper,
     OpenBASDetectionHelper,
 )
-from tanium_api_handler import TaniumApiHandler
+from tanium_threat_response.api_handler import TaniumApiHandler
 
 
 class OpenBASTaniumThreatResponse:
@@ -66,7 +66,7 @@ class OpenBASTaniumThreatResponse:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            config=self.config, icon="img/icon-tanium.png", security_platform_type="EDR"
+            config=self.config, icon="tanium_threat_response/img/icon-tanium.png", security_platform_type="EDR"
         )
 
         # Initialize Tanium API

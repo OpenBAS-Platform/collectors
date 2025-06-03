@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "openbas-mitre-attack-collector"
+version = "1.16.4"
+description = "A Collector for fetching MITRE ATT&CK taxonomies; https://attack.mitre.org/"
+authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "mitre_attack" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = "1.16.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
