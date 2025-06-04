@@ -1,7 +1,7 @@
 FROM python:3.13-alpine AS builder
 
 # poetry version available on Ubuntu 24.04
-RUN pip3 install poetry==1.8.2
+RUN pip3 install poetry==2.1.3
 
 RUN apk update && apk upgrade
 
