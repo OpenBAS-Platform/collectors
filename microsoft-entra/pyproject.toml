@@ -19,8 +19,8 @@ pyobas = [
 msgraph-sdk = "1.31.0"
 
 [tool.poetry.extras]
-dev = []
-ci = []
+dev = ["pyobas"]
+ci = ["pyobas"]
 
 [build-system]
 requires = ["poetry-core"]

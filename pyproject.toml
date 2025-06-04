@@ -24,8 +24,8 @@ pyobas = [
 ]
 
 [tool.poetry.extras]
-dev = []
-ci = []
+dev = ["pyobas"]
+ci = ["pyobas"]
 
 [build-system]
 requires = ["poetry-core"]

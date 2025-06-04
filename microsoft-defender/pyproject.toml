@@ -20,8 +20,8 @@ msgraph-sdk = "1.31.0"
 msal = "1.32.3"
 
 [tool.poetry.extras]
-dev = []
-ci = []
+dev = ["pyobas"]
+ci = ["pyobas"]
 
 [build-system]
 requires = ["poetry-core"]
