@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 import requests
@@ -11,6 +11,69 @@ from pyobas.helpers import (
 )
 from sentinel_api_handler import SentinelApiHandler
 
+SENTINEL_QUERY = """
+        let SubscriptionId = "{subscription_id}";
+        let ResourceGroup = "{resource_group}";}";
+        let WorkspaceName = "{workspace_name}";
+        let WorkspaceId = strcat("/subscriptions/", SubscriptionId, "/resourceGroups/", ResourceGroup, 
+                                "/providers/Microsoft.OperationalInsights/workspaces/", WorkspaceName);
+        let SentinelBaseUrl = "https://portal.azure.com/#blade/Microsoft_Azure_Security_Insights/";
+        SecurityAlert
+        | where StartTime between (datetime({start_time}) .. datetime({end_time}))}))
+        | project
+            SystemAlertId,
+            AlertName,
+            StartTime,
+            EndTime,
+            TimeGenerated,
+            Entities,
+            ProviderName,
+            VendorName,
+            ProductName
+        | extend Entities = parse_json(Entities)
+        | extend ParsedEntities = Entities
+        | mv-expand ParsedEntities
+        | extend EntityType = tostring(ParsedEntities.Type)
+        | summarize 
+            IPAddresses = make_set_if(tostring(ParsedEntities.Address), EntityType == "ip"),
+            Hostnames = make_set_if(tostring(ParsedEntities.HostName), EntityType == "host"),
+            ProcessNames = make_set_if(tostring(ParsedEntities.Name), EntityType == "process"),
+            ProcessIds = make_set_if(tostring(ParsedEntities.ProcessId), EntityType == "process"),
+            Filenames = make_set_if(tostring(ParsedEntities.Name), EntityType == "file"),
+            // Keep all original fields to prevent duplicates
+            take_any(TimeGenerated, AlertName, ProviderName, VendorName, ProductName, Entities, StartTime, EndTime)
+            by SystemAlertId  // Group ONLY by SystemAlertId to ensure uniqueness
+        | extend 
+            IPAddress = strcat_array(IPAddresses, ", "),
+            Hostname = strcat_array(Hostnames, ", "),
+            ProcessName = strcat_array(ProcessNames, ", "),
+            ProcessId = strcat_array(ProcessIds, ", "),
+            Filename = strcat_array(Filenames, ", "),
+            AlertLink = strcat(SentinelBaseUrl, "AlertBlade/alertId/", SystemAlertId, WorkspaceId)
+        | join kind=leftouter (
+            SecurityIncident
+            | mv-expand AlertIds = parse_json(AlertIds)
+            | extend AlertId = tostring(AlertIds)
+            | summarize take_any(IncidentNumber, IncidentUrl, Title, Status, Severity) by AlertId  // Deduplicate here too
+            )
+            on $left.SystemAlertId == $right.AlertId
+        | extend HasIncident = isnotempty(IncidentNumber)
+        | project
+            TimeGenerated,
+            StartTime,
+            EndTime,
+            AlertName,
+            IPAddress,
+            Hostname,
+            ProcessName,
+            Filename, 
+            IncidentUrl,
+            AlertLink,
+            SystemAlertId,
+            HasIncident
+        | order by TimeGenerated desc
+        """
+TIME_DELTA_FOR_EXPECTATIONS = 500 # milliseconds
 
 class OpenBASMicrosoftSentinel:
     def __init__(self):
@@ -130,6 +193,32 @@ class OpenBASMicrosoftSentinel:
 
     # --- MATCHING ---
 
+    def _get_time_range_from_expectations(self, expectations):
+        earliest_start = None
+        latest_end = None
+
+        for expectation in expectations:
+            status = expectation["inject"]["inject_status"]
+
+            if status["tracking_sent_date"] is not None:
+                start_time = parse(status["tracking_sent_date"]).astimezone(pytz.UTC)
+                if earliest_start is None or start_time < earliest_start:
+                    earliest_start = start_time
+
+            if status["tracking_end_date"] is not None:
+                end_time = parse(status["tracking_end_date"]).astimezone(pytz.UTC)
+                if latest_end is None or end_time > latest_end:
+                    latest_end = end_time
+
+        # Adjust times with deltas
+        buffer = timedelta(milliseconds=TIME_DELTA_FOR_EXPECTATIONS)
+        if earliest_start is not None:
+            earliest_start = earliest_start - buffer
+        if latest_end is not None:
+            latest_end = latest_end + buffer
+
+        return earliest_start, latest_end
+
     def _is_prevented(self, columns_index, alert):
         prevented_keywords = ["blocked", "quarantine", "remove", "prevented"]
         alert_name = alert[columns_index["AlertName"]].strip().lower()
@@ -141,19 +230,17 @@ class OpenBASMicrosoftSentinel:
     def _match_alert_link(self, expectation, alert_link_datas) -> bool:
         # Extract expectation alert link
         alert_id_expectation = None
-        for item in expectation["inject_expectation_results"]:
-            self.helper.collector_logger.info(item["sourceName"])
-            attached_collectors = self.config.get_conf(
-                "microsoft_sentinel_edr_collectors"
-            )
-            if item["sourceId"] in attached_collectors:
-                alert_id_expectation = item["metadata"]["alertId"]
-                break
-
-        if alert_id_expectation:
-            for alert_link_data in alert_link_datas:
-                if alert_id_expectation in alert_link_data:
-                    return True
+        status_start_time = parse(expectation["inject"]["inject_status"]["tracking_sent_date"]).astimezone(pytz.UTC)
+        status_end_time = parse(expectation["inject"]["inject_status"]["tracking_end_date"]).astimezone(pytz.UTC)
+        IPs = expectation["asset"]["endpoint_ips"]
+        hostname = expectation["asset"]["endpoint_hostnames"]
+        if (alert_link_datas["IPAddress"] in IPs) or (alert_link_datas["Hostname"] == hostname):
+            # expectation and alert are on the same asset, we then need to check the time range to make sure they correspond to the same inject
+            alert_start_time = alert_link_datas["StartTime"]
+            alert_end_time = alert_link_datas["EndTime"]
+            buffer = timedelta(milliseconds=TIME_DELTA_FOR_EXPECTATIONS)
+            if (alert_start_time >= status_start_time - buffer) and (alert_end_time <= status_end_time + buffer):
+                return True
         return False
 
     def _match_alert_from_edr(self, _endpoint, columns_index, alert, expectation):
@@ -208,6 +295,9 @@ class OpenBASMicrosoftSentinel:
             minutes=self.scanning_delta
         )
 
+        # Get the time range for expectations, to use in the KQL query
+        earliest_start, latest_end = self._get_time_range_from_expectations(expectations)
+
         # Retrieve alerts
         url = (
             self.log_analytics_url
@@ -215,8 +305,15 @@ class OpenBASMicrosoftSentinel:
             + self.config.get_conf("microsoft_sentinel_workspace_id")
             + "/query"
         )
-        body = {"query": "SecurityAlert | sort by TimeGenerated desc | take 200"}
-        data = self.sentinel_api_handler._query(method="post", url=url, payload=body)
+
+        query = SENTINEL_QUERY.format(
+            subscription_id=self.config.get_conf("microsoft_sentinel_subscription_id"),
+            resource_group=self.config.get_conf("microsoft_sentinel_resource_group"),
+            workspace_name=self.config.get_conf("microsoft_sentinel_workspace_id"),
+            start_time=earliest_start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            end_time=latest_end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
+        data = self.sentinel_api_handler._query(method="post", url=url, payload={"query": query})
 
         if len(data["tables"]) == 0:
             return
@@ -229,6 +326,7 @@ class OpenBASMicrosoftSentinel:
             columns_index[column["name"]] = idx
 
         endpoint_per_asset = {}
+
         # For each expectation, try to find the proper alert to assign a detection or prevention result
         for expectation in expectations:
             if expectation["inject_expectation_asset"] not in endpoint_per_asset:
