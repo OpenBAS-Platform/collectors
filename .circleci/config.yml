@@ -56,7 +56,7 @@ jobs:
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Install dependencies for crowdstrike collector
-          command: poetry install --extras ci
+          command: poetry install
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Tests for crowdstrike collector
