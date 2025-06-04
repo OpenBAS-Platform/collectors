@@ -2,7 +2,7 @@
 name = "openbas-mitre-attack-collector"
 version = "1.16.4"
 description = "A Collector for fetching MITRE ATT&CK taxonomies; https://attack.mitre.org/"
-authors = ["Antoine MAZEAS <antoine.mazeas@filigran.io>"]
+authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
@@ -11,7 +11,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pyobas = "1.16.4"
+pyobas = [
+    { markers = "extra != 'dev'", version = "1.16.4", source = "pypi"  },
+    { markers = "extra == 'dev'", path = "../../client-python", develop = true },
+]
+
+[tool.poetry.extras]
+dev = []
 
 [build-system]
 requires = ["poetry-core"]

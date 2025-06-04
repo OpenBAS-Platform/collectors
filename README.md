@@ -21,8 +21,68 @@ If you want to help use improve or develop new collector, please check out the
 the [OpenBAS ecosystem](https://filigran.notion.site/OpenBAS-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
 
 ## Development
+In this repository, you need to have `python >= 3.11` and `poetry >= 2.1`. Install the development environment with:
+> [!IMPORTANT]
+> This repository uses "mutually exclusive extra markers" to manage the source of the pyobas dependency. Make sure to
+> follow the steps to set up poetry correctly to handle this case:
+> https://python-poetry.org/docs/dependency-specification/#exclusive-extras
+```shell
+poetry install --extra dev
+```
 
-In this repository, you need to have `python >= 3.11` and `poetry >= 1.8`
+### Creating a new collector
+
+#### Project setup
+Assuming a new collector by the name of `new_collector`, create a skeleton directory with:
+```shell
+poetry new new_collector
+```
+
+#### `pyobas` dependency
+We wish to retain the possibility to develop simultaneously on `pyobas` and collectors. We rely on PEP 508 environment
+markers to alternatively install a local path `pyobas` dependency or a released version from PyPI; specifically the `extra`
+marker.
+
+Navigate to the new directory and edit `pyproject.toml`.
+```shell
+vim new_collector/pyproject.toml
+```
+(or open the file in your favourite editor).
+
+Here's the expression for the pyobas dependency, including the `extra` definition:
+```toml
+[tool.poetry.dependencies]
+pyobas = [
+    { markers = "extra != 'dev'", version = "1.16.4", source = "pypi"  },
+    { markers = "extra == 'dev'", path = "../../client-python", develop = true },
+]
+
+[tool.poetry.extras]
+dev = []
+```
+
+### Simultaneous development on pyobas and a collector
+The collectors repository is set to assume that in the event of a simultaneous development work on both pyobas
+and collectors, the `pyobas` repository is cloned in a directory at the same level as the collectors root directory,
+and is named strictly `client-python`
+Here's an example layout:
+```
+.
+├── client-python       <= mandatory dir name
+│   ├── docs
+│   ├── pyobas
+│   ├── scripts
+│   └── test
+└── collectors          <= this repo root dir
+    ├── atomic-red-team
+    ├── crowdstrike
+    ├── microsoft-defender
+    ├── microsoft-entra
+    ├── microsoft-sentinel
+    ├── mitre-attack
+    ├── scripts
+    └── tanium-threat-response
+```
 
 ## License
 
