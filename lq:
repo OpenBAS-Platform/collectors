@@ -1,0 +1,1460 @@
+[33mcommit 0ab5af39ac7ce9a10a5716ded0a525ec5bdc6eec[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpoetry-redux[m[33m)[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:39:34 2025 +0200
+
+    optional false
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit c960b9b7449b0f9958d338e5b30d63853190a43e[m[33m ([m[1;31morigin/poetry-redux[m[33m)[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:31:55 2025 +0200
+
+    try align versions ?
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit c582a05c3099046894df5ca96f7eea4b812f900c[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:28:31 2025 +0200
+
+    output lock file
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit e59af318d8e362785ee484476b367cbf8dad2d63[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:26:29 2025 +0200
+
+    lock ??
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit d29b2ee6173a120629c789c8612e7212fd668f89[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:15:44 2025 +0200
+
+    sync
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 3fd31dbdca3af2666e61d4d371aaa100075a35fb[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:08:01 2025 +0200
+
+    again
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 4486c71978ac2fdc22bad36967923cb10dbd575f[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 17:02:40 2025 +0200
+
+    test
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit e1d3bbd9f39d067488b586a279ab26d11e8f46ef[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 16:55:07 2025 +0200
+
+    add extra checkout ??
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 4611b28727507cf31c9801aadda7858c776f1ae5[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 16:32:28 2025 +0200
+
+    try with lockfile
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit a928b77df2cab7e388e973d790d02996089a06aa[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 16:27:57 2025 +0200
+
+    lock file redo
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 6ad6ee6cf3e8377ceda5c8a386d78bc6260dc73c[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 16:17:23 2025 +0200
+
+    add ci mode
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 38292ee17cbde21740e4dbd1933193487d3b5d03[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Wed Jun 4 14:28:33 2025 +0200
+
+    enable dev mode
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit d6e755de1e39c175768f223235692965e16dd853[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Tue Jun 3 16:48:56 2025 +0200
+
+    amend readmes
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit e97fc89d8625d4a4dbfb14c81e631b1618e07e3f[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Tue Jun 3 16:17:44 2025 +0200
+
+    linting + formatting
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 6e265f98e77f903af43177eaa9cba07657f7f991[m
+Author: Antoine MAZEAS <antoine.mazeas@filigran.io>
+Date:   Tue Jun 3 16:15:26 2025 +0200
+
+    redo poetry changes
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit e58a429fb1fd26af901d30e14a6ade7e64c94cdf[m[33m ([m[1;32mrelease/current[m[33m)[m
+Merge: aece914 c1195a3
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Fri May 30 17:34:07 2025 +0200
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       crowdstrike/requirements.txt
+    #       microsoft-defender/src/requirements.txt
+    #       microsoft-entra/src/requirements.txt
+    #       microsoft-sentinel/src/requirements.txt
+
+[33mcommit c1195a36f7043776579cc4e6dd57aca8737b1680[m[33m ([m[1;33mtag: [m[1;33m1.16.4[m[33m, [m[1;32mmain[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed May 28 10:09:00 2025 +0000
+
+    [all] Release 1.16.4
+
+[33mcommit aece914899e9a18a4241ee309ca76d935eb9e5d1[m
+Merge: 9c791de da629a4
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Thu May 22 15:02:08 2025 +0200
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       crowdstrike/requirements.txt
+    #       microsoft-defender/src/requirements.txt
+    #       microsoft-entra/src/requirements.txt
+    #       microsoft-sentinel/src/requirements.txt
+
+[33mcommit da629a483cd0febc249e9b6ba7c4ad447edf32a1[m[33m ([m[1;33mtag: [m[1;33m1.16.3[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu May 22 11:44:48 2025 +0000
+
+    [all] Release 1.16.3
+
+[33mcommit fea35ec977e5920f3e86426f5c613ebdb73ed4c4[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue May 20 17:15:52 2025 +0200
+
+    [microsoft-defender] Fix graphmap deprecation variable edge scalar (#154)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 9c791deb1d546a4ab43317144543ada412a2c8fb[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon May 19 16:20:08 2025 +0200
+
+    [microsoft] Update dependency msgraph-sdk to v1.30.0
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 7cb55f0f42641a1ce94a73dd4c863e26f49368d4[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon May 19 16:09:37 2025 +0200
+
+    [crowdstrike] Update dependency pydantic to v2.11.4
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 818b542c1b3fd8227922e663245690508966974c[m
+Merge: 1df9d4b 036ea52
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Mon May 19 14:54:07 2025 +0200
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       crowdstrike/requirements.txt
+    #       microsoft-defender/src/requirements.txt
+    #       microsoft-entra/src/requirements.txt
+    #       microsoft-sentinel/src/requirements.txt
+
+[33mcommit 036ea5266527f20d44566df702c3e0afbd121cd1[m[33m ([m[1;33mtag: [m[1;33m1.16.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon May 19 12:35:28 2025 +0000
+
+    [all] Release 1.16.2
+
+[33mcommit 1df9d4b274d3e44f62e210d5092f1181ee5352c1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 9 12:50:01 2025 +0200
+
+    [microsoft] Update dependency msal to v1.32.3
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 46911fa7cf7bf55298c1e7bb622ac89a470489bd[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 9 12:35:41 2025 +0200
+
+    [crowdstrike] Update dependency crowdstrike-falconpy to v1.5.0
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 5af3e9f94af1d62a10977d6735b46e730fe3321d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 9 12:27:17 2025 +0200
+
+    [microsoft] Update dependency msgraph-sdk to v1.29.0
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 066c049604bedba531a0e869be8b5be7d3ce2fad[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Wed May 7 16:03:39 2025 +0200
+
+    [crowdstrike] Improv logs
+
+[33mcommit f61978f6fafb3b4cf6487beed784dc026af88393[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Wed May 7 15:03:42 2025 +0200
+
+    [crowdstrike] Improv README
+
+[33mcommit db7da4b59cdf41d4f7960b9dab501fc5f2550d2e[m[33m ([m[1;33mtag: [m[1;33m1.16.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri May 9 12:59:40 2025 +0000
+
+    [all] Release 1.16.1
+
+[33mcommit d509e1969025abaad95424eff10312bb0b8dffd1[m[33m ([m[1;33mtag: [m[1;33m1.16.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon May 5 09:16:03 2025 +0000
+
+    [all] Release 1.16.0
+
+[33mcommit 1e0325f87a650fdded4a5f846be9ebd99bd82535[m
+Merge: 41916a3 2fda0ab
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Apr 23 08:58:24 2025 +0200
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       crowdstrike/requirements.txt
+    #       microsoft-sentinel/src/requirements.txt
+
+[33mcommit 41916a37c520aaf8aa95db860697ba17cd680208[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Apr 23 08:46:32 2025 +0200
+
+    [crowdstrike] Update dependency crowdstrike-falconpy to v1.4.9
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 2fda0aba35420f1d223c3466674a726614a23595[m[33m ([m[1;33mtag: [m[1;33m1.15.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Apr 22 14:54:56 2025 +0000
+
+    [all] Release 1.15.2
+
+[33mcommit 57ed74e4d5abbb691f231ac046fb0ed873d515b9[m
+Author: Yann <yann.pauly@filigran.io>
+Date:   Tue Apr 22 10:21:01 2025 +0200
+
+    [crowdstrike] feat: migrated create traces to bulk endpoint (#2873)
+
+[33mcommit 4a7c50bff9837f6466248091c4473d987daf623c[m
+Author: Yann <yann.pauly@filigran.io>
+Date:   Fri Apr 18 15:14:09 2025 +0200
+
+    [Microsoft Defender] fix/sometimes, alerts don't have a createdTimestamp (#134)
+
+[33mcommit 9f742950f63f5d66acf8fd14d2c9a1ee0050a0e2[m
+Author: Stephanya Casanova <savacano28@users.noreply.github.com>
+Date:   Wed Apr 16 09:57:57 2025 +0200
+
+    [all] Specify the time unit for the collector period
+
+[33mcommit 020c34968a3466efb83f1c1409745db73dd7d6c1[m
+Merge: 690a2f2 18abc51
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Mon Apr 14 15:48:12 2025 +0200
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       crowdstrike/requirements.txt
+    #       microsoft-sentinel/src/requirements.txt
+
+[33mcommit 18abc51564603d6a9c1bae2e6124ce64c59279ab[m[33m ([m[1;33mtag: [m[1;33m1.15.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Apr 14 12:32:51 2025 +0000
+
+    [all] Release 1.15.1
+
+[33mcommit 690a2f2f7eb3f697247772df32eeb150b1ceef97[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Apr 14 10:16:07 2025 +0200
+
+    [crowdstrike] Update dependency pydantic to v2.11.3
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit df2171d8c4a4efd6cd95a6b67276b8e2d0b725f0[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Apr 14 08:54:59 2025 +0200
+
+    [microsoft-defender | microsoft-sentinel] Update dependency msal to v1.32.0
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 802b584fc06829b877d5a70a68e7726358964132[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Apr 14 08:40:36 2025 +0200
+
+    [crowdstrike] Update dependency crowdstrike-falconpy to v1.4.8
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 2bd5de10ae42d2cec0dcfe610a5c61b631419d70[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Thu Apr 10 11:43:46 2025 +0200
+
+    [tool] Change deploy_testing namespace (#125)
+
+[33mcommit 3684dd7ee8cd4dbcbd3b30b3e8c87ac7127dd1d1[m[33m ([m[1;33mtag: [m[1;33m1.15.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Apr 2 12:48:39 2025 +0000
+
+    [all] Release 1.15.0
+
+[33mcommit 93cacade7dcb533f663b5ca060f07f568cebc2e7[m
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Wed Apr 2 09:38:08 2025 +0200
+
+    Fix release workflow
+
+[33mcommit 7f31b2e02b7132a5040b5bb538dd5b7b2c459232[m
+Author: Johanah LEKEU <49673066+johanah29@users.noreply.github.com>
+Date:   Mon Mar 31 08:59:11 2025 +0200
+
+    [all] Show expectation traces (#564)
+    
+    Signed-off-by: Johanah LEKEU <johanah.lekeu@filigran.io>
+    Co-authored-by: Yann <yann.pauly@filigran.io>
+
+[33mcommit cee0717e2c6a893e11b8f6cad6dc2ad635cdeb57[m[33m ([m[1;33mtag: [m[1;33m1.14.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Mar 24 13:27:42 2025 +0000
+
+    [all] Release 1.14.1
+
+[33mcommit 28621f00fb4a6c8f4b2edea5f24b3c4cc0a0d622[m[33m ([m[1;33mtag: [m[1;33m1.14.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Mar 19 15:23:30 2025 +0000
+
+    [all] Release 1.14.0
+
+[33mcommit 02f506ddfec099d3680a217f3f214f0f7fe1a420[m
+Merge: 527ab37 4ee2fde
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Wed Mar 19 15:03:55 2025 +0100
+
+    Merge remote-tracking branch 'origin/release/current'
+
+[33mcommit 527ab37978e7e3f13a6eaa6bb61a634b54ec7eaa[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Mar 14 17:06:21 2025 +0100
+
+    [integration] Remove Teams notification in favor of GitHub adaptive cards
+
+[33mcommit 4ee2fde1358fe7eb5cec1f6db3076c6a87eba5f2[m
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Fri Mar 7 17:16:57 2025 +0100
+
+    Improve release workflow
+
+[33mcommit 080bf158efefde757a6a2e22d479a971302541f1[m[33m ([m[1;33mtag: [m[1;33m1.13.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Mar 5 14:21:20 2025 +0000
+
+    [all] Release 1.13.1
+
+[33mcommit 53e44ebdd3da92193986d7dedb4f99de8753b353[m[33m ([m[1;33mtag: [m[1;33m1.13.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Mar 4 09:17:19 2025 +0000
+
+    [all] Release 1.13.0
+
+[33mcommit 23dc35363aa6acf348daf1d61f736f7c5ad9b913[m[33m ([m[1;33mtag: [m[1;33m1.12.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Feb 18 10:16:17 2025 +0000
+
+    [all] Release 1.12.2
+
+[33mcommit 4677aea100d87690562bc683adbb871de680cb07[m[33m ([m[1;33mtag: [m[1;33m1.12.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri Feb 14 16:00:41 2025 +0000
+
+    [all] Release 1.12.1
+
+[33mcommit 0827b94b789758693782b811952b29c4fdc35203[m[33m ([m[1;33mtag: [m[1;33m1.12.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Feb 12 14:37:52 2025 +0000
+
+    [all] Release 1.12.0
+
+[33mcommit 73fea80c8d1c0613f4176ef2587db3e9b93a5281[m
+Author: Stephanya Casanova <savacano28@users.noreply.github.com>
+Date:   Wed Feb 12 14:16:44 2025 +0100
+
+    [all] Fix link documentation collectors
+
+[33mcommit 0fe06a4345b719e28236a0bca453d21cdae256a9[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Fri Feb 7 09:51:34 2025 +0100
+
+    [all] Update README
+
+[33mcommit 1d056e0bc55607943cfbf1c27293cfd4ca52d632[m
+Merge: a52d2c8 4a44e94
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Feb 5 11:45:28 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+    
+    # Conflicts:
+    #       microsoft-defender/src/requirements.txt
+    #       microsoft-entra/src/requirements.txt
+
+[33mcommit 4a44e94ba8c391756fe99010f85b5440de281d42[m[33m ([m[1;33mtag: [m[1;33m1.11.5[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Feb 3 09:33:38 2025 +0000
+
+    [all] Release 1.11.5
+
+[33mcommit a52d2c898c4a65450f553371aafd543c4b78d252[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Mon Feb 3 09:43:53 2025 +0100
+
+    [all] Fix some README and replace "connector" with "collector"
+
+[33mcommit 71ab5114505df61bbc8c33414aa69eb9da0372ae[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jan 31 15:07:05 2025 +0100
+
+    [crowdstrike] Update dependency pydantic to v2.10.6 (release/current)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 293cb4435261f0cd60192ecbf936a5a085c554fe[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jan 31 15:06:26 2025 +0100
+
+    [microsoft-defender/microsoft-entra] Update dependency msgraph-sdk to v1.18.0 (release/current)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 8b5a387014b49202ec646b348ac0f9d925d68c3d[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Thu Jan 30 14:58:00 2025 +0100
+
+    [microsoft-entra] Update README
+
+[33mcommit 7967185c8633c6ac197a7820ab93df63b7155b7d[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Mon Jan 27 14:49:48 2025 +0100
+
+    [microsoft-sentinel] Document how sentinel configuration works with defender
+
+[33mcommit cabc7dc754d5f52b7e23e333d3e9d5b978d36f0c[m
+Merge: 12fef59 4771f06
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Jan 22 11:14:28 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+
+[33mcommit 4771f0658e66de37c16e144cd245dc1ec151c5be[m[33m ([m[1;33mtag: [m[1;33m1.11.4[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Jan 22 09:04:27 2025 +0000
+
+    [all] Release 1.11.4
+
+[33mcommit 12fef59a6048dda828b4e2a020b604a4975254b1[m
+Merge: 263e15d 7e25164
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Tue Jan 21 14:55:05 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+
+[33mcommit 7e25164c29bb197a7a155a27663b0451b54aebf7[m[33m ([m[1;33mtag: [m[1;33m1.11.3[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Jan 21 09:09:53 2025 +0000
+
+    [all] Release 1.11.3
+
+[33mcommit 263e15d750b7f8f6576b0602d6ad53f1c4253ef1[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Mon Jan 20 17:40:25 2025 +0100
+
+    [crowdstrike] Specify Crowdstrike Endpoint Security name
+
+[33mcommit 012eb2623f1331ec24d01da9a957fff4fd83367d[m
+Merge: 9e328a4 9a33fa3
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Mon Jan 20 10:22:37 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+
+[33mcommit 9a33fa3d81245c3fc10fc4d7d641f71c18bc3f57[m[33m ([m[1;33mtag: [m[1;33m1.11.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Jan 20 08:34:52 2025 +0000
+
+    [all] Release 1.11.2
+
+[33mcommit 9e328a401bd1540a161c665bf23654ae8dc4b7da[m
+Merge: 65ca6a8 c86c413
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Fri Jan 17 15:38:53 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+
+[33mcommit c86c413bd8e71a4810b40c39c9d776efdd90a34e[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Fri Jan 17 15:03:35 2025 +0100
+
+    [tool] update renovate for release/current branch
+
+[33mcommit 5169db372a5222164899841a2cc265f9cae41894[m[33m ([m[1;33mtag: [m[1;33m1.11.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri Jan 17 10:30:55 2025 +0000
+
+    [all] Release 1.11.1
+
+[33mcommit 65ca6a8a18f661c3a89eae32817e2f87d07465a1[m
+Merge: 63c9d48 3fbf62e
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Jan 15 17:39:15 2025 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/current
+
+[33mcommit 3fbf62e07b0207e00920a33bd7d653bcddf04f2e[m[33m ([m[1;33mtag: [m[1;33m1.11.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Jan 15 15:46:12 2025 +0000
+
+    [all] Release 1.11.0
+
+[33mcommit cc84f5e430022b64ed9469ca8466af0154ae8f77[m
+Merge: df89be1 edaa03d
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Jan 15 16:14:44 2025 +0100
+
+    Merge remote-tracking branch 'origin/release/1.10.2'
+
+[33mcommit 63c9d48d7934b76966bfb1b5c1459e23d4773c45[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Tue Jan 14 15:38:41 2025 +0100
+
+    [tool] update circle for prerelease platform
+
+[33mcommit edaa03dea6fa8a0e8e8300402ce432ea107ff207[m[33m ([m[1;33mtag: [m[1;33m1.10.2[m[33m, [m[1;31morigin/release/1.10.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Jan 14 09:43:55 2025 +0000
+
+    [all] Release 1.10.2
+
+[33mcommit df89be174f8e73edc30f41bbc4bcd773a2744987[m
+Merge: 53d85a0 63a6951
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Mon Jan 13 14:23:30 2025 +0100
+
+    Merge branch 'release/1.11.0'
+
+[33mcommit 63a6951577b6217af84c8b452bff7185326c05f1[m[33m ([m[1;31morigin/release/1.11.0[m[33m)[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Mon Jan 13 13:52:42 2025 +0100
+
+    [tool] update renovate config to take release branch into account
+
+[33mcommit b1d282d65caac30cc3621503298d7ee9add4f3ef[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jan 9 17:35:36 2025 +0100
+
+    [crowdstrike] Update dependency pydantic to v2.10.5
+    
+    Co-authored-by: Samuel Hassine <samuel.hassine@filigran.io>
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 5c8f1441911421383675b22bb29f32e960d92f30[m
+Author: damgouj <damien.goujard@filigran.io>
+Date:   Thu Jan 9 16:53:29 2025 +0100
+
+    [atomic-red-team] Fix cloned arguments
+
+[33mcommit c8a53a23613dfb2c332240861e3e90415c12fd3f[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Thu Jan 9 14:54:03 2025 +0100
+
+    [all] Improv README
+
+[33mcommit 6198d8648fc63e3eb5d78332b22cc04332c43efe[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Wed Jan 8 12:12:12 2025 +0100
+
+    [microsoft-defender | microsoft-sentinel] Improv README (#72)
+
+[33mcommit 53d85a06f24826e481f551ac6d17cf06ca998a3f[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Jan 2 19:03:11 2025 +0100
+
+    [crowdstrike] Update logo
+
+[33mcommit 901864bcb520f90c66ff1d2b354ddb16c6e7cacf[m[33m ([m[1;33mtag: [m[1;33m1.10.1[m[33m, [m[1;31morigin/release/1.10.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu Jan 2 13:44:41 2025 +0000
+
+    [all] Release 1.10.1
+
+[33mcommit a172c5f0cf962d487b7bd5b709879d7d13652d4d[m
+Author: Hedi <hedi.tarchouni@filigran.io>
+Date:   Thu Dec 26 09:40:42 2024 +0100
+
+    [all] updated pr template
+
+[33mcommit f2fc7f3985779674fcadbfd828e09b47d7204ea5[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Dec 24 09:50:49 2024 +0100
+
+    [crowdstrike] Update dependency pydantic to v2.10.4
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 0c8fda57d2ff2b2da72f75461940d38e42f0eae1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Dec 24 09:45:15 2024 +0100
+
+    [crowdstrike] Update dependency crowdstrike-falconpy to v1.4.6
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 43ba2e7b6cde139386ff17493f49b1d2c44fc4e2[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Dec 24 09:44:54 2024 +0100
+
+    [microsoft-defender / microsoft-entra] Update dependency msgraph-sdk to v1.15.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 5c596d8a4b5a1ed88ef2b6799746ae3529d7f438[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Mon Dec 23 17:47:24 2024 +0100
+
+    [tanium] remove hostname match + add parent process match (#86)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit ea809a717a694b915d08f85b8a739468b1e10b38[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Mon Dec 23 10:22:42 2024 +0100
+
+    [microsoft-defender] remove hostname matching from defender collector (#85)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 3c653790ff95023e0ef51c7de2a7dc4205dbe27b[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Mon Dec 23 10:22:13 2024 +0100
+
+    [tool] fix circleci for crowdstrike collector (#11)
+
+[33mcommit 118498f9a53503d897ffa41c996031e3fe03e104[m[33m ([m[1;33mtag: [m[1;33m1.10.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Dec 18 16:42:28 2024 +0000
+
+    [all] Release 1.10.0
+
+[33mcommit 25194a5d96f172f91c91e14b2725682b5a73e3dd[m
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Wed Dec 18 18:26:10 2024 +0100
+
+    [crowdstrike] Fixing pyobas release version
+
+[33mcommit 4ffee2479337023cba40c3724302a78a97bc9168[m[33m ([m[1;31morigin/release/1.10.0[m[33m)[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue Dec 17 17:27:56 2024 +0100
+
+    [crowdstrike] Default to "EDR" when security platform is not set in configuration
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 56b934ab365f6b9e82acf0758420334045cfec6e[m
+Merge: 684b701 f5c888a
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Mon Dec 16 15:22:58 2024 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/1.10.0
+
+[33mcommit f5c888a3dcc7d7bfb78f537eae6132fdccacb654[m[33m ([m[1;33mtag: [m[1;33m1.9.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Dec 16 10:19:26 2024 +0000
+
+    [all] Release 1.9.2
+
+[33mcommit 817206e7b83d9377f8519c830558f07ae59973fe[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Mon Dec 16 14:51:59 2024 +0100
+
+    [tool] fix docker tagging when building for a tag (#36)
+
+[33mcommit 684b7013f48102d06aaa552450879e07b197591d[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Fri Dec 13 15:05:15 2024 +0100
+
+    [tool] add crowdstrike build & push for prerelease (#11)
+
+[33mcommit a5bf6125b748ebb9e489c1ff12aa5100b979f559[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Fri Dec 13 15:01:59 2024 +0100
+
+    [crowdstrike] Add necessary api privileges to readme (#11)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 2cb4668437d7b6a21d7eadf8eb192019cf93ef38[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Dec 12 17:14:20 2024 +0100
+
+    [tool] Update dependency slack to v5
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+    Co-authored-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit e435b26f99d0fa9034f4a7dad493d20d39876983[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Thu Dec 12 16:02:58 2024 +0100
+
+    [tool] fix latest tag incorrectly points to a lower semver (#76)
+
+[33mcommit 581ca2806a2484d7b38cfbba6b7d79d4ae53a0b8[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Thu Dec 12 15:45:48 2024 +0100
+
+    [microsoft-defender] change implementation to not use TimeGenerated (#2035)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit c24045269e215f099cd9f300d968e031cf0ae1b2[m
+Author: Stephanya Casanova <savacano28@users.noreply.github.com>
+Date:   Thu Dec 12 14:21:41 2024 +0100
+
+    [crowdstrike] Collector crowdstrike - chunk 1, 2 (#11)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+    Co-authored-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 0a2e802bdb03a391ae9831d794a235a29786c866[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Dec 12 08:59:48 2024 +0100
+
+    [all] Update dependency pyobas to v1.9.1
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit 2d4fea977a67812aed4b8d533dbcbc8c2e2e45ad[m
+Merge: 3c11183 1bf2fcc
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Dec 11 16:26:53 2024 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/1.10.0
+
+[33mcommit 1bf2fcc596fb28d5b79fe41dfe612d0e525a8675[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Wed Dec 11 15:35:21 2024 +0100
+
+    [tool] fix circle for prerelease platform (#1909)
+
+[33mcommit 3c111838296de296fcd76300cd609b3e36a2dd09[m
+Merge: 4fd26a9 7de3e15
+Author: Guillaume Paris <guillaume.paris@filigran.io>
+Date:   Wed Dec 11 10:18:20 2024 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/1.10.0
+
+[33mcommit 7de3e1542db524c8a18f4c220dd78b53211c57d0[m
+Author: Guillaume <guillaume.paris@filigran.io>
+Date:   Wed Dec 11 09:46:34 2024 +0100
+
+    [tool] update circle for prerelease platform (#1909)
+
+[33mcommit 5edba12a08921716f1b6cb8d9ea9cb2b1b675fa5[m[33m ([m[1;33mtag: [m[1;33m1.9.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Dec 10 08:56:18 2024 +0000
+
+    [all] Release 1.9.1
+
+[33mcommit 4fd26a97d45b49d9f85ada190b81f1d3a57ded6b[m
+Merge: bcbd6f6 f16ac55
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Mon Dec 9 11:21:59 2024 +0100
+
+    Merge remote-tracking branch 'origin/main' into release/1.10.0
+
+[33mcommit f16ac552e5c0a9b40a06c2d34cb8ff6b2bdee2c4[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Fri Dec 6 13:56:04 2024 +0100
+
+    [microsoft-sentinel] Create README.md
+
+[33mcommit 853f0ab57d9ffeda9a9caa1247f0ced9dab50d9a[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Dec 6 12:39:42 2024 +0100
+
+    [microsoft-defender/microsoft-entra] Update dependency msgraph-sdk to v1.14.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 70e0db1d628a555b142e098509fac7b51851191e[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Fri Dec 6 12:25:00 2024 +0100
+
+    [microsoft-defender/microsoft-entra] fix image builds on python 3.13
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit fa8fc5f8ec8e37934dcceaff07713f481979a519[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Dec 6 11:25:06 2024 +0100
+
+    [all] Update python Docker tag to v3.13
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit bcbd6f67fc6c040d749ddd7cc5d9836e9086b175[m
+Author: Stephanya Casanova <savacano28@users.noreply.github.com>
+Date:   Wed Dec 4 14:16:55 2024 +0100
+
+    [atomic-red-team] Add architecture by default
+
+[33mcommit 2200a7ce128499405183fb97f23fcdaea7e15f14[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Dec 4 09:06:08 2024 +0100
+
+    [microsoft-sentinel/microsoft-defender] Update dependency msal to v1.31.1
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit eb7cf70915bd0a51e1d6f3843a539ee87b83cb9b[m[33m ([m[1;33mtag: [m[1;33m1.9.0[m[33m)[m
+Author: Gael Leblan <gael.leblan@filigran.io>
+Date:   Fri Nov 29 18:24:52 2024 +0100
+
+    [all] Release 1.9.0
+
+[33mcommit 01ee0094d4afd9bca9853877b30f391fb03e4420[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue Nov 26 17:19:23 2024 +0100
+
+    [microsoft-defender] fix alert metadata access path for saving expectation
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 101fc38aa494b0977e77e9198391abf6ee31339c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Nov 26 16:41:55 2024 +0100
+
+    Update dependency msgraph-sdk to v1.13.0 (#39)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit a4e2d87c6d6741784fcaf90cf1af5ef589e827e3[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Tue Nov 26 16:11:48 2024 +0100
+
+    [microsoft-defender] Fix variable usage
+
+[33mcommit 0513b94f01624621fd7825f3a856fa2a77f57b0e[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue Nov 26 15:05:06 2024 +0100
+
+    [microsoft-defender] Microsoft Defender collector not working (#1686)
+    
+    Hotfix for considering full process ancestry for file and process evidence
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 6d234433a0aa11ec1ac9753aa7bb5987afab4abf[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Tue Nov 26 13:40:36 2024 +0100
+
+    [microsoft-sentinel/microsoft-defender] Change sentinel strategy to rely on Microsoft Defender
+
+[33mcommit 8acaebdd7ab73d726fa470d7cb778780d179129e[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue Nov 26 09:20:07 2024 +0100
+
+    [backend] Microsoft Sentinel collector not working (#1686)
+    
+    Signed-off-by: Antoine MAZEAS <antoine.mazeas@filigran.io>
+
+[33mcommit 2cabda7e0c3765500483253ca1171e5f72e0841f[m
+Author: Issel Parra <14161286+isselparra@users.noreply.github.com>
+Date:   Wed Nov 20 13:06:18 2024 +0100
+
+    Some payloads coming from Atomic Red team are marked as "Manual" (#46)
+
+[33mcommit f35b76891ecd3d63abdbcc8ef1c5f57fcf09b12e[m
+Author: MarineLeM <marine.le.mezo@gmail.com>
+Date:   Wed Nov 20 10:53:35 2024 +0100
+
+    [atomic-red-team] add resources (#1834)
+
+[33mcommit 853201f5a341607060b3912bc610f0850a9aea33[m
+Author: antoinemzs <antoine.mazeas@filigran.io>
+Date:   Tue Nov 19 10:17:42 2024 +0100
+
+    [atomic-red-team] Enforce required cleanup command AND executor when choosing one of the two
+
+[33mcommit 98b02702162c2234386e36f89612f6a3611aa1b7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Nov 18 18:57:54 2024 +0100
+
+    [ci] Update cimg/python Docker tag to v3.13
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 830cf6449454c47fea71441fc4334bac2c096b68[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Nov 18 18:56:35 2024 +0100
+
+    [ci] Update dependency slack to v4.15.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f4903c112f766f4411e76d78c5ab63050c8e5e39[m
+Author: Issel Parra <14161286+isselparra@users.noreply.github.com>
+Date:   Thu Nov 7 10:39:57 2024 +0100
+
+    [microsoft-sentinel/microsoft-defender] Improve matching to identify Prevented and add match on parent process name (#1757)
+    
+    Co-authored-by: Romuald Lemesle <romuald.lemesle@filigran.io>
+
+[33mcommit a295a259f7c99564d19a65b06c8cd53fa5707526[m[33m ([m[1;33mtag: [m[1;33m1.8.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Nov 5 07:26:39 2024 +0000
+
+    [all] Release 1.8.1
+
+[33mcommit f5e34821083f7e772e5c913616ec23d0267216ae[m[33m ([m[1;33mtag: [m[1;33m1.8.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri Oct 25 12:47:59 2024 +0000
+
+    [all] Release 1.8.0
+
+[33mcommit 13501326aa8ccdf95d076c81aa77e63c2b04605f[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Mon Oct 21 19:57:28 2024 +0200
+
+    [microsoft-sentinel] Matching hostname on lowercase
+
+[33mcommit 48a70bf00b28b5aeebb545e67d29ec2aaff933ef[m
+Author: Romuald Lemesle <romuald.lemesle@filigran.io>
+Date:   Mon Oct 21 19:57:18 2024 +0200
+
+    [microsoft-defender] Matching hostname on lowercase
+
+[33mcommit 264d01ad1ede6ad0fc3ff030622bb892ec2ef4d3[m[33m ([m[1;33mtag: [m[1;33m1.7.3[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Oct 15 12:36:30 2024 +0000
+
+    [all] Release 1.7.3
+
+[33mcommit 2a12bc5886e2e547002ba6430168b3527c6ffa27[m[33m ([m[1;33mtag: [m[1;33m1.7.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Oct 14 15:13:09 2024 +0000
+
+    [all] Release 1.7.2
+
+[33mcommit 3d5107006d704a06e326014f77a53fefd28fe1a9[m[33m ([m[1;33mtag: [m[1;33m1.7.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Oct 7 09:51:50 2024 +0000
+
+    [all] Release 1.7.1
+
+[33mcommit 7cbe6d398511260f9cae4fc934481254f0c2ea33[m[33m ([m[1;33mtag: [m[1;33m1.7.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Oct 2 08:50:11 2024 +0000
+
+    [all] Release 1.7.0
+
+[33mcommit eea671843fb97b2af130259239e1e4fc84c348c1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Sep 30 08:43:49 2024 +0200
+
+    [microsoft-defender/microsoft-sentinel] Update dependency msal to v1.31.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit eb9552bc7e1d88723b7eb33da3942b8edde00f67[m
+Author: Romuald Lemesle <romu.lemesle@gmail.com>
+Date:   Mon Sep 23 14:00:14 2024 +0200
+
+    [microsoft-entra] Fix call on create users method
+
+[33mcommit 7c8fd455b8c74eff4f11a0c9bcbf9d7984b96ad6[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu Sep 19 07:14:44 2024 +0000
+
+    [all] Release 1.6.1
+
+[33mcommit 51ae7f86acb693193e37531aefb63381bc1885fb[m
+Author: Stephanya Casanova <savacano28@users.noreply.github.com>
+Date:   Tue Sep 17 11:46:26 2024 +0200
+
+    [atomic-red-team] add elevation_required param
+
+[33mcommit b38454dd136695974a03b072a2d7a0736f87d7cc[m[33m ([m[1;33mtag: [m[1;33m1.6.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Sep 16 12:30:34 2024 +0000
+
+    [all] Release 1.6.0
+
+[33mcommit 658eddd0d464aa5bcf8bda3619e38654dfb3be72[m[33m ([m[1;33mtag: [m[1;33m1.5.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Sep 10 08:23:00 2024 +0000
+
+    [all] Release 1.5.1
+
+[33mcommit 97420d6f66cf9529f90513f855d71cfa227a7434[m[33m ([m[1;33mtag: [m[1;33m1.5.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Sep 2 09:45:13 2024 +0000
+
+    [all] Release 1.5.0
+
+[33mcommit bc956b29680050b45b8885bee4ad6e1aacdb7c44[m[33m ([m[1;33mtag: [m[1;33m1.4.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri Aug 30 07:13:10 2024 +0000
+
+    [all] Release 1.4.1
+
+[33mcommit 0841d128b281fe9969488e304d74a77f70aa62ec[m[33m ([m[1;33mtag: [m[1;33m1.4.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Aug 12 11:53:29 2024 +0000
+
+    [all] Release 1.4.0
+
+[33mcommit 213fa4e0b8eb41159b040359988bfbf795e8e3dc[m[33m ([m[1;33mtag: [m[1;33m1.3.1[m[33m)[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Aug 4 20:26:00 2024 -0700
+
+    Update dependency msgraph-sdk to v1.5.4 (#38)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit d35dfa1c8017a350daae301945ed20471ca7fd8c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Aug 4 20:25:47 2024 -0700
+
+    Update openbas/collector-atomic-red-team Docker tag to v1.3.1 (#35)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 089906c5902122aa0762348a524d703482598a02[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu Aug 1 23:40:28 2024 +0000
+
+    [all] Release 1.3.1
+
+[33mcommit 0badb90e995945dc966012990f7f5901804a856b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jul 31 22:23:01 2024 +0200
+
+    [microsoft-defender | microsoft-sentinel] Update dependency msal to v1.30.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 879ff6c0594f94231129145f5fb79ba1521577c8[m[33m ([m[1;33mtag: [m[1;33m1.3.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu Jul 25 08:15:31 2024 +0000
+
+    [all] Release 1.3.0
+
+[33mcommit 12fc64ebc53f855383bd8b9700db13114aaca28e[m[33m ([m[1;33mtag: [m[1;33m1.2.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri Jul 19 09:52:15 2024 +0000
+
+    [all] Release 1.2.2
+
+[33mcommit 820ccbfcec68bb50278419aee11df5eef8ac337e[m[33m ([m[1;33mtag: [m[1;33m1.2.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed Jul 3 17:21:45 2024 +0000
+
+    [all] Release 1.2.1
+
+[33mcommit 46c525d66a031fa0278d557cb04e8c08e3d15584[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue Jul 2 10:54:01 2024 +0200
+
+    [microsoft-entra] Fix the collector (#37)
+
+[33mcommit 6704df5aa1ef2a951255402f7fd47fe02a8bf603[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue Jul 2 10:45:12 2024 +0200
+
+    [microsoft-sentinel] Fix the collector (#36)
+
+[33mcommit 06792c88a4a7f56abfdc7fb754e9e277d15f282d[m[33m ([m[1;33mtag: [m[1;33m1.2.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Jul 1 20:43:37 2024 +0000
+
+    [all] Release 1.2.0
+
+[33mcommit 025b75c1d9541dd2e21ff5b5b550cde702004354[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon Jul 1 20:04:15 2024 +0200
+
+    [all] Reduce fuzzy match for process names
+
+[33mcommit 472912132a4fb6103bfb4487f7aeca5b13e82416[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon Jul 1 19:15:11 2024 +0200
+
+    [atomic-red-team] Implement trusted / untrusted
+
+[33mcommit f4b55777cc4717992ab3845bfbcbfb31a7bc1cfa[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Jun 27 13:55:45 2024 +0200
+
+    [all] Adapt to security platforms (#34)
+
+[33mcommit 682ae1f0ff411f77b8f1062dffa812bf854b2624[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Sat Jun 22 09:50:22 2024 +0200
+
+    [atomic-red-team] Fix executor for dependencies
+
+[33mcommit 9147de0b4d043d5de79a255ce14aecbebc3568a7[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Jun 21 15:33:25 2024 +0200
+
+    [atomic-red-team] Fix Docker entry point
+
+[33mcommit 84a5c5c014f2336a2b10ea89179b18fbf6f2e087[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Jun 21 14:30:39 2024 +0200
+
+    [atomic-red-team] Introduce the collector (#29)
+
+[33mcommit 9bd043abd3a816fec20110faf0c075ebe264d1c4[m[33m ([m[1;33mtag: [m[1;33m1.1.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Jun 18 17:30:41 2024 +0000
+
+    [all] Release 1.1.1
+
+[33mcommit 8c9b16ecd5a4cb49b5f644f06a09b5a07d070076[m[33m ([m[1;33mtag: [m[1;33m1.1.0[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue Jun 18 09:20:25 2024 +0000
+
+    [all] Release 1.1.0
+
+[33mcommit ebb1f7a18848731334e42b57003329741a74a1ce[m[33m ([m[1;33mtag: [m[1;33m1.0.9[m[33m)[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Jun 13 15:57:54 2024 +0200
+
+    [all] Fix linting
+
+[33mcommit 1ef9518f775ab41a88c1fa52168cb08f0cac20bc[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Wed Jun 12 19:30:28 2024 +0200
+
+    [all] Use the new helper logics
+
+[33mcommit 049926cf9bb6cd1849d87d64dca78f03ea78e615[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Wed Jun 12 11:23:37 2024 +0200
+
+    [all] Take only relevant signature types
+
+[33mcommit 12729d4a2d64067fe891d0cfa3ded8ec9d1a92ca[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu Jun 6 14:58:21 2024 +0000
+
+    [all] Release 1.0.9
+
+[33mcommit 9c05f68ef0962f4eb48343c405a577e4f70230a4[m[33m ([m[1;33mtag: [m[1;33m1.0.8[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Mon Jun 3 15:04:09 2024 +0000
+
+    [all] Release 1.0.8
+
+[33mcommit a5c60f68da392ac645196ac96cb3623180296a31[m[33m ([m[1;33mtag: [m[1;33m1.0.7[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri May 31 01:03:00 2024 +0000
+
+    [all] Release 1.0.7
+
+[33mcommit 3222e679945b4a2c068072e20baa607c3f01e281[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri May 31 01:54:14 2024 +0200
+
+    [all] Use API for asset expectations
+
+[33mcommit 454329194f5be33341ee3ecf38dffe4087cf10fe[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri May 31 00:54:32 2024 +0200
+
+    [defender] Avoid logging on command line
+
+[33mcommit 84aaf74982b3fbe74d51a5f4aab2845e94a684c1[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri May 31 00:45:18 2024 +0200
+
+    [all] Enhance logging
+
+[33mcommit 1af6c52a98c6b1e43b2ef689e6e6dbc0f6e28e41[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri May 31 00:08:36 2024 +0200
+
+    [all] Add more logging
+
+[33mcommit 2e8c2d9242008eececec94f5c7b73156381dc22d[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu May 30 23:21:35 2024 +0200
+
+    [all] Get endpoint before checking
+
+[33mcommit 96d800067a1e899a9704bf1708c87a8b392fda0c[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu May 30 21:47:20 2024 +0200
+
+    [all] More logging
+
+[33mcommit 7f5ab6b57aa45a92601bd8abcf07529c82d03835[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu May 30 20:40:12 2024 +0200
+
+    [all] Take first 50 alerts
+
+[33mcommit a7af94ef2915115d83e96874b1ec13889d42dc97[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu May 30 19:49:28 2024 +0200
+
+    [all] Fix logic of MS SDK
+
+[33mcommit 76ef80bea11c94906514b896e79dc07668a87774[m[33m ([m[1;33mtag: [m[1;33m1.0.6[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu May 30 14:07:52 2024 +0000
+
+    [all] Release 1.0.6
+
+[33mcommit 3ef93d8e37461e17e5f66f8f4ac9ed8089c60786[m[33m ([m[1;33mtag: [m[1;33m1.0.5[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Wed May 29 20:05:08 2024 +0000
+
+    [all] Release 1.0.5
+
+[33mcommit 5513163e250ea04411a905728c2f83f3f20ce8bc[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Wed May 29 10:18:29 2024 +0200
+
+    [sentinel] Fix wired behaviour in Docker Hub
+
+[33mcommit 4734a184e22c286268b48db35e06fb1c1cfee9e2[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Wed May 29 02:37:16 2024 +0200
+
+    [docs] Update README
+
+[33mcommit e7b21c791da0f02bce672bcc8e0b68be09888ce6[m[33m ([m[1;33mtag: [m[1;33m1.0.4[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Tue May 28 22:10:25 2024 +0000
+
+    [all] Release 1.0.4
+
+[33mcommit 86ffd90ee83beaa2b6801f460a9e32680d47b964[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue May 28 21:26:22 2024 +0200
+
+    [all] Lib python on main branch
+
+[33mcommit d94608246c250b0bef816c536030e2ba481537b6[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue May 28 19:25:52 2024 +0200
+
+    [defender] Dont resolve on command line for the moment
+
+[33mcommit 9f2522e3c4f495519f44c3332aa130576e92ae46[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue May 28 14:35:00 2024 +0200
+
+    [defender/sentinel/thr] Fix fuzzy scoring
+
+[33mcommit 84207854ae722bfbd56c05de3b2af785037a6735[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Tue May 28 13:40:27 2024 +0200
+
+    [defender/sentinel/thr] Add collectors
+
+[33mcommit 1830a86de9e1f8209da025d3b9ccd6b80d7a11df[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon May 27 23:21:05 2024 +0200
+
+    [tanium-thr/defender] Add collectors
+
+[33mcommit 208796ba23b607fe86102d2a34fb2f075077a18e[m[33m ([m[1;33mtag: [m[1;33m1.0.3[m[33m)[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu May 23 17:59:29 2024 +0200
+
+    [all] Remove useless requirements
+
+[33mcommit 7fd95cd2e63f15e0b55e034f341ac6fe91d0317d[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu May 23 14:36:49 2024 +0000
+
+    [all] Release 1.0.3
+
+[33mcommit 33c332c648fb008f43df12357615e6859e59fa7b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu May 23 14:52:08 2024 +0200
+
+    [ci] Update slack orb to v4.13.3
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 79a60a64be6ba4f30181e66ae9c60919b5424827[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed May 22 08:45:47 2024 +0200
+
+    [microsoft-entra] Update dependency msgraph-sdk to v1.4.0
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit d0918e6859135a6b51e00b1b5372d97bda4f5150[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed May 22 08:44:56 2024 +0200
+
+    [all] Update dependency dataclasses-json to v0.6.6
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 78ef34e567800faeffe6bc34e5ec27a0b54f6a1f[m[33m ([m[1;33mtag: [m[1;33m1.0.2[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Fri May 17 20:00:58 2024 +0000
+
+    [all] Release 1.0.2
+
+[33mcommit 2607cf24c4a938ddd6ce84ef41cd944ad3677240[m[33m ([m[1;33mtag: [m[1;33m1.0.1[m[33m)[m
+Author: Filigran Automation <automation@filigran.io>
+Date:   Thu May 16 21:20:55 2024 +0000
+
+    [all] Release 1.0.1
+
+[33mcommit 851eb0cdec570feeaaac529dc1e699a48712fde7[m[33m ([m[1;33mtag: [m[1;33m1.0.0[m[33m)[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon May 13 13:13:06 2024 +0200
+
+    [all] Update version numbers
+
+[33mcommit 375906b4817466595a19c9548f7413f761c4b1a3[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon Apr 29 13:57:43 2024 +0200
+
+    [all] Change default config
+
+[33mcommit 7269c4f51bc3756af8b8d908e3cd86c3483d3bb1[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Mon Apr 29 13:06:34 2024 +0200
+
+    [all] Adapt collectors default config
+
+[33mcommit b8e2065bdce44f068b2614ebbdf21384c4afcd67[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Sun Apr 28 11:34:44 2024 +0200
+
+    [all] Adjust version number for release
+
+[33mcommit f30a35b9b7b457347228a442c257c458998a057c[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Apr 26 22:03:42 2024 +0200
+
+    [all] Fix default config
+
+[33mcommit 2e1267fab1ccca69fad52cdf4a706cc0ec84cb56[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 25 17:17:42 2024 +0200
+
+    [all] Default delay / interval
+
+[33mcommit 4a23605d062f8b42b431477ceb158b32ca7e9f97[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 25 17:17:28 2024 +0200
+
+    [all] Default delay / interval
+
+[33mcommit 497cd46168a7643b070ea45ca1aa6fccf1c1ff74[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 25 15:44:41 2024 +0200
+
+    [mitre] Fix parent of attack patterns
+
+[33mcommit ac3ffe73d2a5af560ea19a98a97cbb09384b7fdb[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 25 13:05:34 2024 +0200
+
+    [all] Adapt and new icons
+
+[33mcommit 4eabcc95deeb86dad8eda4529d309e4c99e53e77[m
+Author: Jean-Philippe Salles <jean-philippe.salles@filigran.io>
+Date:   Mon Apr 22 17:45:39 2024 +0200
+
+    Update issue templates
+
+[33mcommit 86a1c9366d51b7f163ed4650ec2ed36dd21e1fca[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Apr 19 09:01:16 2024 +0200
+
+    [mitre] Simplify
+
+[33mcommit 2b0dbb66834fa3ea19ba0949ff5336ddbf16e41e[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Apr 19 02:07:06 2024 +0200
+
+    [microsoft-entra] Fix the docker build
+
+[33mcommit 1a22600439b85dfa6c12bb88adc3be00e965e97a[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Fri Apr 19 01:41:13 2024 +0200
+
+    [all] Fix collectors
+
+[33mcommit 88ed842323e457b961132e19a9725942f6262136[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 18 16:34:49 2024 +0200
+
+    [microsoft-entra] Fix linting
+
+[33mcommit 9122e678f238f22368649243953f5bff230b8936[m
+Author: Samuel Hassine <samuel.hassine@filigran.io>
+Date:   Thu Apr 18 16:29:16 2024 +0200
+
+    [microsoft-entra] Add the collector
+
+[33mcommit e01cf8367d520d2dcd2f56c0b466b3aad38c4ace[m
+Author: Julien Richard <julien.richard@filigran.io>
+Date:   Wed Mar 20 01:33:33 2024 +0100
+
+    [collectors] Introduce collectors repository
