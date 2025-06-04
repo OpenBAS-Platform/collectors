@@ -46,6 +46,10 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          working_directory: ~/
+          name: Clone pyobas
+          command: git clone -b release/current https://github.com/OpenBAS-Platform/client-python
+      - run:
           working_directory: ~/openbas/crowdstrike
           name: Install poetry
           command: pip install poetry==2.1.3
