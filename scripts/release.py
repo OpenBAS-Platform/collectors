@@ -74,15 +74,25 @@ os.system(
     + "/g' @"
 )
 
-# pyobas==x.x.x -> requirements.txt
+# pyobas= = x.x.x -> pyproject.toml
 os.system(
-    "grep -rli 'pyobas=="
+    "grep -rli 'pyobas = \""
     + previous_version
-    + "' * | xargs -i@ sed -i 's/pyobas=="
+    + "\"' **/pyproject.toml | xargs -i@ sed -i 's/pyobas = \""
     + previous_version.replace(".", "\\.")
-    + "/pyobas=="
+    + '"/pyobas = "'
     + new_version.replace(".", "\\.")
-    + "/g' @"
+    + "\"/g' @"
+)
+
+os.system(
+    "grep -rli 'version = \""
+    + previous_version
+    + "\"' **/pyproject.toml | xargs -i@ sed -i 's/version = \""
+    + previous_version.replace(".", "\\.")
+    + '"/version = "'
+    + new_version.replace(".", "\\.")
+    + "\"/g' @"
 )
 
 logging.info("[collectors] Pushing to " + branch_collectors)

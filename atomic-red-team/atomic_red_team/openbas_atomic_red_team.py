@@ -219,7 +219,7 @@ class OpenBASAtomicRedTeam:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            self.config, "img/icon-atomic-red-team.png"
+            self.config, "atomic_red_team/img/icon-atomic-red-team.png"
         )
 
     def _process_message(self) -> None:

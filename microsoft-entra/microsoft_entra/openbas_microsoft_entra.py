@@ -59,7 +59,7 @@ class OpenBASMicrosoftEntra:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            config=self.config, icon="img/icon-microsoft-entra.png"
+            config=self.config, icon="microsoft_entra/img/icon-microsoft-entra.png"
         )
 
         # External

@@ -1,3 +1,4 @@
 config.yml
-src/__pycache__
+mitre_attack/__pycache__
 __pycache__
+dist

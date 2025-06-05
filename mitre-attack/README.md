@@ -64,16 +64,16 @@ Create a file `config.yml` based on the provided `config.yml.sample`.
 Replace the configuration variables with the appropriate configurations for
 you environment.
 
-Install the required python dependencies (preferably in a virtual environment):
+Install the required python dependencies:
 
 ```shell
-pip3 install -r requirements.txt
+poetry install --extras prod
 ```
 
 Then, start the collector:
 
 ```shell
-python3 openbas_mitre_attack.py
+poetry run python -m mitre_attack.openbas_mitre_attack
 ```
 
 ## Behavior
