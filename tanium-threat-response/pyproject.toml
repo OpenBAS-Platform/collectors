@@ -19,8 +19,8 @@ pyobas = [
 thefuzz = "0.22.1"
 
 [tool.poetry.extras]
-dev = ["pyobas"]
-ci = ["pyobas"]
+dev = []
+ci = []
 
 [build-system]
 requires = ["poetry-core"]
