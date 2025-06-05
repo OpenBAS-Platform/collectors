@@ -64,10 +64,10 @@ Create a file `config.yml` based on the provided `config.yml.sample`.
 Replace the configuration variables with the appropriate configurations for
 you environment.
 
-Install the required python dependencies (preferably in a virtual environment):
+Install the required python dependencies:
 
 ```shell
-poetry install
+poetry install --extras prod
 ```
 
 Then, start the collector:

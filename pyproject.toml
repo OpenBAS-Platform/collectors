@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "collectors"
-version = "1.16.4"
+version = "1.17.0"
 description = "A collection of Collectors for interfacing with security software"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"
@@ -18,7 +18,7 @@ openbas-mitre-attack-collector = { path = "./mitre-attack" }
 openbas-tanium-threat-response-collector = { path = "./tanium-threat-response" }
 # install pyobas explicitly to force getting the dep from the local path in dev mode
 pyobas = [
-    { markers = "extra != 'dev' and extra != 'ci'", version = "1.16.4", source = "pypi"  },
+    { markers = "extra != 'dev' and extra != 'ci'", version = "1.17.0", source = "pypi"  },
     { markers = "extra == 'dev' and extra != 'ci'", path = "../client-python", develop = true },
     { markers = "extra == 'ci' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
 ]

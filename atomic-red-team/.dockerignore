@@ -1,3 +1,4 @@
 config.yml
 atomic_red_team/__pycache__
 __pycache__
+dist

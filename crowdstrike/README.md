@@ -12,9 +12,9 @@ Get a local copy
 git checkout https://github.com/OpenBAS-Platform/collectors
 ```
 
-Install the CrowdStrike Endpoint Security collector dependencies
-```commandline
-poetry install
+Install the CrowdStrike Endpoint Security collector dependencies:
+```shell
+poetry install --extras prod
 ```
 
 ## Usage

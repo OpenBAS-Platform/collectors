@@ -27,7 +27,7 @@ In this repository, you need to have `python >= 3.11` and `poetry >= 2.1`. Insta
 > follow the steps to set up poetry correctly to handle this case:
 > https://python-poetry.org/docs/dependency-specification/#exclusive-extras
 ```shell
-poetry install --extra dev
+poetry install --extras dev
 ```
 
 ### Creating a new collector
@@ -53,12 +53,15 @@ Here's the expression for the pyobas dependency, including the `extra` definitio
 ```toml
 [tool.poetry.dependencies]
 pyobas = [
-    { markers = "extra != 'dev'", version = "1.16.4", source = "pypi"  },
-    { markers = "extra == 'dev'", path = "../../client-python", develop = true },
+    { markers = "extra == 'prod' and extra != 'dev' and extra != 'ci'", version = "<latest pyobas release on PyPI>", source = "pypi"  },
+    { markers = "extra == 'dev' and extra != 'prod' and extra != 'ci'", path = "../../client-python", develop = true },
+    { markers = "extra == 'ci' and extra != 'prod' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
 ]
 
 [tool.poetry.extras]
+prod = []
 dev = []
+ci = []
 ```
 
 ### Simultaneous development on pyobas and a collector

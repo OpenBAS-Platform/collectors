@@ -13,9 +13,9 @@ FROM python:3.13-alpine AS runner
 
 ARG installdir=/collector
 COPY --from=builder ${installdir} ${installdir}
-RUN cd ${installdir}/dist && pip3 install *.whl
+RUN cd ${installdir}/dist && pip3 install "$(ls *.whl)[prod]"
 
 # necessary for icon location
-WORKDIR ${installdir}/atomic_red_team
+WORKDIR ${installdir}
 
 CMD ["python3", "-m", "atomic_red_team.openbas_atomic_red_team"]

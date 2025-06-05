@@ -13,9 +13,9 @@ FROM python:3.13-alpine AS runner
 
 ARG installdir=/collector
 COPY --from=builder ${installdir} ${installdir}
-RUN cd ${installdir}/dist && pip3 install *.whl
+RUN cd ${installdir}/dist && pip3 install "$(ls *.whl)[prod]"
 
 # necessary for icon location
-WORKDIR ${installdir}/microsoft_defender
+WORKDIR ${installdir}
 
 CMD ["python3", "-m", "microsoft_defender.openbas_microsoft_defender"]

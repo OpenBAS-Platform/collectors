@@ -52,23 +52,11 @@ jobs:
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Install poetry
-          command: pip install poetry==2.1.3
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Configure poetry
-          command: poetry config installer.re-resolve false
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Create lock file
-          command: poetry lock
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: print lock file
-          command: cat poetry.lock
+          command: pip install poetry==2.1.3 && poetry config installer.re-resolve false
       - run:
           working_directory: ~/openbas/crowdstrike
           name: install crowdstrike
-          command: poetry install -vvv --extras ci
+          command: poetry install --extras ci
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Tests for crowdstrike collector
