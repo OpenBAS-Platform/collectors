@@ -148,48 +148,7 @@ jobs:
       - slack/notify:
           event: fail
           template: basic_fail_1
-  publish_rolling_1:
-    working_directory: ~/openbas
-    docker:
-      - image: cimg/base:stable-20.04
-    steps:
-      - attach_workspace:
-          at: .
-      - setup_remote_docker
-      - run: sudo apt-get update -qq && sudo apt install curl gettext-base
-      - run:
-          working_directory: ~/openbas/images
-          name: Restore saved images
-          command: |
-            docker image load < collector-mitre-attack
-            docker tag openbas/collector-mitre-attack:${CIRCLE_SHA1} openbas/collector-mitre-attack:rolling
-            docker image load < collector-microsoft-entra
-            docker tag openbas/collector-microsoft-entra:${CIRCLE_SHA1} openbas/collector-microsoft-entra:rolling
-            docker image load < collector-tanium-threat-response
-            docker tag openbas/collector-tanium-threat-response:${CIRCLE_SHA1} openbas/collector-tanium-threat-response:rolling
-            docker image load < collector-microsoft-defender
-            docker tag openbas/collector-microsoft-defender:${CIRCLE_SHA1} openbas/collector-microsoft-defender:rolling
-            docker image load < collector-microsoft-sentinel
-            docker tag openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} openbas/collector-microsoft-sentinel:rolling
-            docker image load < collector-atomic-red-team
-            docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:rolling
-            docker image load < collector-crowdstrike
-            docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:rolling
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push openbas/collector-mitre-attack:rolling
-            docker push openbas/collector-microsoft-entra:rolling
-            docker push openbas/collector-tanium-threat-response:rolling
-            docker push openbas/collector-microsoft-defender:rolling
-            docker push openbas/collector-microsoft-sentinel:rolling
-            docker push openbas/collector-atomic-red-team:rolling
-            docker push openbas/collector-crowdstrike:rolling
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
-  publish_prerelease_1:
+  publish_images:
     working_directory: ~/openbas
     docker:
       - image: cimg/base:stable-20.04
@@ -199,33 +158,51 @@ jobs:
       - setup_remote_docker
       - run:
           working_directory: ~/openbas/images
+          name: Fix tag name
+          command: |
+            if [ "${CIRCLE_TAG}" != "" ]
+            then
+              export IMAGETAG=${CIRCLE_TAG}
+            elif [ "${CIRCLE_BRANCH}" = "main" ]
+            then
+              export IMAGETAG="rolling"
+            elif [ "${CIRCLE_BRANCH}" = "release/current" ]
+            then
+              export IMAGETAG="prerelease"
+            else
+              echo "No tag supplied or branch is neither 'main' nor 'release/current' (was: '${CIRCLE_BRANCH}')"
+              exit 1
+            fi
+            echo "Image tag: ${IMAGETAG}"
+      - run:
+          working_directory: ~/openbas/images
           name: Restore saved images
           command: |
             docker image load < collector-mitre-attack
-            docker tag openbas/collector-mitre-attack:${CIRCLE_SHA1} openbas/collector-mitre-attack:prerelease
+            docker tag openbas/collector-mitre-attack:${CIRCLE_SHA1} openbas/collector-mitre-attack:${IMAGETAG}
             docker image load < collector-microsoft-entra
-            docker tag openbas/collector-microsoft-entra:${CIRCLE_SHA1} openbas/collector-microsoft-entra:prerelease
+            docker tag openbas/collector-microsoft-entra:${CIRCLE_SHA1} openbas/collector-microsoft-entra:${IMAGETAG}
             docker image load < collector-tanium-threat-response
-            docker tag openbas/collector-tanium-threat-response:${CIRCLE_SHA1} openbas/collector-tanium-threat-response:prerelease
+            docker tag openbas/collector-tanium-threat-response:${CIRCLE_SHA1} openbas/collector-tanium-threat-response:${IMAGETAG}
             docker image load < collector-microsoft-defender
-            docker tag openbas/collector-microsoft-defender:${CIRCLE_SHA1} openbas/collector-microsoft-defender:prerelease
+            docker tag openbas/collector-microsoft-defender:${CIRCLE_SHA1} openbas/collector-microsoft-defender:${IMAGETAG}
             docker image load < collector-microsoft-sentinel
-            docker tag openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} openbas/collector-microsoft-sentinel:prerelease
+            docker tag openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} openbas/collector-microsoft-sentinel:${IMAGETAG}
             docker image load < collector-atomic-red-team
-            docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:prerelease
+            docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:${IMAGETAG}
             docker image load < collector-crowdstrike
-            docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:prerelease
+            docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:${IMAGETAG}
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push openbas/collector-mitre-attack:prerelease
-            docker push openbas/collector-microsoft-entra:prerelease
-            docker push openbas/collector-tanium-threat-response:prerelease
-            docker push openbas/collector-microsoft-defender:prerelease
-            docker push openbas/collector-microsoft-sentinel:prerelease
-            docker push openbas/collector-atomic-red-team:prerelease
-            docker push openbas/collector-crowdstrike:prerelease
+            docker push openbas/collector-mitre-attack:${IMAGETAG}
+            docker push openbas/collector-microsoft-entra:${IMAGETAG}
+            docker push openbas/collector-tanium-threat-response:${IMAGETAG}
+            docker push openbas/collector-microsoft-defender:${IMAGETAG}
+            docker push openbas/collector-microsoft-sentinel:${IMAGETAG}
+            docker push openbas/collector-atomic-red-team:${IMAGETAG}
+            docker push openbas/collector-crowdstrike:${IMAGETAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -271,26 +248,28 @@ workflows:
             - ensure_formatting
             - linter
             - test
-      - publish_rolling_1:
+      - publish_images:
           requires:
             - build_docker_images
           filters:
-            branches:
-              only:
-                - main
-      - publish_prerelease_1:
-          requires:
-            - build_docker_images
-          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
               only:
                 - release/current
+                - main
       - deploy_testing:
           requires:
-            - publish_rolling_1
+            - publish_images
+          filters:
+            branches:
+              only: main
       - deploy_prerelease:
           requires:
-            - publish_prerelease_1
+            - publish_images
+          filters:
+            branches:
+              only: release/current
       - notify_rolling:
           requires:
             - deploy_testing
