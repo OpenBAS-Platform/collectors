@@ -1799,7 +1799,7 @@ doc = ["autoapi (>=2.0.1,<2.1.0)", "sphinx-autodoc-typehints (>=3.2.0,<3.3.0)", 
 type = "git"
 url = "https://github.com/OpenBAS-Platform/client-python"
 reference = "release/current"
-resolved_reference = "34eb22ba24555a8448a557719a9ec2d747d287af"
+resolved_reference = "c60df86fa15421756db53e2bfdae568d8acbd958"
 
 [[package]]
 name = "python-dateutil"

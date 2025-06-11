@@ -10,11 +10,20 @@ details dictate what data is actually available to the collector.
 Get a local copy
 ```commandline
 git checkout https://github.com/OpenBAS-Platform/collectors
+cd ./collectors/crowdstrike
+```
+Install the environment:
+**Production**:
+```shell
+# production environment
+poetry install --extras prod
 ```
 
-Install the CrowdStrike Endpoint Security collector dependencies:
+**Development** (note that you should also clone the [pyobas](OpenBAS-Platform/client-python) repository [according to
+these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collector))
 ```shell
-poetry install --extras prod
+# development environment
+poetry install --extras dev
 ```
 
 ## Usage

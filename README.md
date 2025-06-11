@@ -21,11 +21,23 @@ If you want to help use improve or develop new collector, please check out the
 the [OpenBAS ecosystem](https://filigran.notion.site/OpenBAS-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
 
 ## Development
+This step installs all collectors within the repository inside a single poetry environment. If you do not wish
+to work with all collectors at once, it is possible to install each collector within its own poetry environment. Refer
+to each collector's individual README for instructions.
+
 In this repository, you need to have `python >= 3.11` and `poetry >= 2.1`. Install the development environment with:
 > [!IMPORTANT]
 > This repository uses "mutually exclusive extra markers" to manage the source of the pyobas dependency. Make sure to
 > follow the steps to set up poetry correctly to handle this case:
 > https://python-poetry.org/docs/dependency-specification/#exclusive-extras
+
+> [!NOTE]
+> For Windows hosts: as of writing, the [msgraph-python-sdk has the following note](https://github.com/microsoftgraph/msgraph-sdk-python/blob/65d88850202e9ea75477583e76e75dfbf6d75859/README.md#1-installation):
+> > * The Microsoft Graph SDK for Python is a fairly large package. It may take a few minutes for the initial installation to complete.
+> > * Enable long paths in your environment if you receive a Could not install packages due to an OSError. For details, see [Enable Long Paths in Windows 10, Version 1607, and Later](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell#enable-long-paths-in-windows-10-version-1607-and-later).
+> 
+> Follow these instructions if not already enabled on your system.
+
 ```shell
 poetry install --extras dev
 ```
