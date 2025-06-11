@@ -283,6 +283,7 @@ class OpenBASTaniumThreatResponse:
         )
 
         # For each expectation, try to find the proper alert to assign a detection or prevention result
+        traces_to_create: list[dict[str, str]] = []
         for expectation in expectations:
             if expectation in expectations_not_filled:
                 # Check expired expectation
@@ -333,7 +334,7 @@ class OpenBASTaniumThreatResponse:
                             )
                             expectations_not_filled.remove(expectation)
 
-                        # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
+                        # Save alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                         self.helper.collector_logger.info(
                             "Expectation matched, adding trace for expectation "
                             + expectation["inject_expectation_inject"]
@@ -341,8 +342,8 @@ class OpenBASTaniumThreatResponse:
                             + expectation["inject_expectation_type"]
                             + ")"
                         )
-                        self.helper.api.inject_expectation_trace.create(
-                            data={
+                        traces_to_create.append(
+                            {
                                 "inject_expectation_trace_expectation": expectation[
                                     "inject_expectation_id"
                                 ],
@@ -360,6 +361,10 @@ class OpenBASTaniumThreatResponse:
                                 ),
                             }
                         )
+
+        self.helper.api.inject_expectation_trace.bulk_create(
+            payload={"expectation_traces": traces_to_create}
+        )
 
     # Start the main loop
     def start(self):
