@@ -18,6 +18,7 @@ pyobas = [
 ]
 
 [tool.poetry.extras]
+prod = []
 dev = []
 ci = []
 
