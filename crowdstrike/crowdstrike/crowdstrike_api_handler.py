@@ -36,7 +36,10 @@ class CrowdstrikeApiHandler:
             if alerts_response["status_code"] == 200:
                 return alerts_response["body"]["resources"]
             else:
-                self.helper.collector_logger.info("No alerts ID found for this specific parameters :" + str(parameters))
+                self.helper.collector_logger.info(
+                    "No alerts ID found for this specific parameters :"
+                    + str(parameters)
+                )
                 return []
 
         self.helper.collector_logger.error(
