@@ -74,7 +74,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Echo imagetag
-          command: echo ${IMAGETAG}
+          command: echo $IMAGETAG
       - run:
           name: Install environment
           command: |
