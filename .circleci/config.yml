@@ -68,16 +68,9 @@ jobs:
     environment:
       LATEST_SEMANTIC_VERSION: $(git tag --sort=-v:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
       IS_LATEST: $([ "$CIRCLE_TAG" = "$LATEST_SEMANTIC_VERSION" ] && echo "true" || echo "false")
-      IMAGETAG: $([ "${CIRCLE_TAG}" != "" ] && echo ${CIRCLE_TAG} || [ "${CIRCLE_BRANCH}" = "main" ] && echo "rolling" || [ "${CIRCLE_BRANCH}" = "release/current" ] && echo "prerelease" || exit 1)
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Echo imagetag
-          command: |
-            echo $IMAGETAG
-            echo $IS_LATEST
-            echo $LATEST_SEMANTIC_VERSION
       - run:
           name: Install environment
           command: |
@@ -165,8 +158,23 @@ jobs:
       - setup_remote_docker
       - run:
           working_directory: ~/openbas/images
-          name: Restore saved images
+          name: Restore saved images and publish
           command: |
+            if [ "${CIRCLE_TAG}" != "" ]
+            then
+              export IMAGETAG=${CIRCLE_TAG}
+            elif [ "${CIRCLE_BRANCH}" = "main" ]
+            then
+              export IMAGETAG="rolling"
+            elif [ "${CIRCLE_BRANCH}" = "release/current" ]
+            then
+              export IMAGETAG="prerelease"
+            else
+              echo "No tag supplied or branch is neither 'main' nor 'release/current' (was: '${CIRCLE_BRANCH}')"
+              exit 1
+            fi
+            echo "Image tag: ${IMAGETAG}"
+
             docker image load < collector-mitre-attack
             docker tag openbas/collector-mitre-attack:${CIRCLE_SHA1} openbas/collector-mitre-attack:${IMAGETAG}
             docker image load < collector-microsoft-entra
@@ -181,9 +189,7 @@ jobs:
             docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:${IMAGETAG}
             docker image load < collector-crowdstrike
             docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:${IMAGETAG}
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
+
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:${IMAGETAG}
             docker push openbas/collector-microsoft-entra:${IMAGETAG}
