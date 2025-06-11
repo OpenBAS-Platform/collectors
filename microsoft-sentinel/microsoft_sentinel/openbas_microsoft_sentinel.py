@@ -4,12 +4,12 @@ import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+from microsoft_sentinel.api_handler import SentinelApiHandler
 from pyobas.helpers import (
     OpenBASCollectorHelper,
     OpenBASConfigHelper,
     OpenBASDetectionHelper,
 )
-from sentinel_api_handler import SentinelApiHandler
 
 
 class OpenBASMicrosoftSentinel:
@@ -79,7 +79,7 @@ class OpenBASMicrosoftSentinel:
 
         self.helper = OpenBASCollectorHelper(
             config=self.config,
-            icon="img/icon-microsoft-sentinel.png",
+            icon="microsoft_sentinel/img/icon-microsoft-sentinel.png",
             security_platform_type="SIEM",
         )
 

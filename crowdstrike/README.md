@@ -10,18 +10,25 @@ details dictate what data is actually available to the collector.
 Get a local copy
 ```commandline
 git checkout https://github.com/OpenBAS-Platform/collectors
+cd ./collectors/crowdstrike
+```
+Install the environment:
+**Production**:
+```shell
+# production environment
+poetry install --extras prod
 ```
 
-Install the CrowdStrike Endpoint Security collector dependencies
-```commandline
-cd collectors/crowdstrike
-pip install -r requirements.txt
+**Development** (note that you should also clone the [pyobas](OpenBAS-Platform/client-python) repository [according to
+these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collector))
+```shell
+# development environment
+poetry install --extras dev
 ```
 
 ## Usage
 ```commandline
-cd collectors/crowdstrike
-python -m crowdstrike.openbas_crowdstrike
+poetry run python -m crowdstrike.openbas_crowdstrike
 ```
 
 ## Configuration
@@ -57,20 +64,5 @@ by OpenBAS agents to validate prevention and detection expectations.
 In a terminal:
 ```commandline
 cd collectors/crowdstrike
-python -m unittest
+poetry run python -m unittest
 ```
-
-### JetBrains PyCharm configuration
-To run the collector from within PyCharm, you must:
-
-1. Ensure the requirements are installed correctly:
-```commandline
-pip install -r requirements.txt
-```
-
-2. Create a run configuration in PyCharm with the following settings:
-* **Run**: module `crowdstrike.openbas_crowdstrike`
-* **Working directory**: `...[path]\collectors\crowdstrike`
-* **Deactivate options**: `Add source roots to PYTHONPATH` and `Add content roots to PYTHONPATH`
-
-You may now run or debug the module, run tests...

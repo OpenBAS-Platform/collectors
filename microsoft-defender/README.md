@@ -83,16 +83,31 @@ Create a file `config.yml` based on the provided `config.yml.sample`.
 Replace the configuration variables with the appropriate configurations for
 you environment.
 
-Install the required python dependencies (preferably in a virtual environment):
+Install the environment:
+> [!NOTE]
+> For Windows hosts: as of writing, the [msgraph-python-sdk has the following note](https://github.com/microsoftgraph/msgraph-sdk-python/blob/65d88850202e9ea75477583e76e75dfbf6d75859/README.md#1-installation):
+> > * The Microsoft Graph SDK for Python is a fairly large package. It may take a few minutes for the initial installation to complete.
+> > * Enable long paths in your environment if you receive a Could not install packages due to an OSError. For details, see [Enable Long Paths in Windows 10, Version 1607, and Later](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell#enable-long-paths-in-windows-10-version-1607-and-later).
+> 
+> Follow these instructions if not already enabled on your system.
 
+**Production**:
 ```shell
-pip3 install -r requirements.txt
+# production environment
+poetry install --extras prod
+```
+
+**Development** (note that you should also clone the [pyobas](OpenBAS-Platform/client-python) repository [according to
+these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collector))
+```shell
+# development environment
+poetry install --extras dev
 ```
 
 Then, start the collector:
 
 ```shell
-python3 openbas_microsoft_defender.py
+poetry run python -m microsoft_defender.openbas_microsoft_defender
 ```
 
 ## Behavior

@@ -1,17 +1,21 @@
-FROM python:3.13-alpine
+FROM python:3.13-alpine AS builder
 
-# Copy the collector
-COPY src /opt/openbas-collector-microsoft-sentinel
+# poetry version available on Ubuntu 24.04
+RUN pip3 install poetry==2.1.3
 
-# Install Python modules
-# hadolint ignore=DL3003
-RUN apk update && apk upgrade && \
-    apk --no-cache add git build-base libmagic libffi-dev libxslt libxslt-dev libxml2 libxml2-dev && \
-    cd /opt/openbas-collector-microsoft-sentinel && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    apk del git build-base
+RUN apk update && apk upgrade
 
-# Expose and entrypoint
-COPY start.sh /
-RUN chmod +x /start.sh
-ENTRYPOINT ["/start.sh"]
+ARG installdir=/collector
+ADD . ${installdir}
+RUN cd ${installdir} && poetry build
+
+FROM python:3.13-alpine AS runner
+
+ARG installdir=/collector
+COPY --from=builder ${installdir} ${installdir}
+RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[prod]"
+
+# necessary for icon location
+WORKDIR ${installdir}
+
+CMD ["python3", "-m", "microsoft_sentinel.openbas_microsoft_sentinel"]

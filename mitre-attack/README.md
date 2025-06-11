@@ -64,16 +64,25 @@ Create a file `config.yml` based on the provided `config.yml.sample`.
 Replace the configuration variables with the appropriate configurations for
 you environment.
 
-Install the required python dependencies (preferably in a virtual environment):
+Install the environment:
 
+**Production**:
 ```shell
-pip3 install -r requirements.txt
+# production environment
+poetry install --extras prod
+```
+
+**Development** (note that you should also clone the [pyobas](OpenBAS-Platform/client-python) repository [according to
+these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collector))
+```shell
+# development environment
+poetry install --extras dev
 ```
 
 Then, start the collector:
 
 ```shell
-python3 openbas_mitre_attack.py
+poetry run python -m mitre_attack.openbas_mitre_attack
 ```
 
 ## Behavior

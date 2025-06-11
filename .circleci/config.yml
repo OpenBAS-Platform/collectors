@@ -46,14 +46,22 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          working_directory: ~/
+          name: Clone pyobas
+          command: git clone -b release/current https://github.com/OpenBAS-Platform/client-python
+      - run:
           working_directory: ~/openbas/crowdstrike
-          name: Install dependencies for crowdstrike collector
-          command: pip install -r requirements.txt
+          name: Install poetry
+          command: pip install poetry==2.1.3 && poetry config installer.re-resolve false
+      - run:
+          working_directory: ~/openbas/crowdstrike
+          name: install crowdstrike
+          command: poetry install --extras ci
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Tests for crowdstrike collector
-          command: python -m unittest
-  build_1:
+          command: poetry run python -m unittest
+  build_docker_images:
     working_directory: ~/openbas
     docker:
       - image: cimg/base:stable-20.04
@@ -63,183 +71,138 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: sudo apt-get update -qq && sudo apt install curl gettext-base
+      - run:
+          name: Install environment
+          command: |
+            sudo apt-get update -qq
+            sudo apt install curl gettext-base
+            mkdir -p ~/openbas/images
+      - run:
+          working_directory: ~/openbas
+          name: Replace pyobas requirement of stable version with latest release branch code
+          # We safely expand the CIRCLE_BRANCH variable because the CircleCI filters already enforce a strict release/x.x.x pattern using regex
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "main" ]; then
+              find . -name pyproject.toml | xargs -I ___ sed "s|branch = 'release/current'|branch = '${CIRCLE_BRANCH}'|" -i ___;
+            fi;
       - run:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
-            TAGS="-t openbas/collector-mitre-attack:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-mitre-attack:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-mitre-attack:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-mitre-attack openbas/collector-mitre-attack:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
           command: |
-            TAGS="-t openbas/collector-microsoft-entra:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-microsoft-entra:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-entra:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-microsoft-entra openbas/collector-microsoft-entra:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
           command: |
-            TAGS="-t openbas/collector-tanium-threat-response:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-tanium-threat-response:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-tanium-threat-response:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-tanium-threat-response openbas/collector-tanium-threat-response:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
           command: |
-            TAGS="-t openbas/collector-microsoft-defender:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-microsoft-defender:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-defender:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-microsoft-defender openbas/collector-microsoft-defender:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: |
-            TAGS="-t openbas/collector-microsoft-sentinel:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-microsoft-sentinel:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-sentinel:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-microsoft-sentinel openbas/collector-microsoft-sentinel:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
           command: |
-            TAGS="-t openbas/collector-atomic-red-team:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-atomic-red-team:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-atomic-red-team:latest"
             docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-atomic-red-team openbas/collector-atomic-red-team:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Build Docker image openbas/collector-crowdstrike
           command: |
-            TAGS="-t openbas/collector-crowdstrike:${CIRCLE_TAG}"
+            TAGS="-t openbas/collector-crowdstrike:${CIRCLE_SHA1}"
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-crowdstrike:latest"
             docker build --progress=plain $TAGS .
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            $IS_LATEST && docker push openbas/collector-mitre-attack:latest
-            docker push openbas/collector-mitre-attack:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-microsoft-entra:latest
-            docker push openbas/collector-microsoft-entra:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-tanium-threat-response:latest
-            docker push openbas/collector-tanium-threat-response:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-microsoft-defender:latest
-            docker push openbas/collector-microsoft-defender:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-microsoft-sentinel:latest
-            docker push openbas/collector-microsoft-sentinel:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-atomic-red-team:latest
-            docker push openbas/collector-atomic-red-team:${CIRCLE_TAG}
-            $IS_LATEST && docker push openbas/collector-crowdstrike:latest
-            docker push openbas/collector-crowdstrike:${CIRCLE_TAG}
+            docker save -o ~/openbas/images/collector-crowdstrike openbas/collector-crowdstrike:${CIRCLE_SHA1}
+      - persist_to_workspace:
+          root: ~/openbas
+          paths:
+            - images
       - slack/notify:
           event: fail
           template: basic_fail_1
-  build_rolling_1:
+  publish_images:
     working_directory: ~/openbas
     docker:
       - image: cimg/base:stable-20.04
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
       - setup_remote_docker
-      - run: sudo apt-get update -qq && sudo apt install curl gettext-base
       - run:
-         working_directory: ~/openbas
-         name: Replace pyobas requirement of stable version with latest main branch code
-         command: find . -name requirements.txt -exec sed 's|^pyobas==.*$|pyobas @ git+https://github.com/OpenBAS-Platform/client-python@main|' -i {} \;
+          working_directory: ~/openbas/images
+          name: Fix tag name
+          command: |
+            if [ "${CIRCLE_TAG}" != "" ]
+            then
+              export IMAGETAG=${CIRCLE_TAG}
+            elif [ "${CIRCLE_BRANCH}" = "main" ]
+            then
+              export IMAGETAG="rolling"
+            elif [ "${CIRCLE_BRANCH}" = "release/current" ]
+            then
+              export IMAGETAG="prerelease"
+            else
+              echo "No tag supplied or branch is neither 'main' nor 'release/current' (was: '${CIRCLE_BRANCH}')"
+              exit 1
+            fi
+            echo "Image tag: ${IMAGETAG}"
       - run:
-          working_directory: ~/openbas/mitre-attack
-          name: Build Docker image openbas/collector-mitre-attack
-          command: docker build --progress=plain -t openbas/collector-mitre-attack:rolling .
-      - run:
-          working_directory: ~/openbas/microsoft-entra
-          name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build --progress=plain -t openbas/collector-microsoft-entra:rolling .
-      - run:
-          working_directory: ~/openbas/tanium-threat-response
-          name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:rolling .
-      - run:
-          working_directory: ~/openbas/microsoft-defender
-          name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build --progress=plain -t openbas/collector-microsoft-defender:rolling .
-      - run:
-          working_directory: ~/openbas/microsoft-sentinel
-          name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:rolling .
-      - run:
-          working_directory: ~/openbas/atomic-red-team
-          name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build --progress=plain -t openbas/collector-atomic-red-team:rolling .
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Build Docker image openbas/collector-crowdstrike
-          command: docker build --progress=plain -t openbas/collector-crowdstrike:rolling .
+          working_directory: ~/openbas/images
+          name: Restore saved images
+          command: |
+            docker image load < collector-mitre-attack
+            docker tag openbas/collector-mitre-attack:${CIRCLE_SHA1} openbas/collector-mitre-attack:${IMAGETAG}
+            docker image load < collector-microsoft-entra
+            docker tag openbas/collector-microsoft-entra:${CIRCLE_SHA1} openbas/collector-microsoft-entra:${IMAGETAG}
+            docker image load < collector-tanium-threat-response
+            docker tag openbas/collector-tanium-threat-response:${CIRCLE_SHA1} openbas/collector-tanium-threat-response:${IMAGETAG}
+            docker image load < collector-microsoft-defender
+            docker tag openbas/collector-microsoft-defender:${CIRCLE_SHA1} openbas/collector-microsoft-defender:${IMAGETAG}
+            docker image load < collector-microsoft-sentinel
+            docker tag openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} openbas/collector-microsoft-sentinel:${IMAGETAG}
+            docker image load < collector-atomic-red-team
+            docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:${IMAGETAG}
+            docker image load < collector-crowdstrike
+            docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:${IMAGETAG}
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push openbas/collector-mitre-attack:rolling
-            docker push openbas/collector-microsoft-entra:rolling
-            docker push openbas/collector-tanium-threat-response:rolling
-            docker push openbas/collector-microsoft-defender:rolling
-            docker push openbas/collector-microsoft-sentinel:rolling
-            docker push openbas/collector-atomic-red-team:rolling
-            docker push openbas/collector-crowdstrike:rolling
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
-  build_prerelease_1:
-    working_directory: ~/openbas
-    docker:
-      - image: cimg/base:stable-20.04
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: sudo apt-get update -qq && sudo apt install curl gettext-base
-      - run:
-         working_directory: ~/openbas
-         name: Replace pyobas requirement of stable version with latest release branch code
-         # We safely expand the CIRCLE_BRANCH variable because the CircleCI filters already enforce a strict release/x.x.x pattern using regex
-         command: find . -name requirements.txt -exec sed "s|^pyobas==.*$|pyobas @ git+https://github.com/OpenBAS-Platform/client-python@${CIRCLE_BRANCH}|" -i {} \;
-      - run:
-          working_directory: ~/openbas/mitre-attack
-          name: Build Docker image openbas/collector-mitre-attack
-          command: docker build --progress=plain -t openbas/collector-mitre-attack:prerelease .
-      - run:
-          working_directory: ~/openbas/microsoft-entra
-          name: Build Docker image openbas/collector-microsoft-entra
-          command: docker build --progress=plain -t openbas/collector-microsoft-entra:prerelease .
-      - run:
-          working_directory: ~/openbas/tanium-threat-response
-          name: Build Docker image openbas/collector-tanium-threat-response
-          command: docker build --progress=plain -t openbas/collector-tanium-threat-response:prerelease .
-      - run:
-          working_directory: ~/openbas/microsoft-defender
-          name: Build Docker image openbas/collector-microsoft-defender
-          command: docker build --progress=plain -t openbas/collector-microsoft-defender:prerelease .
-      - run:
-          working_directory: ~/openbas/microsoft-sentinel
-          name: Build Docker image openbas/collector-microsoft-sentinel
-          command: docker build --progress=plain -t openbas/collector-microsoft-sentinel:prerelease .
-      - run:
-          working_directory: ~/openbas/atomic-red-team
-          name: Build Docker image openbas/collector-atomic-red-team
-          command: docker build --progress=plain -t openbas/collector-atomic-red-team:prerelease .
-      - run:
-          working_directory: ~/openbas/crowdstrike
-          name: Build Docker image openbas/collector-crowdstrike
-          command: docker build --progress=plain -t openbas/collector-crowdstrike:prerelease .
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push openbas/collector-mitre-attack:prerelease
-            docker push openbas/collector-microsoft-entra:prerelease
-            docker push openbas/collector-tanium-threat-response:prerelease
-            docker push openbas/collector-microsoft-defender:prerelease
-            docker push openbas/collector-microsoft-sentinel:prerelease
-            docker push openbas/collector-atomic-red-team:prerelease
-            docker push openbas/collector-crowdstrike:prerelease
+            docker push openbas/collector-mitre-attack:${IMAGETAG}
+            docker push openbas/collector-microsoft-entra:${IMAGETAG}
+            docker push openbas/collector-tanium-threat-response:${IMAGETAG}
+            docker push openbas/collector-microsoft-defender:${IMAGETAG}
+            docker push openbas/collector-microsoft-sentinel:${IMAGETAG}
+            docker push openbas/collector-atomic-red-team:${IMAGETAG}
+            docker push openbas/collector-crowdstrike:${IMAGETAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -280,41 +243,40 @@ workflows:
       - ensure_formatting
       - linter
       - test
-      - build_1:
+      - build_docker_images:
+          requires:
+            - ensure_formatting
+            - linter
+            - test
+      - publish_images:
+          requires:
+            - build_docker_images
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
-      - build_rolling_1:
-          requires:
-            - ensure_formatting
-            - linter
-          filters:
-            branches:
-              only:
-                - main
-      - build_prerelease_1:
-          requires:
-            - ensure_formatting
-            - linter
-          filters:
-            branches:
               only:
                 - release/current
+                - main
       - deploy_testing:
           requires:
-            - build_rolling_1
+            - publish_images
+          filters:
+            branches:
+              only: main
       - deploy_prerelease:
           requires:
-            - build_prerelease_1
+            - publish_images
+          filters:
+            branches:
+              only: release/current
       - notify_rolling:
           requires:
             - deploy_testing
             - deploy_prerelease
       - notify:
           requires:
-            - build_1
+            - build_docker_images
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/

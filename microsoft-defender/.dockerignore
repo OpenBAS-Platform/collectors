@@ -1,3 +1,4 @@
 config.yml
-src/__pycache__
+microsoft_defender/__pycache__
 __pycache__
+dist

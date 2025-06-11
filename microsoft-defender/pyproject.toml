@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "openbas-microsoft-defender-collector"
+version = "1.17.0"
+description = "A Collector for the Microsoft Defender security software"
+authors = ["Filigran <contact@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "microsoft_defender" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = [
+    { markers = "extra == 'prod' and extra != 'dev' and extra != 'ci'", version = "1.17.0", source = "pypi"  },
+    { markers = "extra == 'dev' and extra != 'prod' and extra != 'ci'", path = "../../client-python", develop = true },
+    { markers = "extra == 'ci' and extra != 'prod' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
+]
+msgraph-sdk = "1.31.0"
+msal = "1.32.3"
+
+[tool.poetry.extras]
+prod = []
+dev = []
+ci = []
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
