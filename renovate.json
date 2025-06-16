@@ -1,31 +1,46 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "labels": [
     "dependencies",
     "filigran team"
   ],
   "prConcurrentLimit": 2,
-  "baseBranches": ["release/current", "main"],
+  "baseBranches": [
+    "release/current",
+    "main"
+  ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor"],
+      "matchUpdateTypes": [
+        "minor"
+      ],
       "prPriority": 5
     },
     {
-      "matchBaseBranches": ["release/current"],
+      "matchBaseBranches": [
+        "release/current"
+      ],
       "commitMessageSuffix": null
     },
     {
-      "matchJsonata": ["$exists(isVulnerabilityAlert)"],
-      "matchBaseBranches": ["release/current"],
+      "matchJsonata": [
+        "$exists(isVulnerabilityAlert)"
+      ],
+      "matchBaseBranches": [
+        "release/current"
+      ],
       "enabled": false
     },
     {
-      "matchJsonata": ["$not($exists(isVulnerabilityAlert))"],
-      "matchBaseBranches": ["main"],
+      "matchJsonata": [
+        "$not($exists(isVulnerabilityAlert))"
+      ],
+      "matchBaseBranches": [
+        "main"
+      ],
       "enabled": false
     }
   ]
