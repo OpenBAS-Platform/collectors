@@ -1,0 +1,15 @@
+openbas:
+  url: "http://OPENBAS_URL:OPENBAS_PORT"  # Required
+  token: "ChangeMe"  # Required
+
+collector:
+  id: "ChangeMe"  # Required
+  # name: "Splunk ES"  # Optional
+  # period: 60  # Optional
+  # log_level: "error"  # Optional
+
+splunk:
+  base_url: "http://SPLUNK_ES_URL:SPLUNK_ES_PORT"  # Required
+  username: "ChangeMe"  # Required
+  password: "ChangeMe"  # Required
+  # index: "ChangeMe"  # Optional
