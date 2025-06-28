@@ -1,5 +1,4 @@
 import requests
-
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 
@@ -53,7 +52,8 @@ class OpenBASOpenBAS:
 
     def _process_message(self) -> None:
         manifest_url = self.config.get_conf(
-            "openbas_manifest_url", default="https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/manifest.json"
+            "openbas_manifest_url",
+            default="https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/manifest.json",
         )
         response = self.session.get(url=manifest_url)
         payloads = response.json()
