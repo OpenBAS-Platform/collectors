@@ -115,7 +115,7 @@ attrs = ">=17.3.0"
 frozenlist = ">=1.1.1"
 multidict = ">=4.5,<7.0"
 propcache = ">=0.2.0"
-yarl = ">=1.17.0,<2.0"
+yarl = ">=1.17.2,<2.0"
 
 [package.extras]
 speedups = ["Brotli ; platform_python_implementation == \"CPython\"", "aiodns (>=3.3.0)", "brotlicffi ; platform_python_implementation != \"CPython\""]
@@ -1171,7 +1171,7 @@ files = [
 
 [[package]]
 name = "openbas-atomic-red-team-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for fetching Atomic Red Team payloads; https://www.atomicredteam.io/"
 optional = false
 python-versions = "^3.11"
@@ -1190,7 +1190,7 @@ url = "atomic-red-team"
 
 [[package]]
 name = "openbas-crowdstrike-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "Collector for Crowdstrike Falcon"
 optional = false
 python-versions = "^3.11"
@@ -1213,7 +1213,7 @@ url = "crowdstrike"
 
 [[package]]
 name = "openbas-microsoft-defender-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for the Microsoft Defender security software"
 optional = false
 python-versions = "^3.11"
@@ -1236,7 +1236,7 @@ url = "microsoft-defender"
 
 [[package]]
 name = "openbas-microsoft-entra-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for Microsoft Entra asset management system"
 optional = false
 python-versions = "^3.11"
@@ -1258,7 +1258,7 @@ url = "microsoft-entra"
 
 [[package]]
 name = "openbas-microsoft-sentinel-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for Microsoft Sentinel SIEM solution"
 optional = false
 python-versions = "^3.11"
@@ -1280,7 +1280,7 @@ url = "microsoft-sentinel"
 
 [[package]]
 name = "openbas-mitre-attack-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for fetching MITRE ATT&CK taxonomies; https://attack.mitre.org/"
 optional = false
 python-versions = "^3.11"
@@ -1298,7 +1298,7 @@ url = "mitre-attack"
 
 [[package]]
 name = "openbas-tanium-threat-response-collector"
-version = "1.17.0"
+version = "1.17.2"
 description = "A Collector for Tanium Threat Response security suite"
 optional = false
 python-versions = "^3.11"
@@ -1692,15 +1692,15 @@ tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pyobas"
-version = "1.17.0"
+version = "1.17.2"
 description = "Python API client for OpenBAS."
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
 markers = "extra != \"dev\" and extra != \"ci\""
 files = [
-    {file = "pyobas-1.17.0-py3-none-any.whl", hash = "sha256:c000eac823d793dff9273b4da26859af66cbb5309c251062ee8b240de9d9d7a2"},
-    {file = "pyobas-1.17.0.tar.gz", hash = "sha256:54383f993854599ad62473e199d8961d1c52c14137342930b9a74bc8a5bc7979"},
+    {file = "pyobas-1.17.2-py3-none-any.whl", hash = "sha256:c000eac823d793dff9273b4da26859af66cbb5309c251062ee8b240de9d9d7a2"},
+    {file = "pyobas-1.17.2.tar.gz", hash = "sha256:54383f993854599ad62473e199d8961d1c52c14137342930b9a74bc8a5bc7979"},
 ]
 
 [package.dependencies]
@@ -1727,7 +1727,7 @@ doc = ["autoapi (>=2.0.1,<2.1.0)", "sphinx-autodoc-typehints (>=3.2.0,<3.3.0)", 
 
 [[package]]
 name = "pyobas"
-version = "1.17.0"
+version = "1.17.2"
 description = "Python API client for OpenBAS."
 optional = true
 python-versions = ">=3.11"
@@ -1764,7 +1764,7 @@ url = "../client-python"
 
 [[package]]
 name = "pyobas"
-version = "1.17.0"
+version = "1.17.2"
 description = "Python API client for OpenBAS."
 optional = true
 python-versions = ">=3.7"
@@ -2211,14 +2211,14 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "six"
-version = "1.17.0"
+version = "1.17.2"
 description = "Python 2 and 3 compatibility utilities"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 groups = ["main"]
 files = [
-    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
-    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
+    {file = "six-1.17.2-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.2.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
 
 [[package]]
