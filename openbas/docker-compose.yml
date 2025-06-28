@@ -1,0 +1,11 @@
+version: '3'
+services:
+  collector-openbas:
+    image: openbas/collector-openbas:1.17.0
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - "COLLECTOR_NAME=OpenBAS Datasets"
+      - COLLECTOR_LOG_LEVEL=error
+    restart: always

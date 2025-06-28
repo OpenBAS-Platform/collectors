@@ -141,6 +141,14 @@ jobs:
             $IS_LATEST && TAGS="$TAGS -t openbas/collector-crowdstrike:latest"
             docker build --progress=plain $TAGS .
             docker save -o ~/openbas/images/collector-crowdstrike openbas/collector-crowdstrike:${CIRCLE_SHA1}
+      - run:
+          working_directory: ~/openbas/openbas
+          name: Build Docker image openbas/collector-openbas
+          command: |
+            TAGS="-t openbas/collector-openbas:${CIRCLE_SHA1}"
+            $IS_LATEST && TAGS="$TAGS -t openbas/collector-openbas:latest"
+            docker build --progress=plain $TAGS .
+            docker save -o ~/openbas/images/collector-openbas openbas/collector-openbas:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
           paths:
@@ -189,6 +197,8 @@ jobs:
             docker tag openbas/collector-atomic-red-team:${CIRCLE_SHA1} openbas/collector-atomic-red-team:${IMAGETAG}
             docker image load < collector-crowdstrike
             docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:${IMAGETAG}
+            docker image load < collector-openbas
+            docker tag openbas/collector-openbas:${CIRCLE_SHA1} openbas/collector-openbas:${IMAGETAG}
 
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:${IMAGETAG}
@@ -198,6 +208,7 @@ jobs:
             docker push openbas/collector-microsoft-sentinel:${IMAGETAG}
             docker push openbas/collector-atomic-red-team:${IMAGETAG}
             docker push openbas/collector-crowdstrike:${IMAGETAG}
+            docker push openbas/collector-openbas:${IMAGETAG}
       - slack/notify:
           event: fail
           template: basic_fail_1
