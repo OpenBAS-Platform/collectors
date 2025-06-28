@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-microsoft-defender:
-    image: openbas/collector-microsoft-defender:1.17.0
+    image: openbas/collector-microsoft-defender:1.17.2
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
