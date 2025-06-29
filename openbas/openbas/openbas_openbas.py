@@ -139,6 +139,9 @@ class OpenBASOpenBAS:
 
             self.helper.api.payload.upsert(payload_information)
             payload_external_ids.append(payload_information["payload_external_id"])
+            self.helper.collector_logger.info(
+                "Payload " + payload_information["payload_name"] + " imported"
+            )
 
         self.helper.api.payload.deprecate(
             {
