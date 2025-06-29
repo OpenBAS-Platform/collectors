@@ -1,3 +1,7 @@
+import io
+import mimetypes
+import zipfile
+
 import requests
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
@@ -40,9 +44,9 @@ class OpenBASOpenBAS:
                     "default": 604800,
                 },
                 # OpenBAS Datasets
-                "openbas_manifest_url": {
-                    "env": "OPENBAS_MANIFEST_URL",
-                    "file_path": ["openbas", "manifest_url"],
+                "openbas_generated_url_prefix": {
+                    "env": "OPENBAS_URL_PREFIX",
+                    "file_path": ["openbas", "url_prefix"],
                 },
             },
         )
@@ -51,22 +55,91 @@ class OpenBASOpenBAS:
         )
 
     def _process_message(self) -> None:
-        manifest_url = self.config.get_conf(
-            "openbas_manifest_url",
-            default="https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/manifest.json",
+        openbas_url_prefix = self.config.get_conf(
+            "openbas_url_prefix",
+            default="https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/",
         )
-        response = self.session.get(url=manifest_url)
+        response = self.session.get(url=openbas_url_prefix + "manifest.json")
         payloads = response.json()
         payload_external_ids = []
 
         for payload in payloads:
+            payload_information = payload.get("payload_information")
             self.helper.collector_logger.info(
-                "Importing payload " + payload["payload_name"]
+                "Importing payload " + payload_information["payload_name"]
             )
-            payload["payload_collector"] = self.helper.config.get("collector_id")
 
-            self.helper.api.payload.upsert(payload)
-            payload_external_ids.append(payload["payload_external_id"])
+            # Create tags
+            tags_mapping = {}
+            tags = payload.get("payload_tags", [])
+            for tag in tags:
+                new_tag = self.helper.api.tag.upsert(tag)
+                tags_mapping[tag["tag_id"]] = new_tag["tag_id"]
+
+            # Create attack patterns
+            attack_patterns = payload.get("payload_attack_patterns", [])
+            if len(attack_patterns) > 0:
+                self.helper.api.attack_pattern.upsert(attack_patterns, True)
+
+            # Create document
+            new_document = None
+            document = payload.get("payload_document", None)
+            if document is not None and "document_path" in document:
+                # Upload the document
+                new_tags = []
+                for tag_id in document.get("document_tags", []):
+                    if tag_id in tags_mapping:
+                        new_tags.append(tags_mapping[tag_id])
+                document["document_tags"] = new_tags
+
+                zip_url = openbas_url_prefix + document["document_path"]
+                zip_response = self.session.get(zip_url)
+                zip_response.raise_for_status()
+                with io.BytesIO(zip_response.content) as zip_buffer:
+                    with zipfile.ZipFile(zip_buffer) as z:
+                        file_names = z.namelist()
+                        if not file_names:
+                            raise Exception(f"No file found in zip at {zip_url}")
+                        file_name = file_names[0]
+                        with z.open(file_name, pwd=b"infected") as unzipped_file:
+                            file_content = unzipped_file.read()
+                            mime_type, _ = mimetypes.guess_type(
+                                document["document_name"]
+                            )
+                            if mime_type is None:
+                                mime_type = "application/octet-stream"
+                            file_handle = io.BytesIO(file_content)
+                            file = (document["document_name"], file_handle, mime_type)
+                            new_document = self.helper.api.document.upsert(
+                                document=document, file=file
+                            )
+
+            # Upsert payload
+            payload_information["payload_collector"] = self.helper.config.get(
+                "collector_id"
+            )
+
+            new_tags = []
+            for tag_id in payload_information.get("payload_tags", []):
+                if tag_id in tags_mapping:
+                    new_tags.append(tags_mapping[tag_id])
+            payload_information["payload_tags"] = new_tags
+
+            new_attack_patterns = []
+            for attack_pattern in payload_information.get(
+                "payload_attack_patterns", []
+            ):
+                new_attack_patterns.append(attack_pattern["attack_pattern_external_id"])
+            payload_information["payload_attack_patterns"] = new_attack_patterns
+
+            if "executable_file" in payload_information and new_document is not None:
+                payload_information["executable_file"] = new_document["document_id"]
+            elif "file_drop_file" in payload_information and new_document is not None:
+                payload_information["file_drop_file"] = new_document["document_id"]
+
+            self.helper.api.payload.upsert(payload_information)
+            payload_external_ids.append(payload_information["payload_external_id"])
+
         self.helper.api.payload.deprecate(
             {
                 "collector_id": self.helper.config.get("collector_id"),
