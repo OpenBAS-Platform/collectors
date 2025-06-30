@@ -1,0 +1,12 @@
+version: '3'
+services:
+  collector-splunk-es:
+    image: openbas/collector-splunk-es:1.17.0
+    environment:
+      - OPENBAS_URL=http://localhost
+      - OPENBAS_TOKEN=ChangeMe
+      - COLLECTOR_ID=ChangeMe
+      - COLLECTOR_NAME=Splunk ES
+      - COLLECTOR_LOG_LEVEL=error
+      - COLLECTOR_PLATFORM=SIEM
+    restart: always
