@@ -7,7 +7,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
-dependencies = []
+dependencies = ["requests"]
 
 [tool.poetry]
 packages = [{include = "splunk_es"}]

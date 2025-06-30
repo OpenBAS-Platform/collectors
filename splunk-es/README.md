@@ -1,118 +1,115 @@
-# OpenAEV Splunk ES Collector
+# OpenBAS Splunk ES Collector
 
-A collector module for fetching detection alerts from **Splunk Enterprise Security (ES)** and reconciling them against OpenAEV expectations.
+The Splunk Enterprise Security collector for OpenBAS.
 
-**Note**: This collector assumes access to a working Splunk ES instance with alert-generating content, and requires the OpenAEV platform to be already configured. Expectation results are updated based on matching alert activity.
+**Note**: Requires access to a Splunk Enterprise Security instance with appropriate search permissions.
 
----
+## Overview
+
+This collector validates OpenBAS exercise expectations by querying your Splunk ES environment for matching security alerts. When OpenBAS runs security exercises, this collector automatically checks if the expected security alerts were actually generated in your SIEM, providing visibility into your detection capabilities.
 
 ## Installation
 
-Grab the repo and enter the collector directory:
-
-```bash
-git clone https://github.com/OpenBAS-Platform/collectors
-cd ./collectors/splunk_es
+Get a local copy
+```commandline
+git checkout https://github.com/OpenBAS-Platform/collectors
+cd ./collectors/splunk-es
 ```
 
-Install dependencies via Poetry:
-
-**Production**:
-
-```bash
+Install the environment:
+```shell
 poetry install --extras prod
 ```
 
-**Development** (also clone [pyoaev](OpenBAS-Platform/client-python) as instructed [here](../README.md#simultaneous-development-on-pyobas-and-a-collector)):
-
-```bash
-poetry install --extras dev
-```
-
----
-
 ## Usage
-
-Run the collector manually:
-
-```bash'
+```commandline
 poetry run python -m splunk_es.openaev_splunk_es
 ```
 
----
-
 ## Configuration
 
-Configure via YAML or environment variables. Here’s what you’re wiring up:
+The collector can be configured with the following variables:
 
-| Config Parameter      | Docker env var        | Default     | Required | Description                                                |
-|-----------------------|-----------------------|-------------|----------|------------------------------------------------------------|
-| `openbas.url`         | `OPENBAS_URL`         |             | Yes      | URL of the OpenAEV backend                                 |
-| `openbas.token`       | `OPENBAS_TOKEN`       |             | Yes      | OpenAEV authentication token                               |
-| `collector.id`        | `COLLECTOR_ID`        |             | Yes      | Unique identifier for this collector instance              |
-| `collector.name`      | `COLLECTOR_NAME`      | `Splunk ES` | No       | Display name for the collector in UI                       |
-| `collector.period`    | `COLLECTOR_PERIOD`    | `60`        | No       | Collection run frequency (seconds)                         |
-| `collector.log_level` | `COLLECTOR_LOG_LEVEL` | `error`     | No       | Logging level (e.g., debug, info, warning, error)          |
-| `splunk.base_url`     | `SPLUNK_BASE_URL`     |             | Yes      | Base URL for the Splunk Management API (usually port 8089) |
-| `splunk.username`     | `SPLUNK_USERNAME`     |             | Yes      | Splunk API username                                        |
-| `splunk.password`     | `SPLUNK_PASSWORD`     | `           | Yes      | Splunk API password                                        |
-| `splunk.index`        | `SPLUNK_INDEX`        |             | No       | Splunk Index if any                                        |
+| Config Parameter              | Docker env var              | Default               | Description                                                                                 |
+|-------------------------------|-----------------------------|-----------------------|---------------------------------------------------------------------------------------------|
+| `openbas`.`url`               | `OPENBAS_URL`               |                       | The URL to the OpenBAS instance                                                             |
+| `openbas`.`token`             | `OPENBAS_TOKEN`             |                       | The auth token to the OpenBAS instance                                                      |
+| `collector`.`id`              | `COLLECTOR_ID`              |                       | Unique ID of the running collector instance                                                 |
+| `collector`.`name`            | `COLLECTOR_NAME`            | `Splunk ES Collector` | Name of the collector (visible in UI)                                                       |
+| `collector`.`type`            | `COLLECTOR_TYPE`            | `openaev_splunk_es`   | Type of the collector                                                                       |
+| `collector`.`period`          | `COLLECTOR_PERIOD`          | 60                    | Period for collection cycle (int, seconds)                                                  |
+| `collector`.`log_level`       | `COLLECTOR_LOG_LEVEL`       | `error`               | Threshold for log severity in console output                                                |
+| `splunk`.`base_url`           | `SPLUNK_BASE_URL`           |                       | The base URL for the Splunk ES instance (e.g., `http://splunk:8089`)                        |
+| `splunk`.`username`           | `SPLUNK_USERNAME`           |                       | The Splunk username with search permissions                                                 |
+| `splunk`.`password`           | `SPLUNK_PASSWORD`           |                       | The Splunk user password                                                                    |
 
+### Required Permissions
 
----
+The Splunk user must have:
+- `search` capability for running SPL queries
+- Access to the `notable` index to be able to retrieved Findings and Investigations.
+
+### Sample Configuration
+
+Create a `config.yml` file:
+
+```yaml
+openbas:
+  url: "http://your-openbas-server:3001"
+  token: "your-openbas-api-token"
+
+collector:
+  id: "your-unique-collector-id"
+  name: "Splunk ES Collector"
+  period: 60
+  log_level: "info"
+
+splunk:
+  base_url: "http://your-splunk-server:8089"
+  username: "your-splunk-username"
+  password: "your-splunk-password"
+```
 
 ## Behavior
 
-This collector syncs with OpenAEV to fetch pending expectations, queries Splunk ES for detection alerts, and updates OpenAEV accordingly. It operates in batched cycles.
+The collector validates OpenBAS expectations by querying Splunk Enterprise Security for matching security alerts based on IP signatures:
 
-### Process Flow (mermaid)
+1. **Fetches Expectations**: Retrieves unprocessed expectations from OpenBAS containing IP-based signatures
+2. **Queries Splunk ES**: Searches for security alerts matching the expected source and target IP addresses
+3. **Validates Results**: Compares found alerts against expectations within the specified time window
+4. **Reports Back**: Updates OpenBAS with validation results to show detection success/failure
 
-```mermaid
-flowchart TD
-    A[Collector run on OpenAEV] --> B[Wait for expectations via PyOAEV]
-    B --> C[Expectations received]
-    C --> D{Loop over expectations}
+This process runs continuously based on the configured collection period, providing real-time validation of your security detection capabilities during exercises.
 
-    D -->|Not useful| E[Expire expectation to skip - BadSignatureType, BadDetectionType]
-    D -->|Useful but not executed| F[Ignore until executed]
-        F --> D
-    D -->|Useful & Executed| G[Add to processing in batch]
+## Troubleshooting
 
-    G --> H[Craft global SPL query for batch expectations]
-    H --> I[Call Splunk ES API with the SPL]
-    I --> J[Iterate over alerts to format them as intended]
-    J --> K{Match alert to expectation via PyOAEV]
-    K -->|Alert found| L[Update expectation state to 'Detected' ]
-    K -->|Alert not found| M[Update expectation state to 'Not Detected' ]
+### Common Issues
 
-    L --> N{Check if last batch}
-        M --> N
-    N -->|Not last batch| P[Loop back to next batch]
-    P --> D
-    N -->|Last Batch| O[Wait for next run]
-    O --> A
-```
+**Connection Errors**
+- Verify `splunk.base_url` includes the management port (usually 8089)
+- Check network connectivity between collector and Splunk ES
+- Ensure Splunk ES is running and accessible
 
-Each expectation goes through a validation → filtering → batching → SPL query → result matching → state update pipeline.
-No alert? It’s `Not Detected`. Hit an alert? You got a `Detected`. Simple rules.
+**Authentication Failures**
+- Confirm `splunk.username` and `splunk.password` are correct
+- Verify the user account is active and not locked
+- Check that the user has the required search capabilities
 
----
+**No Expectations Found**
+- Ensure `collector.id` is registered in OpenBAS
+- Verify there are active exercises with IP-based expectations
+- Check that the collector is properly configured in OpenBAS
 
-## Development
+**Permission Denied**
+- Verify the Splunk user has `search` capability
+- Check index access permissions
 
-Run the test suite:
+### Logging
 
-```bash
-cd collectors/splunk_es
-poetry run python -m unittest
-```
+Set `log_level: debug` in your configuration for detailed troubleshooting information. The collector will log:
+- Connection status to OpenBAS and Splunk ES
+- Number of expectations processed
+- Query execution details
+- Any errors encountered during processing
 
----
-
-## Notes
-
-* Splunk credentials must have read access to the `alerts` index or equivalent.
-* Expectation parsing and signature validation is powered by **PyOAEV**.
-* Large batches will be split into multiple SPL queries if needed.
-
----
+For production environments, use `log_level: info` or `log_level: error` to reduce log volume.

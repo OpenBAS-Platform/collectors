@@ -12,4 +12,3 @@ splunk:
   base_url: "http://SPLUNK_ES_URL:SPLUNK_ES_PORT"  # Required
   username: "ChangeMe"  # Required
   password: "ChangeMe"  # Required
-  # index: "ChangeMe"  # Optional
