@@ -48,6 +48,10 @@ class OpenBASOpenBAS:
                     "env": "OPENBAS_URL_PREFIX",
                     "file_path": ["openbas", "url_prefix"],
                 },
+                "openbas_import_only_native": {
+                    "env": "OPENBAS_IMPORT_ONLY_NATIVE",
+                    "file_path": ["openbas", "import_only_native"],
+                },
             },
         )
         self.helper = OpenBASCollectorHelper(
@@ -55,6 +59,10 @@ class OpenBASOpenBAS:
         )
 
     def _process_message(self) -> None:
+        openbas_import_only_native = self.config.get_conf(
+            "openbas_import_only_native",
+            default=True,
+        )
         openbas_url_prefix = self.config.get_conf(
             "openbas_url_prefix",
             default="https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/",
@@ -64,6 +72,13 @@ class OpenBASOpenBAS:
         payload_external_ids = []
 
         for payload in payloads:
+
+            # Only native, continue
+            if openbas_import_only_native and (
+                "native_collection" not in payload or not payload["native_collection"]
+            ):
+                continue
+
             payload_information = payload.get("payload_information")
             self.helper.collector_logger.info(
                 "Importing payload " + payload_information["payload_name"]
