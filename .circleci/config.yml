@@ -65,9 +65,6 @@ jobs:
     working_directory: ~/openbas
     docker:
       - image: cimg/base:stable-20.04
-    environment:
-      LATEST_SEMANTIC_VERSION: $(git tag --sort=-v:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-      IS_LATEST: $([ "$CIRCLE_TAG" = "$LATEST_SEMANTIC_VERSION" ] && echo "true" || echo "false")
     steps:
       - checkout
       - setup_remote_docker
@@ -89,65 +86,49 @@ jobs:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
-            TAGS="-t openbas/collector-mitre-attack:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-mitre-attack:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-mitre-attack:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-mitre-attack openbas/collector-mitre-attack:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
           command: |
-            TAGS="-t openbas/collector-microsoft-entra:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-entra:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-microsoft-entra:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-microsoft-entra openbas/collector-microsoft-entra:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
           command: |
-            TAGS="-t openbas/collector-tanium-threat-response:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-tanium-threat-response:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-tanium-threat-response:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-tanium-threat-response openbas/collector-tanium-threat-response:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
           command: |
-            TAGS="-t openbas/collector-microsoft-defender:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-defender:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-microsoft-defender:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-microsoft-defender openbas/collector-microsoft-defender:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: |
-            TAGS="-t openbas/collector-microsoft-sentinel:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-microsoft-sentinel:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-microsoft-sentinel openbas/collector-microsoft-sentinel:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
           command: |
-            TAGS="-t openbas/collector-atomic-red-team:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-atomic-red-team:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-atomic-red-team:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-atomic-red-team openbas/collector-atomic-red-team:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Build Docker image openbas/collector-crowdstrike
           command: |
-            TAGS="-t openbas/collector-crowdstrike:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-crowdstrike:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-crowdstrike:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-crowdstrike openbas/collector-crowdstrike:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/openbas
           name: Build Docker image openbas/collector-openbas
           command: |
-            TAGS="-t openbas/collector-openbas:${CIRCLE_SHA1}"
-            $IS_LATEST && TAGS="$TAGS -t openbas/collector-openbas:latest"
-            docker build --progress=plain $TAGS .
+            docker build --progress=plain -t openbas/collector-openbas:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-openbas openbas/collector-openbas:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
@@ -161,6 +142,14 @@ jobs:
     docker:
       - image: cimg/base:stable-20.04
     steps:
+      - checkout
+      - run:
+          working_directory: ~/openbas
+          name: Set semantic version environment
+          command: |
+            export LATEST_SEMANTIC_VERSION=$(git tag --sort=-v:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+            export IS_LATEST=$([ "$CIRCLE_TAG" = "$LATEST_SEMANTIC_VERSION" ] && echo "true" || echo "false")
+            echo "IS_LATEST=$IS_LATEST" >> $BASH_ENV
       - attach_workspace:
           at: .
       - setup_remote_docker
@@ -209,6 +198,26 @@ jobs:
             docker push openbas/collector-atomic-red-team:${IMAGETAG}
             docker push openbas/collector-crowdstrike:${IMAGETAG}
             docker push openbas/collector-openbas:${IMAGETAG}
+
+            if [ "${IS_LATEST}" == "true" ]
+            then
+              docker tag openbas/collector-mitre-attack:${IMAGETAG} openbas/collector-mitre-attack:latest
+              docker tag openbas/collector-microsoft-entra:${IMAGETAG} openbas/collector-microsoft-entra:latest
+              docker tag openbas/collector-tanium-threat-response:${IMAGETAG} openbas/collector-tanium-threat-response:latest
+              docker tag openbas/collector-microsoft-defender:${IMAGETAG} openbas/collector-microsoft-defender:latest
+              docker tag openbas/collector-microsoft-sentinel:${IMAGETAG} openbas/collector-microsoft-sentinel:latest
+              docker tag openbas/collector-atomic-red-team:${IMAGETAG} openbas/collector-atomic-red-team:latest
+              docker tag openbas/collector-crowdstrike:${IMAGETAG} openbas/collector-crowdstrike:latest
+              docker tag openbas/collector-openbas:${IMAGETAG} openbas/collector-openbas:latest
+              docker push openbas/collector-mitre-attack:latest
+              docker push openbas/collector-microsoft-entra:latest
+              docker push openbas/collector-tanium-threat-response:latest
+              docker push openbas/collector-microsoft-defender:latest
+              docker push openbas/collector-microsoft-sentinel:latest
+              docker push openbas/collector-atomic-red-team:latest
+              docker push openbas/collector-crowdstrike:latest
+              docker push openbas/collector-openbas:latest
+            fi
       - slack/notify:
           event: fail
           template: basic_fail_1
