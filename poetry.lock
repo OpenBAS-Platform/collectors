@@ -1202,7 +1202,7 @@ files = [
 
 [[package]]
 name = "openbas-atomic-red-team-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for fetching Atomic Red Team payloads; https://www.atomicredteam.io/"
 optional = false
 python-versions = "^3.11"
@@ -1221,7 +1221,7 @@ url = "atomic-red-team"
 
 [[package]]
 name = "openbas-crowdstrike-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "Collector for Crowdstrike Falcon"
 optional = false
 python-versions = "^3.11"
@@ -1244,7 +1244,7 @@ url = "crowdstrike"
 
 [[package]]
 name = "openbas-microsoft-defender-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for the Microsoft Defender security software"
 optional = false
 python-versions = "^3.11"
@@ -1267,7 +1267,7 @@ url = "microsoft-defender"
 
 [[package]]
 name = "openbas-microsoft-entra-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for Microsoft Entra asset management system"
 optional = false
 python-versions = "^3.11"
@@ -1289,7 +1289,7 @@ url = "microsoft-entra"
 
 [[package]]
 name = "openbas-microsoft-sentinel-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for Microsoft Sentinel SIEM solution"
 optional = false
 python-versions = "^3.11"
@@ -1311,7 +1311,7 @@ url = "microsoft-sentinel"
 
 [[package]]
 name = "openbas-mitre-attack-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for fetching MITRE ATT&CK taxonomies; https://attack.mitre.org/"
 optional = false
 python-versions = "^3.11"
@@ -1330,7 +1330,7 @@ url = "mitre-attack"
 
 [[package]]
 name = "openbas-tanium-threat-response-collector"
-version = "1.17.3"
+version = "1.18.0"
 description = "A Collector for Tanium Threat Response security suite"
 optional = false
 python-versions = "^3.11"

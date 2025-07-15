@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-atomic-red-team:
-    image: openbas/collector-atomic-red-team:1.17.3
+    image: openbas/collector-atomic-red-team:1.18.0
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
