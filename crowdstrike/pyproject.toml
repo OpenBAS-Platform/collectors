@@ -18,7 +18,7 @@ pyobas = [
     { markers = "extra != 'ci-release/current' and extra != 'prod' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'main' },
 ]
 crowdstrike-falconpy = "1.5.2"
-pydantic = "2.11.3"
+pydantic = "2.11.7"
 
 [tool.poetry.extras]
 prod = []
