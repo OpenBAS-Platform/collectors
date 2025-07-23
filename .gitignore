@@ -135,4 +135,4 @@ dmypy.json
 cython_debug/
 
 # poetry.lock
-**/poetry.lock
+poetry.lock
