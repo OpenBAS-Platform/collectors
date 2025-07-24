@@ -281,6 +281,8 @@ workflows:
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
       - deploy_testing:
           requires:
             - publish_images
