@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "collectors"
-version = "1.18.0"
+version = "1.18.3"
 description = "A collection of Collectors for interfacing with security software"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"
