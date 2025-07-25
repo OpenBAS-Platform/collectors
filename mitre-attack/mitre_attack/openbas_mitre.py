@@ -120,6 +120,14 @@ class OpenBASMitre:
 
     def _process_message(self) -> None:
         response = self.session.get(url=ENTERPRISE_ATTACK_URI)
+
+        self.helper.collector_logger.debug(
+            str.format("Response headers: {}", response.headers)
+        )
+        self.helper.collector_logger.debug(
+            str.format("Response raw: {}", response.text[:200])
+        )
+
         enterprise_attack = response.json()
         objects = enterprise_attack.get("objects")
         tactics = []
