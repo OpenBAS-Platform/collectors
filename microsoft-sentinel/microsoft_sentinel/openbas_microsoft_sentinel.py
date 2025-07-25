@@ -176,34 +176,25 @@ class OpenBASMicrosoftSentinel:
 
     # --- PROCESS ---
 
-    def _is_expectation_filled(self, expectation) -> bool:
-        return any(
-            er.get("sourceId", "") == self.config.get_conf("collector_id")
-            for er in expectation["inject_expectation_results"]
-        )
-
     def _process_alerts(self):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
+        # Get expectation that are NOT FILLED for this collector
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id"),
-                self.scanning_delta,
+                self.config.get_conf("collector_id")
             )
         )
-        self.helper.collector_logger.debug(
-            "Total expectations returned: " + str(len(expectations))
-        )
-        expectations_not_filled = list(
-            filter(
-                lambda expectation: not self._is_expectation_filled(expectation),
-                expectations,
-            )
-        )
+
         self.helper.collector_logger.info(
-            "Found "
-            + str(len(expectations_not_filled))
-            + " expectations waiting to be matched"
+            "Found " + str(len(expectations)) + " expectations waiting to be matched"
         )
+
+        if not any(expectations):
+            self.helper.collector_logger.info(
+                "No expectations found: skipping iteration."
+            )
+            return
+
         limit_date = datetime.now().astimezone(pytz.UTC) - relativedelta(
             minutes=self.scanning_delta
         )
@@ -238,33 +229,31 @@ class OpenBASMicrosoftSentinel:
                     )
                 )
 
-            if expectation in expectations_not_filled:
-                # Check expired expectation
-                expectation_date = parse(
-                    expectation["inject_expectation_created_at"]
-                ).astimezone(pytz.UTC)
-                if expectation_date < limit_date:
-                    self.helper.collector_logger.info(
-                        "Expectation expired, failing inject "
-                        + expectation["inject_expectation_inject"]
-                        + " ("
-                        + expectation["inject_expectation_type"]
-                        + ")"
-                    )
-                    self.helper.api.inject_expectation.update(
-                        expectation["inject_expectation_id"],
-                        {
-                            "collector_id": self.config.get_conf("collector_id"),
-                            "result": (
-                                "Not Detected"
-                                if expectation["inject_expectation_type"] == "DETECTION"
-                                else "Not Prevented"
-                            ),
-                            "is_success": False,
-                        },
-                    )
-                    expectations_not_filled.remove(expectation)
-                    continue
+            # Check expired expectation
+            expectation_date = parse(
+                expectation["inject_expectation_created_at"]
+            ).astimezone(pytz.UTC)
+            if expectation_date < limit_date:
+                self.helper.collector_logger.info(
+                    "Expectation expired, failing inject "
+                    + expectation["inject_expectation_inject"]
+                    + " ("
+                    + expectation["inject_expectation_type"]
+                    + ")"
+                )
+                self.helper.api.inject_expectation.update(
+                    expectation["inject_expectation_id"],
+                    {
+                        "collector_id": self.config.get_conf("collector_id"),
+                        "result": (
+                            "Not Detected"
+                            if expectation["inject_expectation_type"] == "DETECTION"
+                            else "Not Prevented"
+                        ),
+                        "is_success": False,
+                    },
+                )
+                continue
 
             for alert in data["tables"][0]["rows"]:
                 alert_date = parse(
@@ -278,40 +267,38 @@ class OpenBASMicrosoftSentinel:
                         expectation,
                     )
                     if result is not False:
-                        if expectation in expectations_not_filled:
-                            self.helper.collector_logger.info(
-                                "Expectation matched, fulfilling expectation "
-                                + expectation["inject_expectation_inject"]
-                                + " ("
-                                + expectation["inject_expectation_type"]
-                                + ")"
+                        self.helper.collector_logger.info(
+                            "Expectation matched, fulfilling expectation "
+                            + expectation["inject_expectation_inject"]
+                            + " ("
+                            + expectation["inject_expectation_type"]
+                            + ")"
+                        )
+                        if expectation["inject_expectation_type"] == "DETECTION":
+                            self.helper.api.inject_expectation.update(
+                                expectation["inject_expectation_id"],
+                                {
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
+                                    "result": "Detected",
+                                    "is_success": True,
+                                },
                             )
-                            if expectation["inject_expectation_type"] == "DETECTION":
-                                self.helper.api.inject_expectation.update(
-                                    expectation["inject_expectation_id"],
-                                    {
-                                        "collector_id": self.config.get_conf(
-                                            "collector_id"
-                                        ),
-                                        "result": "Detected",
-                                        "is_success": True,
-                                    },
-                                )
-                            elif (
-                                expectation["inject_expectation_type"] == "PREVENTION"
-                                and result == "PREVENTED"
-                            ):
-                                self.helper.api.inject_expectation.update(
-                                    expectation["inject_expectation_id"],
-                                    {
-                                        "collector_id": self.config.get_conf(
-                                            "collector_id"
-                                        ),
-                                        "result": "Prevented",
-                                        "is_success": True,
-                                    },
-                                )
-                            expectations_not_filled.remove(expectation)
+                        elif (
+                            expectation["inject_expectation_type"] == "PREVENTION"
+                            and result == "PREVENTED"
+                        ):
+                            self.helper.api.inject_expectation.update(
+                                expectation["inject_expectation_id"],
+                                {
+                                    "collector_id": self.config.get_conf(
+                                        "collector_id"
+                                    ),
+                                    "result": "Prevented",
+                                    "is_success": True,
+                                },
+                            )
 
                         # Send alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                         self.helper.collector_logger.info(

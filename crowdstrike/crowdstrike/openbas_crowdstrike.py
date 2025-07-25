@@ -35,10 +35,10 @@ class OpenBASCrowdStrike:
 
     def _fetch_expectations(self, start_time):
         self.helper.collector_logger.info("Gathering expectations for executed injects")
+        # Get expectation that are NOT FILLED for this collector
         expectations = (
             self.helper.api.inject_expectation.expectations_assets_for_source(
-                self.config.get_conf("collector_id"),
-                self.scanning_delta,
+                self.config.get_conf("collector_id")
             )
         )
         self.helper.collector_logger.info(
@@ -100,12 +100,6 @@ class OpenBASCrowdStrike:
         self.helper.collector_logger.debug(
             "Total expectations returned: " + str(len(expectations))
         )
-        expectations_not_filled = list(
-            filter(
-                lambda expectation: not self._is_expectation_filled(expectation),
-                expectations,
-            )
-        )
 
         for expectation in expectations:
             if expectation.get("inject_expectation_signatures") is None:
@@ -134,19 +128,16 @@ class OpenBASCrowdStrike:
                             f"Unsupported expectation type for now: {expectation.get('inject_expectation_type')}"
                         )
                         continue
-                    if expectation in expectations_not_filled:
-                        self.helper.api.inject_expectation.update(
-                            expectation["inject_expectation_id"],
-                            {
-                                "collector_id": self.config.get_conf("collector_id"),
-                                "result": result,
-                                "is_success": success_or_failure,
-                                "metadata": {
-                                    "alertId": self.strategy.get_alert_id(alert)
-                                },
-                            },
-                        )
-                        expectations_not_filled.remove(expectation)
+
+                    self.helper.api.inject_expectation.update(
+                        expectation["inject_expectation_id"],
+                        {
+                            "collector_id": self.config.get_conf("collector_id"),
+                            "result": result,
+                            "is_success": success_or_failure,
+                            "metadata": {"alertId": self.strategy.get_alert_id(alert)},
+                        },
+                    )
 
                     # Save alert to openbas for current matched expectation. Duplicate alerts are handled by openbas itself
                     self.helper.collector_logger.info(
@@ -177,14 +168,6 @@ class OpenBASCrowdStrike:
         return traces_to_create
 
     # --- PROCESS ---
-
-    def _is_expectation_filled(self, expectation) -> bool:
-        if not any(
-            er.get("sourceId", "") == self.config.get_conf("collector_id")
-            for er in expectation["inject_expectation_results"]
-        ):
-            return False
-        return True
 
     def _process(self):
         """Fetch and match expectations with data from cs"""
