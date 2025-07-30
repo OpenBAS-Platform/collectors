@@ -6,8 +6,11 @@ import pytz
 import requests
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from pyobas.helpers import (OpenBASCollectorHelper, OpenBASConfigHelper,
-                            OpenBASDetectionHelper)
+from pyobas.helpers import (
+    OpenBASCollectorHelper,
+    OpenBASConfigHelper,
+    OpenBASDetectionHelper,
+)
 from tanium_threat_response.api_handler import TaniumApiHandler
 
 
