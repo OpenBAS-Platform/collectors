@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from pathlib import PurePosixPath, PureWindowsPath
 
 import pytz
 import requests
@@ -11,6 +12,10 @@ from pyobas.helpers import (
     OpenBASDetectionHelper,
 )
 from tanium_threat_response.api_handler import TaniumApiHandler
+
+
+def _is_unix_absolute_path(path):
+    return path.startswith("/")
 
 
 class OpenBASTaniumThreatResponse:
@@ -104,7 +109,13 @@ class OpenBASTaniumThreatResponse:
             and "file" in artifact["process"]
             and "file" in artifact["process"]["file"]
         ):
-            names.append(artifact["process"]["file"]["file"]["path"].split("\\")[-1])
+            path = artifact["process"]["file"]["file"]["path"]
+            if _is_unix_absolute_path(path):
+                path_obj = PurePosixPath(artifact["process"]["file"]["file"]["path"])
+            else:
+                path_obj = PureWindowsPath(artifact["process"]["file"]["file"]["path"])
+            filename = path_obj.name
+            names.append(filename)
         if "process" in artifact and "parent" in artifact["process"]:
             return self._extract_tree_names(artifact["process"]["parent"], names)
         else:
@@ -191,7 +202,7 @@ class OpenBASTaniumThreatResponse:
     def _match_alert(self, alert, alert_details, expectation):
         self.helper.collector_logger.info(
             "Trying to match alert "
-            + str(alert["id"])
+            + str(alert["guid"])
             + " with expectation "
             + expectation["inject_expectation_id"]
         )
