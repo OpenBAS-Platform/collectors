@@ -16,7 +16,7 @@ pyobas = [
     { markers = "extra == 'dev' and extra != 'prod' and extra != 'ci'", path = "../../client-python", develop = true },
     { markers = "extra == 'ci' and extra != 'prod' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
 ]
-msgraph-sdk = "1.31.0"
+msgraph-sdk = "1.40.0"
 msal = "1.32.3"
 
 [tool.poetry.extras]
