@@ -1,0 +1,14 @@
+openaev:
+  url: 'http://localhost:8080'  # Required
+  token: 'ChangeMe' # Required
+
+collector:
+  id: 'ChangeMe' # Required
+  name: 'Cve by NVD NIST'
+  type: 'nvd_nist_cve'
+  period: 7200
+  log_level: 'info'
+
+nvd-nist-cve:
+  api_base_url: 'https://services.nvd.nist.gov/rest/json'
+  api_key: 'ChangeMe' # Required
