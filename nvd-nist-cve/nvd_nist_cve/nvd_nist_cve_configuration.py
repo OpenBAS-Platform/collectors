@@ -18,7 +18,6 @@ class NvdNistCveConfiguration(Configuration):
             print(f"Collector failed to configure: {e}")
             raise
 
-
     @staticmethod
     def _get_nvd_nist_cve_config_hints() -> dict:
         """
@@ -37,7 +36,6 @@ class NvdNistCveConfiguration(Configuration):
                 "env": "OPENAEV_TOKEN",
                 "file_path": ["openaev", "token"],
             },
-
             # Collector configuration
             "collector_id": {
                 "env": "COLLECTOR_ID",
@@ -62,14 +60,13 @@ class NvdNistCveConfiguration(Configuration):
             "collector_icon_filepath": {
                 "env": "COLLECTOR_ICON_FILEPATH",
                 "file_path": ["collector", "icon_filepath"],
-                "default": "./img/icon-nist.png"
+                "default": "./img/icon-nist.png",
             },
             "log_level": {
                 "env": "COLLECTOR_LOG_LEVEL",
                 "file_path": ["collector", "log_level"],
                 "default": "error",
             },
-
             # NVD NIST CVE API configuration
             "nvd_nist_cve_api_key": {
                 "env": "NVD_NIST_CVE_API_KEY",
