@@ -316,6 +316,7 @@ class OpenBASAtomicRedTeam:
                             "payload_platforms": platforms,
                             "payload_attack_patterns": [attack_pattern],
                             "payload_arguments": arguments,
+                            "payload_expectations": ["PREVENTION", "DETECTION"],
                             "command_executor": EXECUTORS[
                                 atomic_test["executor"]["name"]
                             ],
