@@ -48,7 +48,12 @@ jobs:
       - run:
           working_directory: ~/
           name: Clone pyobas
-          command: git clone -b release/current https://github.com/OpenBAS-Platform/client-python
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
+              git clone -b release/current https://github.com/OpenBAS-Platform/client-python
+            else
+              git clone -b main https://github.com/OpenBAS-Platform/client-python
+            fi
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Install poetry
@@ -56,7 +61,12 @@ jobs:
       - run:
           working_directory: ~/openbas/crowdstrike
           name: install crowdstrike
-          command: poetry install --extras ci
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
+              poetry install --extras ci-current
+            else
+              poetry install
+            fi
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Tests for crowdstrike collector
