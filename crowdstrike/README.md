@@ -7,6 +7,27 @@ details dictate what data is actually available to the collector.
 
 ## Installation
 
+### Docker Deployment
+
+Build a Docker Image using the provided `Dockerfile`.
+
+Example:
+
+```shell
+# Replace the IMAGE NAME with the appropriate value
+docker build . -t [IMAGE NAME]
+```
+
+Make sure to replace the environment variables in `docker-compose.yml` with the appropriate configurations for your
+environment. Then, start the docker container with the provided docker-compose.yml
+
+```shell
+docker compose up -d
+# -d for detached
+```
+
+### Manual deployment
+
 Get a local copy
 ```commandline
 git checkout https://github.com/OpenBAS-Platform/collectors
@@ -41,14 +62,14 @@ The collector can be configured with the following variables:
 | `openbas`.`token`             | `OPENBAS_TOKEN`             |                                       | The auth token to the OpenBAS instance                                                        |
 | `collector`.`id`              | `COLLECTOR_ID`              |                                       | Unique ID of the running collector instance                                                   |
 | `collector`.`name`            | `COLLECTOR_NAME`            | `CrowdStrike Endpoint Security`       | Name of the collector (visible in UI)                                                         |
-| `collector`.`type`            | `COLLECTOR_TYPE`            | `crowdStrike_endpoint_security`       | Type of the collector                                                                         |
+| `collector`.`type`            | `COLLECTOR_TYPE`            | `openbas_crowdstrike`                 | Type of the collector                                                                         |
 | `collector`.`period`          | `COLLECTOR_PERIOD`          | 60                                    | Period for collection cycle (int, seconds)                                                    |
-| `collector`.`log_level`       | `COLLECTOR_LOG_LEVEL`       |                                       | Threshold for log severity in console output                                                  |
+| `collector`.`log_level`       | `COLLECTOR_LOG_LEVEL`       | `warn`                                | Threshold for log severity in console output                                                  |
 | `collector`.`platform`        | `COLLECTOR_PLATFORM`        | `EDR`                                 | Type of security platform this collector works for. One of: `EDR, XDR, SIEM, SOAR, NDR, ISPM` |
-| `crowdstrike`.`api_base_url`  | `CROWDSTRIKE_API_BASE_URL`  | `https://api.crowdstrike.com`         | The base URL for the CrowdStrike APIs.                                                        |
+| `crowdstrike`.`api_base_url`  | `CROWDSTRIKE_API_BASE_URL`  | `https://api.us-2.crowdstrike.com`    | The base URL for the CrowdStrike APIs.                                                        |
 | `crowdstrike`.`ui_base_url`   | `CROWDSTRIKE_UI_BASE_URL`   | `https://falcon.us-2.crowdstrike.com` | The base URL for the CrowdStrike UI you use to see your alerts.                               |
-| `crowdstrike`.`client_id`     | `CROWDSTRIKE_CLIENT_ID`     | `CHANGEME`                            | The CrowdStrike API client ID.                                                                |
-| `crowdstrike`.`client_secret` | `CROWDSTRIKE_CLIENT_SECRET` | `CHANGEME`                            | The CrowdStrike API client secret.                                                            |
+| `crowdstrike`.`client_id`     | `CROWDSTRIKE_CLIENT_ID`     |                                       | The CrowdStrike API client ID.                                                                |
+| `crowdstrike`.`client_secret` | `CROWDSTRIKE_CLIENT_SECRET` |                                       | The CrowdStrike API client secret.                                                            |
 
 **Note**: the Crowdstrike credentials must have been granted the following privilege for this to work: `Alerts: Read and Write`
 (as per https://falcon.us-2.crowdstrike.com/documentation/page/d02475a5/converting-from-detects-api-to-alerts-api#s4c83596)
