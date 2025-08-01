@@ -206,7 +206,7 @@ if __name__ == "__main__":
             "collector_name": {
                 "env": "COLLECTOR_NAME",
                 "file_path": ["collector", "name"],
-                "default": "CrowdStrike Endpoint Security"
+                "default": "CrowdStrike Endpoint Security",
             },
             "collector_type": {
                 "env": "COLLECTOR_TYPE",
@@ -216,17 +216,17 @@ if __name__ == "__main__":
             "collector_period": {
                 "env": "COLLECTOR_PERIOD",
                 "file_path": ["collector", "period"],
-                "default": 60
+                "default": 60,
             },
             "collector_log_level": {
                 "env": "COLLECTOR_LOG_LEVEL",
                 "file_path": ["collector", "log_level"],
-                "default": "warn"
+                "default": "warn",
             },
             "collector_platform": {
                 "env": "COLLECTOR_PLATFORM",
                 "file_path": ["collector", "platform"],
-                "default": "EDR"
+                "default": "EDR",
             },
             # CrowdStrike
             "crowdstrike_client_id": {
