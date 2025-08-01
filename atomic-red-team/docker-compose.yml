@@ -1,11 +1,12 @@
-version: '3'
 services:
   collector-atomic-red-team:
-    image: openbas/collector-atomic-red-team:1.18.9
+    image: openbas/collector-atomic-red-team:latest
     environment:
-      - OPENBAS_URL=http://localhost
-      - OPENBAS_TOKEN=ChangeMe
-      - COLLECTOR_ID=ChangeMe
-      - "COLLECTOR_NAME=Atomic Red Team"
-      - COLLECTOR_LOG_LEVEL=error
-    restart: always
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - COLLECTOR_TYPE=${COLLECTOR_TYPE}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+    restart: unless-stopped

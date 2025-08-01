@@ -32,6 +32,7 @@ class OpenBASMicrosoftSentinel:
                 "collector_name": {
                     "env": "COLLECTOR_NAME",
                     "file_path": ["collector", "name"],
+                    "default": "Microsoft Sentinel"
                 },
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
@@ -41,10 +42,17 @@ class OpenBASMicrosoftSentinel:
                 "collector_log_level": {
                     "env": "COLLECTOR_LOG_LEVEL",
                     "file_path": ["collector", "log_level"],
+                    "default": "warn"
                 },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
+                    "default": 60
+                },
+                "collector_platform": {
+                    "env": "COLLECTOR_PLATFORM",
+                    "file_path": ["collector", "platform"],
+                    "default": "SIEM",
                 },
                 "microsoft_sentinel_tenant_id": {
                     "env": "MICROSOFT_SENTINEL_TENANT_ID",

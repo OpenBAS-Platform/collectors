@@ -1,14 +1,16 @@
-version: '3'
 services:
   collector-microsoft-defender:
-    image: openbas/collector-microsoft-defender:1.18.9
+    image: openbas/collector-microsoft-defender:latest
     environment:
-      - OPENBAS_URL=http://localhost
-      - OPENBAS_TOKEN=ChangeMe
-      - COLLECTOR_ID=ChangeMe
-      - "COLLECTOR_NAME=Microsoft Defender"
-      - COLLECTOR_LOG_LEVEL=error
-      - MICROSOFT_DEFENDER_TENANT_ID=
-      - MICROSOFT_DEFENDER_CLIENT_ID=
-      - MICROSOFT_DEFENDER_CLIENT_SECRET=
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_TYPE=${COLLECTOR_TYPE}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - COLLECTOR_PLATFORM=${COLLECTOR_PLATFORM}
+      - MICROSOFT_DEFENDER_TENANT_ID=${MICROSOFT_DEFENDER_TENANT_ID}
+      - MICROSOFT_DEFENDER_CLIENT_ID=${MICROSOFT_DEFENDER_CLIENT_ID}
+      - MICROSOFT_DEFENDER_CLIENT_SECRET=${MICROSOFT_DEFENDER_CLIENT_SECRET}
     restart: always

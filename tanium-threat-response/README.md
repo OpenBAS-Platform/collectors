@@ -26,31 +26,34 @@ in `config.yml` (for manual deployment).
 
 Below are the parameters you'll need to set for OpenBAS:
 
-| Parameter     | config.yml | Docker environment variable | Mandatory | Description                                          |
-|---------------|------------|-----------------------------|-----------|------------------------------------------------------|
-| OpenBAS URL   | url        | `OPENBAS_URL`               | Yes       | The URL of the OpenBAS platform.                     |
-| OpenBAS Token | token      | `OPENBAS_TOKEN`             | Yes       | The default admin token set in the OpenBAS platform. |
+| Parameter     | config.yml    | Docker environment variable | Mandatory | Description                                          |
+|---------------|---------------|-----------------------------|-----------|------------------------------------------------------|
+| OpenBAS URL   | openbas.url   | `OPENBAS_URL`               | Yes       | The URL of the OpenBAS platform.                     |
+| OpenBAS Token | openbas.token | `OPENBAS_TOKEN`             | Yes       | The default admin token set in the OpenBAS platform. |
 
 ### Base collector environment variables
 
 Below are the parameters you'll need to set for running the collector properly:
 
-| Parameter        | config.yml | Docker environment variable | Default | Mandatory | Description                                                                            |
-|------------------|------------|-----------------------------|---------|-----------|----------------------------------------------------------------------------------------|
-| Collector ID     | id         | `COLLECTOR_ID`              | /       | Yes       | A unique `UUIDv4` identifier for this collector instance.                              |
-| Collector Name   | name       | `COLLECTOR_NAME`            |         | Yes       | Name of the collector.                                                                 |
-| Collector Period | period     | `COLLECTOR_PERIOD`          |         | Yes       | The time interval at which your collector will run (int, seconds).                     |
-| Log Level        | log_level  | `COLLECTOR_LOG_LEVEL`       | info    | Yes       | Determines the verbosity of the logs. Options are `debug`, `info`, `warn`, or `error`. |
+| Parameter        | config.yml            | Docker environment variable | Default                        | Mandatory | Description                                                                                    |
+|------------------|-----------------------|-----------------------------|--------------------------------|-----------|------------------------------------------------------------------------------------------------|
+| Collector ID     | collector.id          | `COLLECTOR_ID`              |                                | Yes       | A unique `UUIDv4` identifier for this collector instance.                                      |
+| Collector Name   | collector.name        | `COLLECTOR_NAME`            | Tanium Threat Response         | No        | Name of the collector.                                                                         |
+| Collector Period | collector.period      | `COLLECTOR_PERIOD`          | 60                             | No        | The time interval at which your collector will run (int, seconds).                             |
+| Log Level        | collector.log_level   | `COLLECTOR_LOG_LEVEL`       | warn                           | No        | Determines the verbosity of the logs. Options are `debug`, `info`, `warn`, or `error`.         |
+| Type             | collector.type        | `COLLECTOR_TYPE`            | openbas_tanium_threat_response | No        | Type of the collector                                                                          |
+| Platform         | collector.platform    | `COLLECTOR_PLATFORM`        | EDR                            | No        | Type of security platform this collector works for. One of: `EDR, XDR, SIEM, SOAR, NDR, ISPM`  |
 
 ### Collector extra parameters environment variables
 
 Below are the parameters you'll need to set for the collector:
 
-| Parameter          | config.yml         | Docker environment variable | Default | Mandatory | Description                          |
-|--------------------|--------------------|-----------------------------|---------|-----------|--------------------------------------|
-| Tanium URL         | tanium_url         | TANIUM_URL                  |         | Yes       | URL of your Tanium instance.         |
-| Tanium URL Console | tanium_url_console | TANIUM_URL_CONSOLE          |         | Yes       | URL of your Tanium console instance. |
-| Tanium API Token   | tanium_token       | TANIUM_TOKEN                |         | Yes       | API Token.                           |
+| Parameter          | config.yml                   | Docker environment variable | Default | Mandatory | Description                              |
+|--------------------|------------------------------|-----------------------------|---------|-----------|------------------------------------------|
+| Tanium URL         | collector.tanium_url         | `TANIUM_URL`                |         | Yes       | URL of your Tanium instance.             |
+| Tanium URL Console | collector.tanium_url_console | `TANIUM_URL_CONSOLE`        |         | Yes       | URL of your Tanium console instance.     |
+| Tanium API Token   | collector.tanium_token       | `TANIUM_TOKEN`              |         | Yes       | API Token.                               |
+| Tanium API Token   | collector.tanium_ssl_verify  | `TANIUM_SSL_VERIFY`         | true    | No        | Verify the Tnaium server TLS certificate |
 
 ## Deployment
 
@@ -62,7 +65,7 @@ Example:
 
 ```shell
 # Replace the IMAGE NAME with the appropriate value
-docker build . -t [IMAGE NAME]:latest
+docker build . -t [IMAGE NAME]
 ```
 
 Make sure to replace the environment variables in `docker-compose.yml` with the appropriate configurations for your

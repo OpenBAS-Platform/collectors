@@ -1,15 +1,16 @@
-version: '3'
 services:
   collector-microsoft-entra:
-    image: openbas/collector-microsoft-entra:1.18.9
+    image: openbas/collector-microsoft-entra:latest
     environment:
-      - OPENBAS_URL=http://localhost
-      - OPENBAS_TOKEN=ChangeMe
-      - COLLECTOR_ID=ChangeMe
-      - "COLLECTOR_NAME=Microsoft Entra"
-      - COLLECTOR_LOG_LEVEL=error
-      - MICROSOFT_ENTRA_TENANT_ID=
-      - MICROSOFT_ENTRA_CLIENT_ID=
-      - MICROSOFT_ENTRA_CLIENT_SECRET=
-      - INCLUDE_EXTERNAL=false
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - COLLECTOR_TYPE=${COLLECTOR_TYPE}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - MICROSOFT_ENTRA_TENANT_ID=${MICROSOFT_ENTRA_TENANT_ID}
+      - MICROSOFT_ENTRA_CLIENT_ID=${MICROSOFT_ENTRA_CLIENT_ID}
+      - MICROSOFT_ENTRA_CLIENT_SECRET=${MICROSOFT_ENTRA_CLIENT_SECRET}
+      - INCLUDE_EXTERNAL=${INCLUDE_EXTERNAL}
     restart: always

@@ -1,11 +1,12 @@
-version: '3'
 services:
   collector-mitre-attack:
-    image: openbas/collector-mitre-attack:1.18.9
+    image: openbas/collector-mitre-attack:latest
     environment:
-      - OPENBAS_URL=http://localhost
-      - OPENBAS_TOKEN=ChangeMe
-      - COLLECTOR_ID=ChangeMe
-      - "COLLECTOR_NAME=MITRE ATT&CK"
-      - COLLECTOR_LOG_LEVEL=error
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - COLLECTOR_TYPE=${COLLECTOR_TYPE}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
     restart: always
