@@ -26,7 +26,7 @@ class OpenBASMitre:
                 "collector_name": {
                     "env": "COLLECTOR_NAME",
                     "file_path": ["collector", "name"],
-                    "default": "MITRE ATT&CK"
+                    "default": "MITRE ATT&CK",
                 },
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
@@ -36,12 +36,12 @@ class OpenBASMitre:
                 "collector_log_level": {
                     "env": "COLLECTOR_LOG_LEVEL",
                     "file_path": ["collector", "log_level"],
-                    "default": "warn"
+                    "default": "warn",
                 },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
-                    "default": 604800
+                    "default": 604800,
                 },
             },
         )

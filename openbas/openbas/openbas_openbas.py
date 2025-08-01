@@ -47,12 +47,12 @@ class OpenBASOpenBAS:
                 "openbas_generated_url_prefix": {
                     "env": "OPENBAS_URL_PREFIX",
                     "file_path": ["openbas", "url_prefix"],
-                    "default": "https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/"
+                    "default": "https://raw.githubusercontent.com/OpenBAS-Platform/payloads/refs/heads/main/",
                 },
                 "openbas_import_only_native": {
                     "env": "OPENBAS_IMPORT_ONLY_NATIVE",
                     "file_path": ["openbas", "import_only_native"],
-                    "default": "false"
+                    "default": "false",
                 },
             },
         )
