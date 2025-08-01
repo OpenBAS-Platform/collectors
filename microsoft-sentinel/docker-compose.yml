@@ -1,7 +1,7 @@
 version: '3'
 services:
   collector-microsoft-sentinel:
-    image: openbas/collector-microsoft-sentinel:1.18.7
+    image: openbas/collector-microsoft-sentinel:1.18.8
     environment:
       - OPENBAS_URL=http://localhost
       - OPENBAS_TOKEN=ChangeMe
