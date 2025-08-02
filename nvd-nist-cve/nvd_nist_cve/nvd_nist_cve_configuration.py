@@ -27,14 +27,14 @@ class NvdNistCveConfiguration(Configuration):
             Dictionary of configuration hints
         """
         return {
-            # OpenAEV configuration
+            # OpenBAS configuration
             "openbas_url": {
-                "env": "OPENAEV_URL",
-                "file_path": ["openaev", "url"],
+                "env": "OPENBAS_URL",
+                "file_path": ["openbas", "url"],
             },
             "openbas_token": {
-                "env": "OPENAEV_TOKEN",
-                "file_path": ["openaev", "token"],
+                "env": "OPENBAS_TOKEN",
+                "file_path": ["openbas", "token"],
             },
             # Collector configuration
             "collector_id": {
@@ -49,7 +49,7 @@ class NvdNistCveConfiguration(Configuration):
             "collector_type": {
                 "env": "COLLECTOR_TYPE",
                 "file_path": ["collector", "type"],
-                "default": "openaev_nvd_nist_cve",
+                "default": "openbas_nvd_nist_cve",
             },
             "collector_period": {
                 "env": "COLLECTOR_PERIOD",
@@ -60,12 +60,12 @@ class NvdNistCveConfiguration(Configuration):
             "collector_icon_filepath": {
                 "env": "COLLECTOR_ICON_FILEPATH",
                 "file_path": ["collector", "icon_filepath"],
-                "default": "./img/icon-nist.png",
+                "default": "nvd_nist_cve/img/icon-nist.png",
             },
             "log_level": {
                 "env": "COLLECTOR_LOG_LEVEL",
                 "file_path": ["collector", "log_level"],
-                "default": "error",
+                "default": "warn",
             },
             # NVD NIST CVE API configuration
             "nvd_nist_cve_api_key": {
@@ -76,6 +76,6 @@ class NvdNistCveConfiguration(Configuration):
             "nvd_nist_cve_api_base_url": {
                 "env": "NVD_NIST_CVE_API_BASE_URL",
                 "file_path": ["nvd_nist_cve", "api_base_url"],
-                "required": True,
+                "default": "https://services.nvd.nist.gov/rest/json",
             },
         }

@@ -1,6 +1,7 @@
-# OpenAEV NVD NIST CVE collector
+# OpenBAS NVD NIST CVE collector
 
-The NVD NIST CVE collector is a standalone Python process that collect data from the NVD (National Vulnerability Database).
+The NVD NIST CVE collector is a standalone Python process that collect data from the NVD (National Vulnerability
+Database).
 
 ### CVE and CVSS base score V3.1
 
@@ -12,23 +13,92 @@ CVEs.
 CVSS V3.1 was released in June 2019, thus most CVE published before 2019 do not include the `cvssMetricV31` object. The
 exception are CVE published before 2019 that were later reanalyzed or modified.
 These CVE may have been updated to include CVSS V3.1 information. If the CVE was updated in this way, the API response
-would include this optional information.   
+would include this optional information.
 
 This collector **will import all CVE with CVSS V3.1 base score**.
 
 ## Requirements
-- OpenAEV Platform version 1.19 or higher
-- An API Key for accessing ([Request an API Key for NVD](https://nvd.nist.gov/developers/request-an-api-key)
 
+- OpenBAS Platform version 1.19 or higher
+- An API Key for accessing ([Request an API Key for NVD](https://nvd.nist.gov/developers/request-an-api-key)
 
 ## Installation
 
 Get a local copy
+
 ```commandline
 git checkout https://github.com/OpenBAS-Platform/collectors
 cd ./collectors/crowdstrike
 ```
+
 Install the environment:
+**Production**:
+
+```shell
+# production environment
+poetry install --extras prod
+```
+
+**Development** (note that you should also clone the [pyobas](OpenBAS-Platform/client-python) repository [according to
+these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collector))
+
+```shell
+# development environment
+poetry install --extras dev
+```
+
+## Usage
+
+```commandline
+poetry run python -m nvd_nist_cve.openbas_nvd_nist_cve
+```
+
+## Configuration
+
+Below are the parameters you'll need to set for OpenBAS:
+
+| Config Parameter | `config.yml`                | Docker Env Var              | Default                                   | Description                                                                              |
+| ---------------- | --------------------------- | --------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------- |
+| OpenBAS URL      | `openbas.url`               | `OPENBAS_URL`               | *required*                                | URL to the OpenBAS instance                                                              |
+| OpenBAS token    | `openbas.token`             | `OPENBAS_TOKEN`             | *required*                                | Authentication token to connect to OpenBAS                                               |
+| Collector ID     | `collector.id`              | `COLLECTOR_ID`              | *required*                                | Unique UUIDv4 identifier for this collector instance                                     |
+| Collector name   | `collector.name`            | `COLLECTOR_NAME`            | `Cve by NVD NIST`                         | Name of the collector                                                                    |
+| Collector type   | `collector.type`            | `COLLECTOR_TYPE`            | `nvd_nist_cve`                            | Type of the collector                                                                    |
+| Run interval     | `collector.period`          | `COLLECTOR_PERIOD`          | `7200` (seconds)                          | Time interval at which the collector will run                                            |
+| Log level        | `collector.log_level`       | `COLLECTOR_LOG_LEVEL`       | `warn`                                    | Log verbosity: `debug`, `info`, `warn`, or `error`                                       |
+| NVD API base URL | `nvd_nist_cve.api_base_url` | `NVD_NIST_CVE_API_BASE_URL` | `https://services.nvd.nist.gov/rest/json` | Base URL for the NVD CVE API                                                             |
+| NVD API key      | `nvd_nist_cve.api_key`      | `NVD_NIST_CVE_API_KEY`      | *required*                                | API Key for NVD ([Request one here](https://nvd.nist.gov/developers/request-an-api-key)) |
+
+## Deployment
+
+### Docker Deployment
+
+Build a Docker Image using the provided `Dockerfile`.
+
+Example:
+
+```shell
+# Replace the IMAGE NAME with the appropriate value
+docker build . -t [IMAGE NAME]
+```
+
+Make sure to replace the environment variables in `docker-compose.yml` with the appropriate configurations for your
+environment. Then, start the docker container with the provided docker-compose.yml
+
+```shell
+docker compose up -d
+# -d for detached
+```
+
+### Manual Deployment
+
+Create a file `config.yml` based on the provided `config.yml.sample`.
+
+Replace the configuration variables with the appropriate configurations for
+you environment.
+
+Install the environment:
+
 **Production**:
 ```shell
 # production environment
@@ -42,23 +112,8 @@ these instructions](../README.md#simultaneous-development-on-pyobas-and-a-collec
 poetry install --extras dev
 ```
 
-## Usage
-```commandline
-poetry run python -m nvd_nist_cve.openaev_nvd_nist_cve
+Then, start the collector:
+
+```shell
+poetry run python -m nvd_nist_cve.openbas_nvd_nist_cve
 ```
-
-## Configuration
-
-The collector can be configured with the following variables:
-
-| Config Parameter             | Docker env var              | Default                                   | Description                                                                                                   |
-|------------------------------|-----------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `openaev`.`url`              | `OPENAEV_URL`               |                                           | The URL to the OpenAEV instance                                                                               |
-| `openaev`.`token`            | `OPENAEV_TOKEN`             |                                           | The auth token to the OpenAEV instance                                                                        |
-| `collector`.`id`             | `COLLECTOR_ID`              |                                           | Unique ID of the running collector instance                                                                   |
-| `collector`.`name`           | `COLLECTOR_NAME`            | `Cve by NVD NIST`                         | Name of the collector (visible in UI)                                                                         |
-| `collector`.`type`           | `COLLECTOR_TYPE`            | `nvd_nist_cve`                            | Type of the collector                                                                                         |
-| `collector`.`period`         | `COLLECTOR_PERIOD`          | 7200                                      | Interval in seconds to check and import new CVEs. Nist advice a minimum of 2hours                             |
-| `collector`.`log_level`      | `COLLECTOR_LOG_LEVEL`       |                                           | Threshold for log severity in console output                                                                  |
-| `crowdstrike`.`api_base_url` | `NVD_NIST_CVE_API_BASE_URL` | `https://services.nvd.nist.gov/rest/json` | The base URL for the CVE NVD APIs.                                                                            |
-| `crowdstrike`.`ui_base_url`  | `NVD_NIST_CVE_API_KEY`      |                                           | API Key for the CVE NVD API.([Request an API Key for NVD](https://nvd.nist.gov/developers/request-an-api-key) |

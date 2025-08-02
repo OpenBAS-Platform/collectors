@@ -1,4 +1,4 @@
-openaev:
+openbas:
   url: 'http://localhost:8080'  # Required
   token: 'ChangeMe' # Required
 
@@ -9,6 +9,6 @@ collector:
   period: 7200
   log_level: 'info'
 
-nvd-nist-cve:
+nvd_nist_cve:
   api_base_url: 'https://services.nvd.nist.gov/rest/json'
   api_key: 'ChangeMe' # Required

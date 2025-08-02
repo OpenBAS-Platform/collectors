@@ -81,9 +81,9 @@ class NvdNistCveCollector(CollectorDaemon):
 
     def __format_cwes(self, cwe_datas: list) -> list:
         """
-        Format the CWE data from NIST CVE into OpenAEV API Cwe format.
+        Format the CWE data from NIST CVE into OpenBAS API Cwe format.
         :param cwe_datas: List of CWE data dictionaries, from NIST CVE.
-        :return: List of formatted CWE dictionaries for OpenAEV API.
+        :return: List of formatted CWE dictionaries for OpenBAS API.
         """
         cwes_formatted = []
         for cwe in cwe_datas:
@@ -112,9 +112,9 @@ class NvdNistCveCollector(CollectorDaemon):
 
     def __format_vulnerability_status(self, status: str) -> str | None:
         """
-        Format the vulnerability status from NIST CVE into OpenAEV API format.
+        Format the vulnerability status from NIST CVE into OpenBAS API format.
         :param status: The status string from NIST CVE
-        :return: Formatted status string for OpenAEV API if valid, otherwise None.
+        :return: Formatted status string for OpenBAS API if valid, otherwise None.
         """
         if status is None:
             return None
@@ -136,9 +136,9 @@ class NvdNistCveCollector(CollectorDaemon):
 
     def __filter_and_format_cve(self, datas: dict) -> list[dict]:
         """
-        Filter and format CVE data from NIST CVE API response to match OpenAEV API format.
+        Filter and format CVE data from NIST CVE API response to match OpenBAS API format.
         :param datas: List of CVE data dictionaries from NIST CVE API.
-        :return: List of formatted CVE dictionaries for OpenAEV API.
+        :return: List of formatted CVE dictionaries for OpenBAS API.
         """
         vulnerabilities = []
         for data in datas:
@@ -192,8 +192,8 @@ class NvdNistCveCollector(CollectorDaemon):
         state_info: dict = None,
     ) -> None:
         """
-        Send a bundle of CVEs to the OpenAEV API.
-        :param cves: List of CVE dictionaries formatted for OpenAEV API.
+        Send a bundle of CVEs to the OpenBAS API.
+        :param cves: List of CVE dictionaries formatted for OpenBAS API.
         :param last_modified_date_fetched: Last modified date of the CVEs, used for state management.
         :param state_info: Additional state information to be included in the API request (optional).
         :return: None
@@ -261,7 +261,7 @@ class NvdNistCveCollector(CollectorDaemon):
         """
         # Fetch collector status
         collector_info = self.api.collector.get(self.get_id())
-        collector_state = collector_info.get("collector_state", {})
+        collector_state = getattr(collector_info, "collector_state", {}) or {}
 
         counters = {"total_fetched": 0, "total_send": 0}
 
