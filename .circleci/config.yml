@@ -59,7 +59,7 @@ jobs:
           command: |
             poetry install --extras prod
       - run:
-          working_directory: ~/
+          working_directory: ~/openbas/crowdstrike
           name: Overwrite pyobas with correct version from CI
           command: |
             if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
