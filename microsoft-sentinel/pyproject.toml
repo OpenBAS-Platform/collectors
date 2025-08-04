@@ -15,7 +15,7 @@ pyobas = [
     { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.9", source = "pypi"  },
     { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
 ]
-msal = "1.32.3"
+msal = "1.33.0"
 
 [tool.poetry.extras]
 prod = []
