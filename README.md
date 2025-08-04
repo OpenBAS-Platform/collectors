@@ -65,21 +65,20 @@ Here's the expression for the pyobas dependency, including the `extra` definitio
 ```toml
 [tool.poetry.dependencies]
 pyobas = [
-    { markers = "extra == 'prod' and extra != 'dev' and extra != 'ci'", version = "<latest pyobas release on PyPI>", source = "pypi"  },
-    { markers = "extra == 'dev' and extra != 'prod' and extra != 'ci'", path = "../../client-python", develop = true },
-    { markers = "extra == 'ci' and extra != 'prod' and extra != 'dev'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
+    { markers = "extra == 'prod' and extra != 'dev'", version = "<latest pyobas release on PyPI>", source = "pypi"  },
+    { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
 ]
 
 [tool.poetry.extras]
 prod = []
 dev = []
-ci = []
 ```
 
 ### Simultaneous development on pyobas and a collector
-The collectors repository is set to assume that in the event of a simultaneous development work on both pyobas
+The collectors repository is set to assume that in the event of a simultaneous development work on both `pyobas`
 and collectors, the `pyobas` repository is cloned in a directory at the same level as the collectors root directory,
-and is named strictly `client-python`
+and is named strictly `client-python`.
+
 Here's an example layout:
 ```
 .
