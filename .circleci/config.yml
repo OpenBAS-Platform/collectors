@@ -48,7 +48,7 @@ jobs:
       - run: # this is only to satisfy poetry; not used
           working_directory: ~/
           name: Clone pyobas
-          command: git clone -b release/current https://github.com/OpenBAS-Platform/client-python
+          command: git clone -b main https://github.com/OpenBAS-Platform/client-python
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Install poetry
