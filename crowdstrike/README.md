@@ -2,10 +2,53 @@
 
 The CrowdStrike Endpoint Security collector.
 
+## Prerequisites
+
 **Note**: Requires subscription to the CrowdStrike Falcon platform. The subscription
 details dictate what data is actually available to the collector.
 
-## Installation
+## Configuration variables
+
+There are a number of configuration options, which are set either in `docker-compose.yml` (for Docker) or
+in `config.yml` (for manual deployment).
+
+### OpenBAS environment variables
+
+Below are the parameters you'll need to set for OpenBAS:
+
+| Parameter     | config.yml    | Docker environment variable | Mandatory | Description                                          |
+|---------------|---------------|-----------------------------|-----------|------------------------------------------------------|
+| OpenBAS URL   | openbas.url   | `OPENBAS_URL`               | Yes       | The URL of the OpenBAS platform.                     |
+| OpenBAS Token | openbas.token | `OPENBAS_TOKEN`             | Yes       | The default admin token set in the OpenBAS platform. |
+
+### Base collector environment variables
+
+Below are the parameters you'll need to set for running the collector properly:
+
+| Parameter        | config.yml          | Docker environment variable | Default                       | Mandatory | Description                                                                                   |
+|------------------|---------------------|-----------------------------|-------------------------------|-----------|-----------------------------------------------------------------------------------------------|
+| Collector ID     | collector.id        | `COLLECTOR_ID`              |                               | Yes       | A unique `UUIDv4` identifier for this collector instance.                                     |
+| Collector Name   | collector.name      | `COLLECTOR_NAME`            | CrowdStrike Endpoint Security | No        | Name of the collector.                                                                        |
+| Collector Period | collector.period    | `COLLECTOR_PERIOD`          | 60                            | No        | The time interval at which your collector will run (int, seconds).                            |
+| Log Level        | collector.log_level | `COLLECTOR_LOG_LEVEL`       | warn                          | No        | Determines the verbosity of the logs. Options are `debug`, `info`, `warn`, or `error`.        |
+| Type             | collector.type      | `COLLECTOR_TYPE`            | openbas_crowdstrike           | No        | Type of the collector                                                                         |
+| Platform         | collector.platform  | `COLLECTOR_PLATFORM`        | EDR                           | No        | Type of security platform this collector works for. One of: `EDR, XDR, SIEM, SOAR, NDR, ISPM` |
+
+### Collector extra parameters environment variables
+
+Below are the parameters you'll need to set for the collector:
+
+**Note**: the Crowdstrike credentials must have been granted the following privilege for this to work: `Alerts: Read and Write`
+(as per https://falcon.us-2.crowdstrike.com/documentation/page/d02475a5/converting-from-detects-api-to-alerts-api#s4c83596)
+
+| Parameter     | config.yml                | Docker environment variable | Default                               | Mandatory | Description                                                     |
+|---------------|---------------------------|-----------------------------|---------------------------------------|-----------|-----------------------------------------------------------------|
+| API Base URL  | crowdstrike.api_base_url  | `CROWDSTRIKE_API_BASE_URL`  | `https://api.us-2.crowdstrike.com`    | No        | The base URL for the CrowdStrike APIs.                          |
+| UI Base URL   | crowdstrike.ui_base_url   | `CROWDSTRIKE_UI_BASE_URL`   | `https://falcon.us-2.crowdstrike.com` | No        | The base URL for the CrowdStrike UI you use to see your alerts. |
+| Client ID     | crowdstrike.client_id     | `CROWDSTRIKE_CLIENT_ID`     |                                       | Yes       | The CrowdStrike API client ID.                                  |
+| Client Secret | crowdstrike.client_secret | `CROWDSTRIKE_CLIENT_SECRET` |                                       | Yes       | The CrowdStrike API client secret.                              |
+
+## Deployment
 
 ### Docker Deployment
 
@@ -51,28 +94,6 @@ poetry install --extras dev
 ```commandline
 poetry run python -m crowdstrike.openbas_crowdstrike
 ```
-
-## Configuration
-
-The collector can be configured with the following variables:
-
-| Config Parameter              | Docker env var              | Default                               | Description                                                                                   |
-|-------------------------------|-----------------------------|---------------------------------------|-----------------------------------------------------------------------------------------------|
-| `openbas`.`url`               | `OPENBAS_URL`               |                                       | The URL to the OpenBAS instance                                                               |
-| `openbas`.`token`             | `OPENBAS_TOKEN`             |                                       | The auth token to the OpenBAS instance                                                        |
-| `collector`.`id`              | `COLLECTOR_ID`              |                                       | Unique ID of the running collector instance                                                   |
-| `collector`.`name`            | `COLLECTOR_NAME`            | `CrowdStrike Endpoint Security`       | Name of the collector (visible in UI)                                                         |
-| `collector`.`type`            | `COLLECTOR_TYPE`            | `openbas_crowdstrike`                 | Type of the collector                                                                         |
-| `collector`.`period`          | `COLLECTOR_PERIOD`          | 60                                    | Period for collection cycle (int, seconds)                                                    |
-| `collector`.`log_level`       | `COLLECTOR_LOG_LEVEL`       | `warn`                                | Threshold for log severity in console output                                                  |
-| `collector`.`platform`        | `COLLECTOR_PLATFORM`        | `EDR`                                 | Type of security platform this collector works for. One of: `EDR, XDR, SIEM, SOAR, NDR, ISPM` |
-| `crowdstrike`.`api_base_url`  | `CROWDSTRIKE_API_BASE_URL`  | `https://api.us-2.crowdstrike.com`    | The base URL for the CrowdStrike APIs.                                                        |
-| `crowdstrike`.`ui_base_url`   | `CROWDSTRIKE_UI_BASE_URL`   | `https://falcon.us-2.crowdstrike.com` | The base URL for the CrowdStrike UI you use to see your alerts.                               |
-| `crowdstrike`.`client_id`     | `CROWDSTRIKE_CLIENT_ID`     |                                       | The CrowdStrike API client ID.                                                                |
-| `crowdstrike`.`client_secret` | `CROWDSTRIKE_CLIENT_SECRET` |                                       | The CrowdStrike API client secret.                                                            |
-
-**Note**: the Crowdstrike credentials must have been granted the following privilege for this to work: `Alerts: Read and Write`
-(as per https://falcon.us-2.crowdstrike.com/documentation/page/d02475a5/converting-from-detects-api-to-alerts-api#s4c83596)
 
 ## Behavior
 
