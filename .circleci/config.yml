@@ -46,15 +46,6 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          working_directory: ~/
-          name: Clone pyobas
-          command: |
-            if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
-              git clone -b release/current https://github.com/OpenBAS-Platform/client-python
-            else
-              git clone -b main https://github.com/OpenBAS-Platform/client-python
-            fi
-      - run:
           working_directory: ~/openbas/crowdstrike
           name: Install poetry
           command: pip install poetry==2.1.3 && poetry config installer.re-resolve false
@@ -62,10 +53,15 @@ jobs:
           working_directory: ~/openbas/crowdstrike
           name: install crowdstrike
           command: |
+            poetry install --extras prod
+      - run:
+          working_directory: ~/
+          name: Overwrite pyobas with correct version from CI
+          command: |
             if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
-              poetry install --extras ci-current
+              poetry run pip install https://github.com/OpenBAS-Platform/client-python@release/current
             else
-              poetry install
+              poetry run pip install https://github.com/OpenBAS-Platform/client-python@main
             fi
       - run:
           working_directory: ~/openbas/crowdstrike
