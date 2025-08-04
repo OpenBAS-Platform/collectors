@@ -15,7 +15,7 @@ pyobas = [
     { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.9", source = "pypi"  },
     { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
 ]
-msgraph-sdk = "1.31.0"
+msgraph-sdk = "1.40.0"
 msal = "1.32.3"
 
 [tool.poetry.extras]
