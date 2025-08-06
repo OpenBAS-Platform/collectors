@@ -24,7 +24,6 @@ class NvdNistCveCollector(CollectorDaemon):
         """
         try:
             self.cve_config = NvdNistCveConfiguration()
-            print(self.cve_config)
 
             super().__init__(
                 configuration=self.cve_config,

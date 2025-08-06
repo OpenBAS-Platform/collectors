@@ -10,7 +10,6 @@ class NvdNistCveConfiguration(Configuration):
             If configuration invalid
         """
         config_hints = self._get_nvd_nist_cve_config_hints()
-        print(config_hints)
 
         try:
             super().__init__(config_hints=config_hints)

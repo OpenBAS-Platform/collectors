@@ -9,9 +9,7 @@ def main():
     Designed to run in a containerized environment.
     """
     try:
-        print("COLLECTOR ")
         collector = NvdNistCveCollector()
-        print("START")
         collector.start()
     except Exception as e:
         print(f"Collector failed to start: {e}")
