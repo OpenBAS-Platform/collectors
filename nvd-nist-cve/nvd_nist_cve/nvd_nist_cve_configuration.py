@@ -15,7 +15,12 @@ class NvdNistCveConfiguration(Configuration):
         config_hints = self._get_nvd_nist_cve_config_hints()
 
         try:
-            super().__init__(config_hints=config_hints, config_file_path=os.path.join(Path(__file__).parent.resolve(), "config.yml"))
+            super().__init__(
+                config_hints=config_hints,
+                config_file_path=os.path.join(
+                    Path(__file__).parent.resolve(), "config.yml"
+                ),
+            )
         except Exception as e:
             print(f"Collector failed to configure: {e}")
             raise
