@@ -38,6 +38,7 @@ class OpenBASTaniumThreatResponse:
                 "collector_name": {
                     "env": "COLLECTOR_NAME",
                     "file_path": ["collector", "name"],
+                    "default": "Tanium Threat Response ",
                 },
                 "collector_type": {
                     "env": "COLLECTOR_TYPE",
@@ -47,10 +48,12 @@ class OpenBASTaniumThreatResponse:
                 "collector_log_level": {
                     "env": "COLLECTOR_LOG_LEVEL",
                     "file_path": ["collector", "log_level"],
+                    "default": "warn",
                 },
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
+                    "default": 60,
                 },
                 "tanium_url": {
                     "env": "TANIUM_URL",

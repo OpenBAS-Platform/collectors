@@ -1,15 +1,17 @@
-version: '0'
 services:
   collector-crowdstrike:
     image: openbas/collector-crowdstrike:latest
     environment:
-      - OPENBAS_URL=http://localhost
-      - OPENBAS_TOKEN=ChangeMe
-      - COLLECTOR_ID=ChangeMe
-      - COLLECTOR_NAME=CrowdStrike
-      - COLLECTOR_LOG_LEVEL=error
-      - COLLECTOR_PLATFORM=EDR
-      - CROWDSTRIKE_BASE_URL=https://api.crowdstrike.com
-      - CROWDSTRIKE_CLIENT_ID=ChangeMe
-      - CROWDSTRIKE_CLIENT_SECRET=ChangeMe
-    restart: always
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME:-"CrowdStrike Endpoint Security"}
+      - COLLECTOR_TYPE=${COLLECTOR_TYPE:-openbas_crowdstrike}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD:-60}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL:-warn}
+      - COLLECTOR_PLATFORM=${COLLECTOR_PLATFORM:-EDR}
+      - CROWDSTRIKE_BASE_URL=${CROWDSTRIKE_BASE_URL}
+      - CROWDSTRIKE_UI_BASE_URL=${CROWDSTRIKE_UI_BASE_URL}
+      - CROWDSTRIKE_CLIENT_ID=${CROWDSTRIKE_CLIENT_ID}
+      - CROWDSTRIKE_CLIENT_SECRET=${CROWDSTRIKE_CLIENT_SECRET}
+    restart: unless-stopped
