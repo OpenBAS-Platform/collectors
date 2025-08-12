@@ -63,8 +63,6 @@ class Alert(Base):
     ):
         if signature_type_str == SignatureTypes.SIG_TYPE_PARENT_PROCESS_NAME:
             return data_item.get_process_image_names()
-        elif signature_type_str == SignatureTypes.SIG_TYPE_HOSTNAME:
-            return data_item.get_hostname()
         else:
             raise OpenBASError(
                 f"Unsupported signature type: {signature_type_str} by strategy {self.get_strategy_name()}"

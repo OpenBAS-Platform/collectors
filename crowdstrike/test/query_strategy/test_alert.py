@@ -105,29 +105,6 @@ class TestAlert(unittest.TestCase):
         with self.assertRaises(ValidationError):
             Item(**{})
 
-    def test_when_valid_alert_item_extract_hostname_as_expected(self):
-        expected_hostname = "hostname.domain"
-        item = Item(
-            **{
-                "id": "alert id",
-                "device": {"hostname": expected_hostname},
-                "filename": "process.exe",
-                "parent_details": {"filename": "parent.exe"},
-                "grandparent_details": {"filename": "grandparent.exe"},
-                "pattern_disposition": 0,
-                "display_name": "display name",
-                "created_timestamp": "2025-01-01T00:00:00Z",
-                "updated_timestamp": "2025-01-01T02:00:00Z",
-                "composite_id": "composite_id",
-            }
-        )
-
-        actual = TestAlert.STRATEGY.extract_signature_data(
-            item, SignatureTypes.SIG_TYPE_HOSTNAME
-        )
-
-        self.assertEqual(actual, expected_hostname)
-
     def test_when_valid_alert_item_extract_process_names_as_expected(self):
         expected_process_name = "process.exe"
         expected_parent_process_name = "parent.exe"

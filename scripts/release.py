@@ -63,17 +63,6 @@ os.system(
     + "/g' @"
 )
 
-# image: openbas/****:x.x.x -> docker-compose.yml
-os.system(
-    r"grep -rli '"
-    + previous_version
-    + "' * | xargs -i@ sed -i -E 's/openbas\/(.*)\:"
-    + previous_version.replace(".", "\\.")
-    + "/openbas\/\\1:"
-    + new_version.replace(".", "\\.")
-    + "/g' @"
-)
-
 # pyobas= = x.x.x -> pyproject.toml
 os.system(
     "grep -rli 'pyobas = \""
