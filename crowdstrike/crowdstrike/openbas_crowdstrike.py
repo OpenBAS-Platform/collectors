@@ -206,6 +206,7 @@ if __name__ == "__main__":
             "collector_name": {
                 "env": "COLLECTOR_NAME",
                 "file_path": ["collector", "name"],
+                "default": "CrowdStrike Endpoint Security",
             },
             "collector_type": {
                 "env": "COLLECTOR_TYPE",
@@ -215,30 +216,31 @@ if __name__ == "__main__":
             "collector_period": {
                 "env": "COLLECTOR_PERIOD",
                 "file_path": ["collector", "period"],
+                "default": 60,
             },
             "collector_log_level": {
                 "env": "COLLECTOR_LOG_LEVEL",
                 "file_path": ["collector", "log_level"],
+                "default": "warn",
             },
             "collector_platform": {
                 "env": "COLLECTOR_PLATFORM",
                 "file_path": ["collector", "platform"],
+                "default": "EDR",
             },
             # CrowdStrike
             "crowdstrike_client_id": {
                 "env": "CROWDSTRIKE_CLIENT_ID",
                 "file_path": ["crowdstrike", "client_id"],
-                "default": "CHANGEME",
             },
             "crowdstrike_client_secret": {
                 "env": "CROWDSTRIKE_CLIENT_SECRET",
                 "file_path": ["crowdstrike", "client_secret"],
-                "default": "CHANGEME",
             },
             "crowdstrike_api_base_url": {
                 "env": "CROWDSTRIKE_API_BASE_URL",
                 "file_path": ["crowdstrike", "api_base_url"],
-                "default": "https://api.crowdstrike.com",
+                "default": "https://api.us-2.crowdstrike.com",
             },
             "crowdstrike_ui_base_url": {
                 "env": "CROWDSTRIKE_UI_BASE_URL",
