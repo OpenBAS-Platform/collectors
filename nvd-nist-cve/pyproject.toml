@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openbas-nvd-nist-cve-collector"
-version = "1.18.9"
+version = "1.18.10"
 description = "Collector for retrieve CVE from NVD by Nist"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"
@@ -10,8 +10,9 @@ packages = [{include = "nvd_nist_cve"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 pyobas = [
-    { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.10", source = "pypi"  },
-    { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
+    { markers = "extra == 'dev'", path = "../../client-python", develop = true },
+    { markers = "extra == 'current'", git = 'https://github.com/OpenBAS-Platform/client-python', branch = 'release/current' },
+    { markers = "extra == 'prod'", version = "1.18.10", source = "pypi"  },
 ]
 
 [tool.poetry.extras]

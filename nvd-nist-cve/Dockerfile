@@ -13,7 +13,7 @@ FROM python:3.13-alpine AS runner
 
 ARG installdir=/collector
 COPY --from=builder ${installdir} ${installdir}
-RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[prod]"
+RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[${EXTRA_NAME}]"
 
 # necessary for icon location
 WORKDIR ${installdir}

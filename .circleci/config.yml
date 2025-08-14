@@ -96,6 +96,11 @@ jobs:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
+            if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
+              EXTRA_NAME="current"
+            else
+              EXTRA_NAME="prod"
+            fi
             docker build --progress=plain -t openbas/collector-mitre-attack:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-mitre-attack openbas/collector-mitre-attack:${CIRCLE_SHA1}
       - run:
