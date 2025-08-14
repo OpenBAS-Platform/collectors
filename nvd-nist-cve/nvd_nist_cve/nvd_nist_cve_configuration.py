@@ -78,7 +78,6 @@ class NvdNistCveConfiguration(Configuration):
             "nvd_nist_cve_api_key": {
                 "env": "NVD_NIST_CVE_API_KEY",
                 "file_path": ["nvd_nist_cve", "api_key"],
-                "required": True,
             },
             "nvd_nist_cve_api_base_url": {
                 "env": "NVD_NIST_CVE_API_BASE_URL",

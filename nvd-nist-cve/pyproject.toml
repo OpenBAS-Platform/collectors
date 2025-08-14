@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openbas-nvd-nist-cve-collector"
-version = "1.18.9"
+version = "1.18.10"
 description = "Collector for retrieve CVE from NVD by Nist"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"

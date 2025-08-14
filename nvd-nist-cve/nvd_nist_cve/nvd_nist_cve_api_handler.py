@@ -23,10 +23,10 @@ class NvdNistCveApiHandler:
     """
 
     def __init__(self, base_url: str, api_key, logger=None):
-        headers = {"apiKey": api_key}
         self.token = api_key
         self.session = requests.Session()
-        self.session.headers.update(headers)
+        if api_key:
+            self.session.headers.update({"apiKey": api_key})
         self.base_url = base_url
         self.logger = logger
         self.cve_url = "/cves/2.0"
