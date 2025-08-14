@@ -17,6 +17,7 @@ pyobas = [
 
 [tool.poetry.extras]
 prod = []
+current = []
 dev = []
 
 [build-system]
