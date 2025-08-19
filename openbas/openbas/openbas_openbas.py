@@ -41,6 +41,7 @@ class OpenBASOpenBAS:
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
+                    "is_number": True,
                     "default": 604800,
                 },
                 # OpenBAS Datasets

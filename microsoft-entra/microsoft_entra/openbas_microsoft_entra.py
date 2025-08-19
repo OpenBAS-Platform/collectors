@@ -41,6 +41,7 @@ class OpenBASMicrosoftEntra:
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
+                    "is_number": True,
                     "default": 60,
                 },
                 "microsoft_entra_tenant_id": {
