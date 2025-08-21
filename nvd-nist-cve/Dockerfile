@@ -1,3 +1,6 @@
+# Declare the build argument
+ARG CIRCLE_BRANCH
+
 FROM python:3.13-alpine AS builder
 
 # poetry version available on Ubuntu 24.04
@@ -13,7 +16,9 @@ FROM python:3.13-alpine AS runner
 
 ARG installdir=/collector
 COPY --from=builder ${installdir} ${installdir}
-RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[${EXTRA_NAME}]"
+RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[prod]"
+
+RUN if [ "${CIRCLE_BRANCH}" = "release/current" ] ; then apk add --no-cache git; pip install git+https://github.com/OpenBAS-Platform/client-python@release/current; echo "forcing release/current version of client-python" ; fi
 
 # necessary for icon location
 WORKDIR ${installdir}

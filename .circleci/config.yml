@@ -96,18 +96,13 @@ jobs:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
-            if [ "${CIRCLE_BRANCH}" = "release/current" ]; then
-              EXTRA_NAME="current"
-            else
-              EXTRA_NAME="prod"
-            fi
             docker build --progress=plain -t openbas/collector-mitre-attack:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-mitre-attack openbas/collector-mitre-attack:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/nvd-nist-cve
           name: Build Docker image openbas/nvd-nist-cve
           command: |
-            docker build --progress=plain -t openbas/collector-nvd-nist-cve:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-nvd-nist-cve:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-nvd-nist-cve openbas/collector-nvd-nist-cve:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-entra
