@@ -96,7 +96,7 @@ jobs:
           working_directory: ~/openbas/mitre-attack
           name: Build Docker image openbas/collector-mitre-attack
           command: |
-            docker build --progress=plain -t openbas/collector-mitre-attack:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-mitre-attack:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-mitre-attack openbas/collector-mitre-attack:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/nvd-nist-cve
@@ -108,43 +108,43 @@ jobs:
           working_directory: ~/openbas/microsoft-entra
           name: Build Docker image openbas/collector-microsoft-entra
           command: |
-            docker build --progress=plain -t openbas/collector-microsoft-entra:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-microsoft-entra:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-microsoft-entra openbas/collector-microsoft-entra:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/tanium-threat-response
           name: Build Docker image openbas/collector-tanium-threat-response
           command: |
-            docker build --progress=plain -t openbas/collector-tanium-threat-response:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-tanium-threat-response:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-tanium-threat-response openbas/collector-tanium-threat-response:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-defender
           name: Build Docker image openbas/collector-microsoft-defender
           command: |
-            docker build --progress=plain -t openbas/collector-microsoft-defender:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-microsoft-defender:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-microsoft-defender openbas/collector-microsoft-defender:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/microsoft-sentinel
           name: Build Docker image openbas/collector-microsoft-sentinel
           command: |
-            docker build --progress=plain -t openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-microsoft-sentinel:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-microsoft-sentinel openbas/collector-microsoft-sentinel:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/atomic-red-team
           name: Build Docker image openbas/collector-atomic-red-team
           command: |
-            docker build --progress=plain -t openbas/collector-atomic-red-team:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-atomic-red-team:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-atomic-red-team openbas/collector-atomic-red-team:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/crowdstrike
           name: Build Docker image openbas/collector-crowdstrike
           command: |
-            docker build --progress=plain -t openbas/collector-crowdstrike:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-crowdstrike:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-crowdstrike openbas/collector-crowdstrike:${CIRCLE_SHA1}
       - run:
           working_directory: ~/openbas/openbas
           name: Build Docker image openbas/collector-openbas
           command: |
-            docker build --progress=plain -t openbas/collector-openbas:${CIRCLE_SHA1} .
+            docker build --progress=plain -t openbas/collector-openbas:${CIRCLE_SHA1} --build-arg CIRCLE_BRANCH="${CIRCLE_BRANCH}" .
             docker save -o ~/openbas/images/collector-openbas openbas/collector-openbas:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
