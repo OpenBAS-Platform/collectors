@@ -18,7 +18,7 @@ ARG installdir=/collector
 COPY --from=builder ${installdir} ${installdir}
 RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[prod]"
 
-RUN if [ "${CIRCLE_BRANCH}" != "main" ] ; then \
+RUN if [ "${CIRCLE_BRANCH}" = "release/current" ] ; then \
         echo "Forcing release/current version of client-python" && \
         apk add --no-cache git && \
         pip install pip3-autoremove && \
