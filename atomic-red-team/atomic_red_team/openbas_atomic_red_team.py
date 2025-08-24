@@ -7,7 +7,24 @@ from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 ATOMIC_RED_TEAM_INDEX = "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/master/atomics/Indexes/index.yaml"
 
-VERIFIED_PAYLOADS = ["aa6cb8c4-b582-4f8e-b677-37733914abda"]
+# Ignore payloads copied and verified to OpenBAS Payloads Repository
+IGNORED_PAYLOADS = [
+    "aa6cb8c4-b582-4f8e-b677-37733914abda",
+    "cab413d8-9e4a-4b8d-9b84-c985bd73a442",
+    "78e95057-d429-4e66-8f82-0f060c1ac96f",
+    "13f09b91-c953-438e-845b-b585e51cac9b",
+    "17538258-5699-4ff1-92d1-5ac9b0dc21f5",
+    "728eca7b-0444-4f6f-ac36-437e3d751dc0",
+    "695eed40-e949-40e5-b306-b4031e4154bd",
+    "99747561-ed8d-47f2-9c91-1e5fde1ed6e0",
+    "114ccff9-ae6d-4547-9ead-4cd69f687306",
+    "0315bdff-4178-47e9-81e4-f31a6d23f7e4",
+    "02a91c34-8a5b-4bed-87af-501103eb5357",
+    "dd4b4421-2e25-4593-90ae-7021947ad12e",
+    "6aa58451-1121-4490-a8e9-1dada3f1c68c",
+    "b854eb97-bf9b-45ab-a1b5-b94e4880c56b",
+    "4ff64f0b-aaf2-4866-b39d-38d9791407cc",
+]
 
 PLATFORMS = {
     "windows": "Windows",
@@ -241,6 +258,8 @@ class OpenBASAtomicRedTeam:
                 for atomic_test in art_index[kill_chain_phase][attack_pattern][
                     "atomic_tests"
                 ]:
+                    if atomic_test["auto_generated_guid"] in IGNORED_PAYLOADS:
+                        continue
                     arguments = []
                     if (
                         "input_arguments" in atomic_test
@@ -306,12 +325,7 @@ class OpenBASAtomicRedTeam:
                         payload = {
                             "payload_source": COMMUNITY,
                             "payload_execution_arch": ALL_ARCHITECTURES,
-                            "payload_status": (
-                                VERIFIED
-                                if atomic_test["auto_generated_guid"]
-                                in VERIFIED_PAYLOADS
-                                else UNVERIFIED
-                            ),
+                            "payload_status": UNVERIFIED,
                             "payload_external_id": atomic_test["auto_generated_guid"],
                             "payload_type": "Command",
                             "payload_collector": self.helper.config.get("collector_id"),
