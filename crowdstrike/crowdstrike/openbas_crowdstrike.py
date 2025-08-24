@@ -216,6 +216,7 @@ if __name__ == "__main__":
             "collector_period": {
                 "env": "COLLECTOR_PERIOD",
                 "file_path": ["collector", "period"],
+                "is_number": True,
                 "default": 60,
             },
             "collector_log_level": {

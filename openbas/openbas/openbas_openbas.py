@@ -41,7 +41,8 @@ class OpenBASOpenBAS:
                 "collector_period": {
                     "env": "COLLECTOR_PERIOD",
                     "file_path": ["collector", "period"],
-                    "default": 604800,
+                    "is_number": True,
+                    "default": 86400,
                 },
                 # OpenBAS Datasets
                 "openbas_generated_url_prefix": {
@@ -170,7 +171,7 @@ class OpenBASOpenBAS:
     # Start the main loop
     def start(self):
         period = self.config.get_conf(
-            "collector_period", default=604800, is_number=True
+            "collector_period", default=86400, is_number=True
         )  # 7 days
         self.helper.schedule(message_callback=self._process_message, delay=period)
 
