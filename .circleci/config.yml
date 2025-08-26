@@ -182,6 +182,12 @@ jobs:
               docker build --progress=plain -t openbas/collector-openbas:${CIRCLE_SHA1} .
             fi
             docker save -o ~/openbas/images/collector-openbas openbas/collector-openbas:${CIRCLE_SHA1}
+      - run:
+          working_directory: ~/openbas/microsoft-azure
+          name: Build Docker image openbas/collector-microsoft-azure
+          command: |
+            docker build --progress=plain -t openbas/collector-microsoft-azure:${CIRCLE_SHA1} .
+            docker save -o ~/openbas/images/collector-microsoft-azure openbas/collector-microsoft-azure:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
           paths:
@@ -242,6 +248,8 @@ jobs:
             docker tag openbas/collector-crowdstrike:${CIRCLE_SHA1} openbas/collector-crowdstrike:${IMAGETAG}
             docker image load < collector-openbas
             docker tag openbas/collector-openbas:${CIRCLE_SHA1} openbas/collector-openbas:${IMAGETAG}
+            docker image load < collector-microsoft-azure
+            docker tag openbas/collector-microsoft-azure:${CIRCLE_SHA1} openbas/collector-microsoft-azure:${IMAGETAG}
 
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:${IMAGETAG}
@@ -253,6 +261,7 @@ jobs:
             docker push openbas/collector-atomic-red-team:${IMAGETAG}
             docker push openbas/collector-crowdstrike:${IMAGETAG}
             docker push openbas/collector-openbas:${IMAGETAG}
+            docker push openbas/collector-microsoft-azure:${IMAGETAG}
 
             if [ "${IS_LATEST}" == "true" ]
             then
@@ -274,6 +283,7 @@ jobs:
               docker push openbas/collector-atomic-red-team:latest
               docker push openbas/collector-crowdstrike:latest
               docker push openbas/collector-openbas:latest
+              docker push openbas/collector-microsoft-azure:latest
             fi
       - slack/notify:
           event: fail
