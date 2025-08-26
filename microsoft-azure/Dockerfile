@@ -1,21 +1,21 @@
-FROM python:3.11-alpine
-ENV PYTHONUNBUFFERED=1
+FROM python:3.13-alpine AS builder
 
-RUN apk update && apk upgrade && apk add --no-cache gcc g++ musl-dev python3-dev libffi-dev openssl-dev
+# poetry version available on Ubuntu 24.04
+RUN pip3 install poetry==2.1.3
 
-RUN mkdir /opt/openbas-microsoft-azure-collector
-WORKDIR /opt/openbas-microsoft-azure-collector
+RUN apk update && apk upgrade
 
-ENV PATH="${PATH}:/root/.local/bin"
-RUN pip install --user --upgrade pip setuptools wheel
-RUN pip install --user poetry
+ARG installdir=/collector
+ADD . ${installdir}
+RUN cd ${installdir} && poetry build
 
-# Copy files
-COPY . ./
-RUN cd /opt/openbas-microsoft-azure-collector && poetry install --with prod --extras prod
+FROM python:3.13-alpine AS runner
 
-# Expose and entrypoint
-COPY microsoft_azure /opt/openbas-microsoft-azure-collector
-WORKDIR /opt/openbas-microsoft-azure-collector
-ENV PYTHONPATH=/opt/openbas-microsoft-azure-collector
-ENTRYPOINT ["poetry", "run", "python3", "openbas_microsoft_azure.py"]
+ARG installdir=/collector
+COPY --from=builder ${installdir} ${installdir}
+RUN cd ${installdir}/dist && pip3 install --no-cache-dir "$(ls *.whl)[prod]"
+
+# necessary for icon location
+WORKDIR ${installdir}
+
+CMD ["python3", "-m", "microsoft_azure.openbas_microsoft_azure"]
