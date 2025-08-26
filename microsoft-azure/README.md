@@ -123,10 +123,16 @@ For each Virtual Machine, the collector captures:
 - **Resource ID**: Azure resource identifier (external reference)
 - **Platform**: Operating system type (Windows/Linux/Generic)
 - **Architecture**: Based on VM size
-- **IP Addresses**: Both private and public IPs
+- **IP Addresses**: Both private and public IPs (placeholder IP used if network details unavailable)
 - **Location**: Azure region
 - **Size**: VM size designation
 - **Tags**: Azure tags for categorization
+
+## API Versions
+
+The collector uses different Azure API versions for different resource types:
+- **Compute Resources** (VMs): API version `2023-03-01`
+- **Network Resources** (NICs, Public IPs): API version `2023-06-01`
 
 ## Troubleshooting
 
