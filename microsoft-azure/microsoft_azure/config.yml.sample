@@ -1,0 +1,14 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Microsoft Azure'
+  period: 3600
+  log_level: 'info'
+  microsoft_azure_tenant_id: ''
+  microsoft_azure_client_id: ''
+  microsoft_azure_client_secret: ''
+  microsoft_azure_subscription_id: ''
+  microsoft_azure_resource_groups: ''  # Comma-separated list of resource groups, leave empty for all VMs in subscription
