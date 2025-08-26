@@ -1,0 +1,18 @@
+version: '3'
+services:
+  openbas-microsoft-azure-collector:
+    container_name: openbas-microsoft-azure-collector
+    image: openbas-microsoft-azure-collector:latest
+    environment:
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - MICROSOFT_AZURE_TENANT_ID=${MICROSOFT_AZURE_TENANT_ID}
+      - MICROSOFT_AZURE_CLIENT_ID=${MICROSOFT_AZURE_CLIENT_ID}
+      - MICROSOFT_AZURE_CLIENT_SECRET=${MICROSOFT_AZURE_CLIENT_SECRET}
+      - MICROSOFT_AZURE_SUBSCRIPTION_ID=${MICROSOFT_AZURE_SUBSCRIPTION_ID}
+      - MICROSOFT_AZURE_RESOURCE_GROUPS=${MICROSOFT_AZURE_RESOURCE_GROUPS}
+    restart: always
