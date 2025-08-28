@@ -146,6 +146,12 @@ jobs:
           command: |
             docker build --progress=plain -t openbas/collector-microsoft-azure:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-microsoft-azure openbas/collector-microsoft-azure:${CIRCLE_SHA1}
+      - run:
+          working_directory: ~/openbas/microsoft-intune
+          name: Build Docker image openbas/collector-microsoft-intune
+          command: |
+            docker build --progress=plain -t openbas/collector-microsoft-intune:${CIRCLE_SHA1} .
+            docker save -o ~/openbas/images/collector-microsoft-intune openbas/collector-microsoft-intune:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
           paths:
@@ -206,6 +212,8 @@ jobs:
             docker tag openbas/collector-openbas:${CIRCLE_SHA1} openbas/collector-openbas:${IMAGETAG}
             docker image load < collector-microsoft-azure
             docker tag openbas/collector-microsoft-azure:${CIRCLE_SHA1} openbas/collector-microsoft-azure:${IMAGETAG}
+            docker image load < collector-microsoft-intune
+            docker tag openbas/collector-microsoft-intune:${CIRCLE_SHA1} openbas/collector-microsoft-intune:${IMAGETAG}
 
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:${IMAGETAG}
@@ -217,6 +225,7 @@ jobs:
             docker push openbas/collector-crowdstrike:${IMAGETAG}
             docker push openbas/collector-openbas:${IMAGETAG}
             docker push openbas/collector-microsoft-azure:${IMAGETAG}
+            docker push openbas/collector-microsoft-intune:${IMAGETAG}
 
             if [ "${IS_LATEST}" == "true" ]
             then
@@ -228,6 +237,8 @@ jobs:
               docker tag openbas/collector-atomic-red-team:${IMAGETAG} openbas/collector-atomic-red-team:latest
               docker tag openbas/collector-crowdstrike:${IMAGETAG} openbas/collector-crowdstrike:latest
               docker tag openbas/collector-openbas:${IMAGETAG} openbas/collector-openbas:latest
+              docker tag openbas/collector-microsoft-azure:${IMAGETAG} openbas/collector-microsoft-azure:latest
+              docker tag openbas/collector-microsoft-intune:${IMAGETAG} openbas/collector-microsoft-intune:latest
               docker push openbas/collector-mitre-attack:latest
               docker push openbas/collector-microsoft-entra:latest
               docker push openbas/collector-tanium-threat-response:latest
@@ -237,6 +248,7 @@ jobs:
               docker push openbas/collector-crowdstrike:latest
               docker push openbas/collector-openbas:latest
               docker push openbas/collector-microsoft-azure:latest
+              docker push openbas/collector-microsoft-intune:latest
             fi
       - slack/notify:
           event: fail
