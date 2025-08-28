@@ -239,6 +239,7 @@ jobs:
               docker tag openbas/collector-openbas:${IMAGETAG} openbas/collector-openbas:latest
               docker tag openbas/collector-microsoft-azure:${IMAGETAG} openbas/collector-microsoft-azure:latest
               docker tag openbas/collector-microsoft-intune:${IMAGETAG} openbas/collector-microsoft-intune:latest
+
               docker push openbas/collector-mitre-attack:latest
               docker push openbas/collector-microsoft-entra:latest
               docker push openbas/collector-tanium-threat-response:latest
