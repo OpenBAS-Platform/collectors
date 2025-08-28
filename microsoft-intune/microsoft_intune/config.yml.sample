@@ -1,0 +1,14 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Microsoft Intune'
+  period: 3600
+  log_level: 'info'
+  microsoft_intune_tenant_id: ''
+  microsoft_intune_client_id: ''
+  microsoft_intune_client_secret: ''
+  microsoft_intune_device_filter: ''  # Optional OData filter e.g. "operatingSystem eq 'Windows'" or leave empty for all devices
+  microsoft_intune_device_groups: ''  # Comma-separated list of device group names or IDs, leave empty for all devices
