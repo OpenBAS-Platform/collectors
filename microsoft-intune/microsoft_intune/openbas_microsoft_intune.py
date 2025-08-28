@@ -414,13 +414,19 @@ class OpenBASMicrosoftIntune:
                 mac_addresses = self._get_mac_addresses(device)
 
                 # Build description
-                description_parts = [f"Intune Managed Device"]
+                description_parts = ["Intune Managed Device"]
                 if model:
                     description_parts.append(f"Model: {model}")
                 if manufacturer:
                     description_parts.append(f"Manufacturer: {manufacturer}")
                 if compliance_state:
                     description_parts.append(f"Compliance: {compliance_state}")
+                if serial_number:
+                    description_parts.append(f"Serial: {serial_number}")
+                if enrollment_date:
+                    description_parts.append(f"Enrolled: {enrollment_date[:10]}")  # Just date part
+                if last_sync:
+                    description_parts.append(f"Last Sync: {last_sync[:10]}")  # Just date part
 
                 # Create endpoint object
                 endpoint = {
