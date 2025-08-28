@@ -1,0 +1,18 @@
+version: '3'
+services:
+  openbas-microsoft-intune-collector:
+    container_name: openbas-microsoft-intune-collector
+    image: openbas-microsoft-intune-collector:latest
+    environment:
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - MICROSOFT_INTUNE_TENANT_ID=${MICROSOFT_INTUNE_TENANT_ID}
+      - MICROSOFT_INTUNE_CLIENT_ID=${MICROSOFT_INTUNE_CLIENT_ID}
+      - MICROSOFT_INTUNE_CLIENT_SECRET=${MICROSOFT_INTUNE_CLIENT_SECRET}
+      - MICROSOFT_INTUNE_DEVICE_FILTER=${MICROSOFT_INTUNE_DEVICE_FILTER}
+      - MICROSOFT_INTUNE_DEVICE_GROUPS=${MICROSOFT_INTUNE_DEVICE_GROUPS}
+    restart: always

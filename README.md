@@ -83,19 +83,22 @@ Here's an example layout:
 ```
 .
 ├── client-python       <= mandatory dir name
-│   ├── docs
-│   ├── pyobas
-│   ├── scripts
-│   └── test
+│   ├── docs
+│   ├── pyobas
+│   ├── scripts
+│   └── test
 └── collectors          <= this repo root dir
-    ├── atomic-red-team
-    ├── crowdstrike
-    ├── microsoft-defender
-    ├── microsoft-entra
-    ├── microsoft-sentinel
-    ├── mitre-attack
-    ├── scripts
-    └── tanium-threat-response
+    ├── atomic-red-team
+    ├── crowdstrike
+    ├── microsoft-azure
+    ├── microsoft-defender
+    ├── microsoft-entra
+    ├── microsoft-intune
+    ├── microsoft-sentinel
+    ├── mitre-attack
+    ├── openbas
+    ├── scripts
+    └── tanium-threat-response
 ```
 
 ## License
