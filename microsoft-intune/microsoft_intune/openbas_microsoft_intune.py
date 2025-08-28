@@ -424,9 +424,13 @@ class OpenBASMicrosoftIntune:
                 if serial_number:
                     description_parts.append(f"Serial: {serial_number}")
                 if enrollment_date:
-                    description_parts.append(f"Enrolled: {enrollment_date[:10]}")  # Just date part
+                    description_parts.append(
+                        f"Enrolled: {enrollment_date[:10]}"
+                    )  # Just date part
                 if last_sync:
-                    description_parts.append(f"Last Sync: {last_sync[:10]}")  # Just date part
+                    description_parts.append(
+                        f"Last Sync: {last_sync[:10]}"
+                    )  # Just date part
 
                 # Create endpoint object
                 endpoint = {
