@@ -94,11 +94,19 @@ class OpenBASMicrosoftEntra:
         members = await graph_client.groups.by_group_id(group_id).members.get()
         if members:
             for i in range(len(members.value)):
-                if members.value[i].mail is not None and (
+                # Skip non-user objects (like Device objects)
+                member = members.value[i]
+                if (
+                    not hasattr(member, "mail")
+                    or member.odata_type != "#microsoft.graph.user"
+                ):
+                    continue
+
+                if member.mail is not None and (
                     self.include_external is True
                     or (
                         self.include_external is False
-                        and "#EXT#" not in members.value[i].user_principal_name
+                        and "#EXT#" not in member.user_principal_name
                     )
                 ):
                     # Prepare tag IDs list
@@ -122,7 +130,7 @@ class OpenBASMicrosoftEntra:
                             tag_ids.append(group_tag_id)
 
                     # Add external user tag if applicable
-                    if "#EXT#" in members.value[i].user_principal_name:
+                    if "#EXT#" in member.user_principal_name:
                         ext_tag_name = "user-type:external"
                         ext_tag_id = self._create_or_get_tag(
                             ext_tag_name, tag_colors["user-type"]
@@ -138,13 +146,8 @@ class OpenBASMicrosoftEntra:
                             tag_ids.append(int_tag_id)
 
                     # Add department tag if available
-                    if (
-                        hasattr(members.value[i], "department")
-                        and members.value[i].department
-                    ):
-                        dept_tag_name = (
-                            f"department:{members.value[i].department.lower()}"
-                        )
+                    if hasattr(member, "department") and member.department:
+                        dept_tag_name = f"department:{member.department.lower()}"
                         dept_tag_id = self._create_or_get_tag(
                             dept_tag_name, tag_colors["department"]
                         )
@@ -152,11 +155,8 @@ class OpenBASMicrosoftEntra:
                             tag_ids.append(dept_tag_id)
 
                     # Add job title tag if available
-                    if (
-                        hasattr(members.value[i], "job_title")
-                        and members.value[i].job_title
-                    ):
-                        job_tag_name = f"job-title:{members.value[i].job_title.lower()}"
+                    if hasattr(member, "job_title") and member.job_title:
+                        job_tag_name = f"job-title:{member.job_title.lower()}"
                         job_tag_id = self._create_or_get_tag(
                             job_tag_name, tag_colors["job-title"]
                         )
@@ -164,9 +164,9 @@ class OpenBASMicrosoftEntra:
                             tag_ids.append(job_tag_id)
 
                     user = {
-                        "user_email": members.value[i].mail,
-                        "user_firstname": members.value[i].given_name,
-                        "user_lastname": members.value[i].surname,
+                        "user_email": member.mail,
+                        "user_firstname": member.given_name,
+                        "user_lastname": member.surname,
                         "user_teams": [openbas_team["team_id"]],
                     }
 
@@ -179,17 +179,25 @@ class OpenBASMicrosoftEntra:
         # iterate over result batches > 100 rows
         while members is not None and members.odata_next_link is not None:
             members = (
-                await graph_client.groups.by_group_id(id)
+                await graph_client.groups.by_group_id(group_id)
                 .members.with_url(members.odata_next_link)
                 .get()
             )
             if members:
                 for i in range(len(members.value)):
-                    if members.value[i].mail is not None and (
+                    # Skip non-user objects (like Device objects)
+                    member = members.value[i]
+                    if (
+                        not hasattr(member, "mail")
+                        or member.odata_type != "#microsoft.graph.user"
+                    ):
+                        continue
+
+                    if member.mail is not None and (
                         self.include_external is True
                         or (
                             self.include_external is False
-                            and "#EXT#" not in members.value[i].user_principal_name
+                            and "#EXT#" not in member.user_principal_name
                         )
                     ):
                         # Prepare tag IDs list
@@ -215,7 +223,7 @@ class OpenBASMicrosoftEntra:
                                 tag_ids.append(group_tag_id)
 
                         # Add external user tag if applicable
-                        if "#EXT#" in members.value[i].user_principal_name:
+                        if "#EXT#" in member.user_principal_name:
                             ext_tag_name = "user-type:external"
                             ext_tag_id = self._create_or_get_tag(
                                 ext_tag_name, tag_colors["user-type"]
@@ -231,13 +239,8 @@ class OpenBASMicrosoftEntra:
                                 tag_ids.append(int_tag_id)
 
                         # Add department tag if available
-                        if (
-                            hasattr(members.value[i], "department")
-                            and members.value[i].department
-                        ):
-                            dept_tag_name = (
-                                f"department:{members.value[i].department.lower()}"
-                            )
+                        if hasattr(member, "department") and member.department:
+                            dept_tag_name = f"department:{member.department.lower()}"
                             dept_tag_id = self._create_or_get_tag(
                                 dept_tag_name, tag_colors["department"]
                             )
@@ -245,13 +248,8 @@ class OpenBASMicrosoftEntra:
                                 tag_ids.append(dept_tag_id)
 
                         # Add job title tag if available
-                        if (
-                            hasattr(members.value[i], "job_title")
-                            and members.value[i].job_title
-                        ):
-                            job_tag_name = (
-                                f"job-title:{members.value[i].job_title.lower()}"
-                            )
+                        if hasattr(member, "job_title") and member.job_title:
+                            job_tag_name = f"job-title:{member.job_title.lower()}"
                             job_tag_id = self._create_or_get_tag(
                                 job_tag_name, tag_colors["job-title"]
                             )
@@ -259,9 +257,9 @@ class OpenBASMicrosoftEntra:
                                 tag_ids.append(job_tag_id)
 
                         user = {
-                            "user_email": members.value[i].mail,
-                            "user_firstname": members.value[i].given_name,
-                            "user_lastname": members.value[i].surname,
+                            "user_email": member.mail,
+                            "user_firstname": member.given_name,
+                            "user_lastname": member.surname,
                             "user_teams": [openbas_team["team_id"]],
                         }
 
