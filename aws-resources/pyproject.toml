@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "openbas-aws-resources-collector"
+version = "1.18.12"
+description = "A Collector for AWS Resources (EC2 Instances)"
+authors = ["Filigran <contact@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "aws_resources" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = [
+    { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.12", source = "pypi"  },
+    { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
+]
+boto3 = "1.35.107"
+botocore = "1.35.107"
+
+[tool.poetry.extras]
+prod = []
+dev = []
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

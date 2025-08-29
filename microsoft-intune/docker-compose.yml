@@ -1,8 +1,7 @@
 version: '3'
 services:
-  openbas-microsoft-intune-collector:
-    container_name: openbas-microsoft-intune-collector
-    image: openbas-microsoft-intune-collector:latest
+  collector-microsoft-intune:
+    image: openbas/collector-microsoft-intune:latest
     environment:
       - OPENBAS_URL=${OPENBAS_URL}
       - OPENBAS_TOKEN=${OPENBAS_TOKEN}

@@ -63,7 +63,7 @@ class OpenBASMicrosoftAzure:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            config=self.config, icon="img/icon-microsoft-azure.png"
+            config=self.config, icon="microsoft_azure/img/icon-microsoft-azure.png"
         )
 
         # Azure settings
@@ -265,6 +265,18 @@ class OpenBASMicrosoftAzure:
         else:
             return "Generic"
 
+    def _create_or_get_tag(self, tag_name, tag_color="#6b7280"):
+        """Create or get a tag and return its ID."""
+        try:
+            tag_data = {"tag_name": tag_name, "tag_color": tag_color}
+            result = self.helper.api.tag.upsert(tag_data)
+            return result.get("tag_id")
+        except Exception as e:
+            self.helper.collector_logger.warning(
+                f"Failed to upsert tag {tag_name}: {e}"
+            )
+            return None
+
     def _process_message(self) -> None:
         """Process message to collect VMs and upsert them as endpoints."""
         try:
@@ -336,11 +348,73 @@ class OpenBASMicrosoftAzure:
                     "asset_description": f"Azure VM - Size: {vm_size}, Location: {vm_location}",
                 }
 
-                # Add tags if available
-                tags = vm.get("tags", {})
-                if tags:
-                    tag_list = [f"{k}:{v}" for k, v in tags.items()]
-                    endpoint["asset_tags"] = tag_list
+                # Prepare tag IDs list for OpenBAS tags
+                tag_ids = []
+                tag_colors = {
+                    "source": "#ef4444",  # Red
+                    "location": "#3b82f6",  # Blue
+                    "size": "#8b5cf6",  # Purple
+                    "state": "#f59e0b",  # Amber
+                    "resource-group": "#10b981",  # Green
+                    "azure-tag": "#6b7280",  # Gray (for native Azure tags)
+                }
+
+                # Add collector source tag
+                source_tag_name = "source:microsoft-azure"
+                source_tag_id = self._create_or_get_tag(
+                    source_tag_name, tag_colors["source"]
+                )
+                if source_tag_id:
+                    tag_ids.append(source_tag_id)
+
+                # Add location tag
+                if vm_location:
+                    tag_name = f"location:{vm_location}"
+                    tag_id = self._create_or_get_tag(tag_name, tag_colors["location"])
+                    if tag_id:
+                        tag_ids.append(tag_id)
+
+                # Add VM size tag
+                if vm_size:
+                    tag_name = f"vm-size:{vm_size.lower()}"
+                    tag_id = self._create_or_get_tag(tag_name, tag_colors["size"])
+                    if tag_id:
+                        tag_ids.append(tag_id)
+
+                # Add provisioning state tag
+                if provisioning_state:
+                    tag_name = f"state:{provisioning_state.lower()}"
+                    tag_id = self._create_or_get_tag(tag_name, tag_colors["state"])
+                    if tag_id:
+                        tag_ids.append(tag_id)
+
+                # Extract resource group from vm_id
+                if vm_id:
+                    parts = vm_id.split("/")
+                    if len(parts) > 4:
+                        resource_group = parts[4]
+                        tag_name = f"resource-group:{resource_group.lower()}"
+                        tag_id = self._create_or_get_tag(
+                            tag_name, tag_colors["resource-group"]
+                        )
+                        if tag_id:
+                            tag_ids.append(tag_id)
+
+                # Add Azure native tags
+                azure_tags = vm.get("tags", {})
+                if azure_tags:
+                    for key, value in azure_tags.items():
+                        if key and value:
+                            tag_name = f"azure-{key.lower()}:{value.lower()}"
+                            tag_id = self._create_or_get_tag(
+                                tag_name, tag_colors["azure-tag"]
+                            )
+                            if tag_id:
+                                tag_ids.append(tag_id)
+
+                # Add tag IDs to endpoint if we have any
+                if tag_ids:
+                    endpoint["asset_tags"] = tag_ids
 
                 # Upsert endpoint
                 try:

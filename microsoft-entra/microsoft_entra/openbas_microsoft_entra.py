@@ -69,7 +69,28 @@ class OpenBASMicrosoftEntra:
         # External
         self.include_external = self.config.get_conf("include_external", default=False)
 
+    def _create_or_get_tag(self, tag_name, tag_color="#6b7280"):
+        """Create or get a tag and return its ID."""
+        try:
+            tag_data = {"tag_name": tag_name, "tag_color": tag_color}
+            result = self.helper.api.tag.upsert(tag_data)
+            return result.get("tag_id")
+        except Exception as e:
+            self.helper.collector_logger.warning(
+                f"Failed to upsert tag {tag_name}: {e}"
+            )
+            return None
+
     async def create_users(self, graph_client, group_id, openbas_team):
+        # Define tag colors
+        tag_colors = {
+            "source": "#ef4444",  # Red
+            "group": "#3b82f6",  # Blue
+            "user-type": "#10b981",  # Green
+            "department": "#8b5cf6",  # Purple
+            "job-title": "#f59e0b",  # Amber
+        }
+
         members = await graph_client.groups.by_group_id(group_id).members.get()
         if members:
             for i in range(len(members.value)):
@@ -80,12 +101,79 @@ class OpenBASMicrosoftEntra:
                         and "#EXT#" not in members.value[i].user_principal_name
                     )
                 ):
+                    # Prepare tag IDs list
+                    tag_ids = []
+
+                    # Add collector source tag
+                    source_tag_name = "source:microsoft-entra"
+                    source_tag_id = self._create_or_get_tag(
+                        source_tag_name, tag_colors["source"]
+                    )
+                    if source_tag_id:
+                        tag_ids.append(source_tag_id)
+
+                    # Add group/team tag
+                    if openbas_team.get("team_name"):
+                        group_tag_name = f"group:{openbas_team['team_name'].lower()}"
+                        group_tag_id = self._create_or_get_tag(
+                            group_tag_name, tag_colors["group"]
+                        )
+                        if group_tag_id:
+                            tag_ids.append(group_tag_id)
+
+                    # Add external user tag if applicable
+                    if "#EXT#" in members.value[i].user_principal_name:
+                        ext_tag_name = "user-type:external"
+                        ext_tag_id = self._create_or_get_tag(
+                            ext_tag_name, tag_colors["user-type"]
+                        )
+                        if ext_tag_id:
+                            tag_ids.append(ext_tag_id)
+                    else:
+                        int_tag_name = "user-type:internal"
+                        int_tag_id = self._create_or_get_tag(
+                            int_tag_name, tag_colors["user-type"]
+                        )
+                        if int_tag_id:
+                            tag_ids.append(int_tag_id)
+
+                    # Add department tag if available
+                    if (
+                        hasattr(members.value[i], "department")
+                        and members.value[i].department
+                    ):
+                        dept_tag_name = (
+                            f"department:{members.value[i].department.lower()}"
+                        )
+                        dept_tag_id = self._create_or_get_tag(
+                            dept_tag_name, tag_colors["department"]
+                        )
+                        if dept_tag_id:
+                            tag_ids.append(dept_tag_id)
+
+                    # Add job title tag if available
+                    if (
+                        hasattr(members.value[i], "job_title")
+                        and members.value[i].job_title
+                    ):
+                        job_tag_name = f"job-title:{members.value[i].job_title.lower()}"
+                        job_tag_id = self._create_or_get_tag(
+                            job_tag_name, tag_colors["job-title"]
+                        )
+                        if job_tag_id:
+                            tag_ids.append(job_tag_id)
+
                     user = {
                         "user_email": members.value[i].mail,
                         "user_firstname": members.value[i].given_name,
                         "user_lastname": members.value[i].surname,
                         "user_teams": [openbas_team["team_id"]],
                     }
+
+                    # Add tags if we have any
+                    if tag_ids:
+                        user["user_tags"] = tag_ids
+
                     self.helper.api.user.upsert(user)
 
         # iterate over result batches > 100 rows
@@ -104,12 +192,83 @@ class OpenBASMicrosoftEntra:
                             and "#EXT#" not in members.value[i].user_principal_name
                         )
                     ):
+                        # Prepare tag IDs list
+                        tag_ids = []
+
+                        # Add collector source tag
+                        source_tag_name = "source:microsoft-entra"
+                        source_tag_id = self._create_or_get_tag(
+                            source_tag_name, tag_colors["source"]
+                        )
+                        if source_tag_id:
+                            tag_ids.append(source_tag_id)
+
+                        # Add group/team tag
+                        if openbas_team.get("team_name"):
+                            group_tag_name = (
+                                f"group:{openbas_team['team_name'].lower()}"
+                            )
+                            group_tag_id = self._create_or_get_tag(
+                                group_tag_name, tag_colors["group"]
+                            )
+                            if group_tag_id:
+                                tag_ids.append(group_tag_id)
+
+                        # Add external user tag if applicable
+                        if "#EXT#" in members.value[i].user_principal_name:
+                            ext_tag_name = "user-type:external"
+                            ext_tag_id = self._create_or_get_tag(
+                                ext_tag_name, tag_colors["user-type"]
+                            )
+                            if ext_tag_id:
+                                tag_ids.append(ext_tag_id)
+                        else:
+                            int_tag_name = "user-type:internal"
+                            int_tag_id = self._create_or_get_tag(
+                                int_tag_name, tag_colors["user-type"]
+                            )
+                            if int_tag_id:
+                                tag_ids.append(int_tag_id)
+
+                        # Add department tag if available
+                        if (
+                            hasattr(members.value[i], "department")
+                            and members.value[i].department
+                        ):
+                            dept_tag_name = (
+                                f"department:{members.value[i].department.lower()}"
+                            )
+                            dept_tag_id = self._create_or_get_tag(
+                                dept_tag_name, tag_colors["department"]
+                            )
+                            if dept_tag_id:
+                                tag_ids.append(dept_tag_id)
+
+                        # Add job title tag if available
+                        if (
+                            hasattr(members.value[i], "job_title")
+                            and members.value[i].job_title
+                        ):
+                            job_tag_name = (
+                                f"job-title:{members.value[i].job_title.lower()}"
+                            )
+                            job_tag_id = self._create_or_get_tag(
+                                job_tag_name, tag_colors["job-title"]
+                            )
+                            if job_tag_id:
+                                tag_ids.append(job_tag_id)
+
                         user = {
                             "user_email": members.value[i].mail,
                             "user_firstname": members.value[i].given_name,
                             "user_lastname": members.value[i].surname,
                             "user_teams": [openbas_team["team_id"]],
                         }
+
+                        # Add tags if we have any
+                        if tag_ids:
+                            user["user_tags"] = tag_ids
+
                         self.helper.api.user.upsert(user)
 
     async def create_groups(self, graph_client):

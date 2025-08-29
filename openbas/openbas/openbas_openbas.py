@@ -61,6 +61,18 @@ class OpenBASOpenBAS:
             self.config, "openbas/img/icon-openbas.png"
         )
 
+    def _create_or_get_tag(self, tag_name, tag_color="#6b7280"):
+        """Create or get a tag and return its ID."""
+        try:
+            tag_data = {"tag_name": tag_name, "tag_color": tag_color}
+            result = self.helper.api.tag.upsert(tag_data)
+            return result.get("tag_id")
+        except Exception as e:
+            self.helper.collector_logger.warning(
+                f"Failed to upsert tag {tag_name}: {e}"
+            )
+            return None
+
     def _process_message(self) -> None:
         openbas_import_only_native = self.config.get_conf(
             "openbas_import_only_native",
@@ -141,6 +153,22 @@ class OpenBASOpenBAS:
             for tag_id in payload_information.get("payload_tags", []):
                 if tag_id in tags_mapping:
                     new_tags.append(tags_mapping[tag_id])
+
+            # Add collector source tag
+            source_tag_name = "source:openbas-datasets"
+            source_tag_id = self._create_or_get_tag(source_tag_name, "#ef4444")  # Red
+            if source_tag_id:
+                new_tags.append(source_tag_id)
+
+            # Add native/community tag if applicable
+            if payload.get("native_collection", False):
+                native_tag_name = "type:native"
+                native_tag_id = self._create_or_get_tag(
+                    native_tag_name, "#10b981"
+                )  # Green
+                if native_tag_id:
+                    new_tags.append(native_tag_id)
+
             payload_information["payload_tags"] = new_tags
 
             new_attack_patterns = []

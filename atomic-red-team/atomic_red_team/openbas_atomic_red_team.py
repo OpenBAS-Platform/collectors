@@ -243,6 +243,18 @@ class OpenBASAtomicRedTeam:
             self.config, "atomic_red_team/img/icon-atomic-red-team.png"
         )
 
+    def _create_or_get_tag(self, tag_name, tag_color="#6b7280"):
+        """Create or get a tag and return its ID."""
+        try:
+            tag_data = {"tag_name": tag_name, "tag_color": tag_color}
+            result = self.helper.api.tag.upsert(tag_data)
+            return result.get("tag_id")
+        except Exception as e:
+            self.helper.collector_logger.warning(
+                f"Failed to upsert tag {tag_name}: {e}"
+            )
+            return None
+
     def _process_message(self) -> None:
         response = self.session.get(url=ATOMIC_RED_TEAM_INDEX)
         art_index = yaml.safe_load(response.text)
@@ -322,6 +334,53 @@ class OpenBASAtomicRedTeam:
                         cleanup_command = (
                             None if cleanup_command == "" else cleanup_command
                         )
+
+                        # Prepare tags for the payload
+                        tag_ids = []
+                        tag_colors = {
+                            "source": "#ef4444",  # Red
+                            "attack-pattern": "#3b82f6",  # Blue
+                            "platform": "#10b981",  # Green
+                            "executor": "#8b5cf6",  # Purple
+                        }
+
+                        # Add collector source tag
+                        source_tag_name = "source:atomic-red-team"
+                        source_tag_id = self._create_or_get_tag(
+                            source_tag_name, tag_colors["source"]
+                        )
+                        if source_tag_id:
+                            tag_ids.append(source_tag_id)
+
+                        # Add attack pattern tag
+                        if attack_pattern:
+                            pattern_tag_name = f"technique:{attack_pattern.lower()}"
+                            pattern_tag_id = self._create_or_get_tag(
+                                pattern_tag_name, tag_colors["attack-pattern"]
+                            )
+                            if pattern_tag_id:
+                                tag_ids.append(pattern_tag_id)
+
+                        # Add platform tags
+                        for platform in platforms:
+                            platform_tag_name = f"platform:{platform.lower()}"
+                            platform_tag_id = self._create_or_get_tag(
+                                platform_tag_name, tag_colors["platform"]
+                            )
+                            if platform_tag_id:
+                                tag_ids.append(platform_tag_id)
+
+                        # Add executor tag
+                        if atomic_test["executor"]["name"]:
+                            executor_tag_name = (
+                                f"executor:{atomic_test['executor']['name']}"
+                            )
+                            executor_tag_id = self._create_or_get_tag(
+                                executor_tag_name, tag_colors["executor"]
+                            )
+                            if executor_tag_id:
+                                tag_ids.append(executor_tag_id)
+
                         payload = {
                             "payload_source": COMMUNITY,
                             "payload_execution_arch": ALL_ARCHITECTURES,
@@ -357,6 +416,11 @@ class OpenBASAtomicRedTeam:
                             ),
                             "payload_prerequisites": prerequisites,
                         }
+
+                        # Add tags if we have any
+                        if tag_ids:
+                            payload["payload_tags"] = tag_ids
+
                         self.helper.api.payload.upsert(payload)
                         payload_external_ids.append(payload["payload_external_id"])
         self.helper.api.payload.deprecate(

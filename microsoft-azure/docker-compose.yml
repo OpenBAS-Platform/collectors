@@ -1,8 +1,7 @@
 version: '3'
 services:
-  openbas-microsoft-azure-collector:
-    container_name: openbas-microsoft-azure-collector
-    image: openbas-microsoft-azure-collector:latest
+  collector-microsoft-azure:
+    image: openbas/collector-microsoft-azure:latest
     environment:
       - OPENBAS_URL=${OPENBAS_URL}
       - OPENBAS_TOKEN=${OPENBAS_TOKEN}
