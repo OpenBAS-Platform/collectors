@@ -65,7 +65,7 @@ class OpenBASMicrosoftIntune:
             },
         )
         self.helper = OpenBASCollectorHelper(
-            config=self.config, icon="img/icon-microsoft-intune.png"
+            config=self.config, icon="microsoft_intune/img/icon-microsoft-intune.png"
         )
 
         # Intune settings
@@ -449,6 +449,7 @@ class OpenBASMicrosoftIntune:
                 # Create and collect tag IDs
                 tag_ids = []
                 tag_colors = {
+                    "source": "#ef4444",  # Red
                     "compliance": "#10b981",  # Green
                     "enrollment": "#3b82f6",  # Blue
                     "category": "#8b5cf6",  # Purple
@@ -459,6 +460,14 @@ class OpenBASMicrosoftIntune:
                     "supervised": "#14b8a6",  # Teal
                     "agent": "#f97316",  # Orange
                 }
+
+                # Add collector source tag
+                source_tag_name = "source:microsoft-intune"
+                source_tag_id = self._create_or_get_tag(
+                    source_tag_name, tag_colors["source"]
+                )
+                if source_tag_id:
+                    tag_ids.append(source_tag_id)
 
                 # Add compliance tag
                 if compliance_state:

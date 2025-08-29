@@ -1,0 +1,17 @@
+version: '3'
+services:
+  collector-aws-resources:
+    image: openbas/collector-aws-resources:latest
+    environment:
+      - OPENBAS_URL=${OPENBAS_URL}
+      - OPENBAS_TOKEN=${OPENBAS_TOKEN}
+      - COLLECTOR_ID=${COLLECTOR_ID}
+      - COLLECTOR_NAME=${COLLECTOR_NAME}
+      - COLLECTOR_PERIOD=${COLLECTOR_PERIOD}
+      - COLLECTOR_LOG_LEVEL=${COLLECTOR_LOG_LEVEL}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      - AWS_ASSUME_ROLE_ARN=${AWS_ASSUME_ROLE_ARN}
+      - AWS_REGIONS=${AWS_REGIONS}
+    restart: always
