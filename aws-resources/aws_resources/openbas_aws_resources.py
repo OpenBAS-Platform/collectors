@@ -1,6 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
-
 from pyobas.helpers import OpenBASCollectorHelper, OpenBASConfigHelper
 
 
