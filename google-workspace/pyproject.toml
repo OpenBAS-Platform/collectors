@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "openbas-microsoft-sentinel-collector"
+name = "openbas-google-workspace-collector"
 version = "1.18.16"
-description = "A Collector for Microsoft Sentinel SIEM solution"
+description = "A Collector for Google Workspace user and group management"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-    { include = "microsoft_sentinel" }
+    { include = "google_workspace" }
 ]
 
 [tool.poetry.dependencies]
@@ -15,7 +15,10 @@ pyobas = [
     { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.16", source = "pypi"  },
     { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
 ]
-msal = "1.33.0"
+google-api-python-client = "^2.149.0"
+google-auth = "^2.35.0"
+google-auth-httplib2 = "^0.2.0"
+google-auth-oauthlib = "^1.2.1"
 
 [tool.poetry.extras]
 prod = []

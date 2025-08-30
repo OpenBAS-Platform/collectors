@@ -85,7 +85,6 @@ class OpenBASMicrosoftEntra:
         # Define tag colors
         tag_colors = {
             "source": "#ef4444",  # Red
-            "group": "#3b82f6",  # Blue
             "user-type": "#10b981",  # Green
             "department": "#8b5cf6",  # Purple
             "job-title": "#f59e0b",  # Amber
@@ -119,15 +118,6 @@ class OpenBASMicrosoftEntra:
                     )
                     if source_tag_id:
                         tag_ids.append(source_tag_id)
-
-                    # Add group/team tag
-                    if openbas_team.get("team_name"):
-                        group_tag_name = f"group:{openbas_team['team_name'].lower()}"
-                        group_tag_id = self._create_or_get_tag(
-                            group_tag_name, tag_colors["group"]
-                        )
-                        if group_tag_id:
-                            tag_ids.append(group_tag_id)
 
                     # Add external user tag if applicable
                     if "#EXT#" in member.user_principal_name:
@@ -210,17 +200,6 @@ class OpenBASMicrosoftEntra:
                         )
                         if source_tag_id:
                             tag_ids.append(source_tag_id)
-
-                        # Add group/team tag
-                        if openbas_team.get("team_name"):
-                            group_tag_name = (
-                                f"group:{openbas_team['team_name'].lower()}"
-                            )
-                            group_tag_id = self._create_or_get_tag(
-                                group_tag_name, tag_colors["group"]
-                            )
-                            if group_tag_id:
-                                tag_ids.append(group_tag_id)
 
                         # Add external user tag if applicable
                         if "#EXT#" in member.user_principal_name:
