@@ -2,7 +2,6 @@ import json
 from typing import Any, Dict, List, Optional
 
 import requests
-from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
