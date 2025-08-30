@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "openbas-google-workspace-collector"
+version = "1.18.15"
+description = "A Collector for Google Workspace user and group management"
+authors = ["Filigran <contact@filigran.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "google_workspace" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyobas = [
+    { markers = "extra == 'prod' and extra != 'dev'", version = "1.18.15", source = "pypi"  },
+    { markers = "extra == 'dev' and extra != 'prod'", path = "../../client-python", develop = true },
+]
+google-api-python-client = "^2.149.0"
+google-auth = "^2.35.0"
+google-auth-httplib2 = "^0.2.0"
+google-auth-oauthlib = "^1.2.1"
+
+[tool.poetry.extras]
+prod = []
+dev = []
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

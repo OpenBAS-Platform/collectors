@@ -152,6 +152,18 @@ jobs:
           command: |
             docker build --progress=plain -t openbas/collector-microsoft-intune:${CIRCLE_SHA1} .
             docker save -o ~/openbas/images/collector-microsoft-intune openbas/collector-microsoft-intune:${CIRCLE_SHA1}
+      - run:
+          working_directory: ~/openbas/aws-resources
+          name: Build Docker image openbas/collector-aws-resources
+          command: |
+            docker build --progress=plain -t openbas/collector-aws-resources:${CIRCLE_SHA1} .
+            docker save -o ~/openbas/images/collector-aws-resources openbas/collector-aws-resources:${CIRCLE_SHA1}
+      - run:
+          working_directory: ~/openbas/google-workspace
+          name: Build Docker image openbas/collector-google-workspace
+          command: |
+            docker build --progress=plain -t openbas/collector-google-workspace:${CIRCLE_SHA1} .
+            docker save -o ~/openbas/images/collector-google-workspace openbas/collector-google-workspace:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ~/openbas
           paths:
@@ -214,6 +226,10 @@ jobs:
             docker tag openbas/collector-microsoft-azure:${CIRCLE_SHA1} openbas/collector-microsoft-azure:${IMAGETAG}
             docker image load < collector-microsoft-intune
             docker tag openbas/collector-microsoft-intune:${CIRCLE_SHA1} openbas/collector-microsoft-intune:${IMAGETAG}
+            docker image load < collector-aws-resources
+            docker tag openbas/collector-aws-resources:${CIRCLE_SHA1} openbas/collector-aws-resources:${IMAGETAG}
+            docker image load < collector-google-workspace
+            docker tag openbas/collector-google-workspace:${CIRCLE_SHA1} openbas/collector-google-workspace:${IMAGETAG}
 
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openbas/collector-mitre-attack:${IMAGETAG}
@@ -226,6 +242,8 @@ jobs:
             docker push openbas/collector-openbas:${IMAGETAG}
             docker push openbas/collector-microsoft-azure:${IMAGETAG}
             docker push openbas/collector-microsoft-intune:${IMAGETAG}
+            docker push openbas/collector-aws-resources:${IMAGETAG}
+            docker push openbas/collector-google-workspace:${IMAGETAG}
 
             if [ "${IS_LATEST}" == "true" ]
             then
@@ -239,6 +257,8 @@ jobs:
               docker tag openbas/collector-openbas:${IMAGETAG} openbas/collector-openbas:latest
               docker tag openbas/collector-microsoft-azure:${IMAGETAG} openbas/collector-microsoft-azure:latest
               docker tag openbas/collector-microsoft-intune:${IMAGETAG} openbas/collector-microsoft-intune:latest
+              docker tag openbas/collector-aws-resources:${IMAGETAG} openbas/collector-aws-resources:latest
+              docker tag openbas/collector-google-workspace:${IMAGETAG} openbas/collector-google-workspace:latest
 
               docker push openbas/collector-mitre-attack:latest
               docker push openbas/collector-microsoft-entra:latest
@@ -250,6 +270,8 @@ jobs:
               docker push openbas/collector-openbas:latest
               docker push openbas/collector-microsoft-azure:latest
               docker push openbas/collector-microsoft-intune:latest
+              docker push openbas/collector-aws-resources:latest
+              docker push openbas/collector-google-workspace:latest
             fi
       - slack/notify:
           event: fail
