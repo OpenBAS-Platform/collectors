@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openbas-microsoft-azure-collector"
-version = "1.18.12"
+version = "1.18.15"
 description = "A Collector for Microsoft Azure Virtual Machines"
 authors = ["Filigran <contact@filigran.io>"]
 license = "Apache-2.0"

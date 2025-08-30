@@ -1,0 +1,14 @@
+openbas:
+  url: 'http://localhost:3001'
+  token: 'ChangeMe'
+
+collector:
+  id: 'changeme'
+  name: 'Google Workspace'
+  period: 3600
+  log_level: 'info'
+  google_workspace_service_account_json: ''  # JSON string of service account credentials
+  google_workspace_delegated_admin_email: ''  # Email of admin user for domain-wide delegation
+  google_workspace_customer_id: 'my_customer'  # Customer ID or 'my_customer' for your own domain
+  include_suspended: false  # Whether to include suspended users
+  sync_all_users: false  # If true, sync all users; if false, only sync users in groups
