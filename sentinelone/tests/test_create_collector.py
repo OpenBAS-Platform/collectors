@@ -27,6 +27,8 @@ def collector_config() -> dict[str, str]:  # type: ignore
         "OPENBAS_TOKEN": "fake-obas-token",
         "COLLECTOR_ID": "fake-collector-id",
         "COLLECTOR_NAME": "SentinelOne",
+        "SENTINELONE_BASE_URL": "https://fake-sentinelone.net/",
+        "SENTINELONE_API_KEY": "fake-api-key",
         "COLLECTOR_ICON_FILEPATH": "src/img/sentinelone-logo.png",
         "COLLECTOR_LOG_LEVEL": "debug",
     }
@@ -71,10 +73,16 @@ def test_collector_config_missing_required_values() -> None:
         "OPENBAS_TOKEN": "fake-obas-token",
         "COLLECTOR_ID": "fake-collector-id",
         "COLLECTOR_NAME": "SentinelOne",
+        "SENTINELONE_BASE_URL": "https://fake-sentinelone.net/",
+        # Missing SENTINELONE_API_KEY - this should cause validation error
         "COLLECTOR_ICON_FILEPATH": "src/img/sentinelone-logo.png",
         "COLLECTOR_LOG_LEVEL": "debug",
     }
     mock_env = _given_setup_config(data)
+
+    # Remove API key env var if it was set by factory
+    if "SENTINELONE_API_KEY" in os_environ:
+        del os_environ["SENTINELONE_API_KEY"]
 
     # Then the collector config should raise a custom ConfigurationException
     with pytest.raises((CollectorConfigError, ValueError)):
@@ -148,6 +156,12 @@ def _then_collector_created_successfully(capfd, mock_env, collector, data) -> No
     assert daemon_config.get("collector_id") == data.get("COLLECTOR_ID")  # noqa: S101
     assert daemon_config.get("collector_name") == data.get(  # noqa: S101
         "COLLECTOR_NAME"
+    )
+    assert daemon_config.get("sentinelone_base_url") == data.get(  # noqa: S101
+        "SENTINELONE_BASE_URL"
+    )
+    assert daemon_config.get("sentinelone_api_key") == data.get(  # noqa: S101
+        "SENTINELONE_API_KEY"
     )
     assert daemon_config.get("collector_log_level") == data.get(  # noqa: S101
         "COLLECTOR_LOG_LEVEL"

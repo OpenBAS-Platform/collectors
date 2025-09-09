@@ -40,6 +40,7 @@ pre-commit = "^4.3.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.1"
+polyfactory = "^2.22.2"
 
 [project.scripts]
 SentinelOneCollector = "src.__main__:main"

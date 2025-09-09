@@ -3,6 +3,7 @@
 import os
 
 from pyobas.daemons import CollectorDaemon  # type: ignore[import-untyped]
+from src.services.utils import SentinelOneConfig
 
 from .exception import (
     CollectorConfigError,
@@ -27,6 +28,14 @@ class Collector(CollectorDaemon):  # type: ignore[misc]
 
         """
         try:
+            self.config = SentinelOneConfig()
+            self.config_instance = self.config.load
+
+            super().__init__(
+                configuration=self.config_instance.to_daemon_config(),
+                callback=self._process_callback,
+            )
+
             self.logger.info(  # type: ignore[has-type]
                 f"{LOG_PREFIX} SentinelOne Collector initialized successfully"
             )

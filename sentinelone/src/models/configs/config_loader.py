@@ -15,6 +15,7 @@ from src.models.configs import (
     ConfigBaseSettings,
     _ConfigLoaderCollector,
     _ConfigLoaderOAEV,
+    _ConfigLoaderSentinelOne,
 )
 
 
@@ -52,6 +53,10 @@ class ConfigLoader(ConfigBaseSettings):
     collector: ConfigLoaderCollector = Field(
         default_factory=ConfigLoaderCollector,  # type: ignore[unused-ignore]
         description="Collector configurations.",
+    )
+    sentinelone: _ConfigLoaderSentinelOne = Field(
+        default_factory=_ConfigLoaderSentinelOne,
+        description="SentinelOne configurations.",
     )
 
     @classmethod
@@ -132,4 +137,10 @@ class ConfigLoader(ConfigBaseSettings):
             "collector_log_level": self.collector.log_level,
             "collector_period": int(self.collector.period.total_seconds()),  # type: ignore[union-attr]
             "collector_icon_filepath": self.collector.icon_filepath,
+            # SentinelOne configuration (flattened)
+            "sentinelone_base_url": str(self.sentinelone.base_url),
+            "sentinelone_api_key": self.sentinelone.api_key.get_secret_value(),
+            "sentinelone_default_time_window": self.sentinelone.time_window,
+            "sentinelone_offset": self.sentinelone.offset,
+            "sentinelone_max_retry": self.sentinelone.max_retry,
         }
