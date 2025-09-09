@@ -3,6 +3,9 @@
 import os
 
 from pyobas.daemons import CollectorDaemon  # type: ignore[import-untyped]
+from pyobas.helpers import OpenBASDetectionHelper  # type: ignore[import-untyped]
+from src.services.expectation_service import SentinelOneExpectationService
+from src.services.trace_service import SentinelOneTraceService
 from src.services.utils import SentinelOneConfig
 
 from .exception import (
@@ -10,6 +13,8 @@ from .exception import (
     CollectorProcessingError,
     CollectorSetupError,
 )
+from .expectation_handler import GenericExpectationHandler
+from .expectation_manager import GenericExpectationManager
 
 LOG_PREFIX = "[Collector]"
 
@@ -67,6 +72,37 @@ class Collector(CollectorDaemon):  # type: ignore[misc]
 
             self.logger.debug(f"{LOG_PREFIX} Initializing SentinelOne services...")
 
+            self.sentinelone_service = SentinelOneExpectationService(
+                self.config_instance
+            )
+
+            self.trace_service = SentinelOneTraceService(self.config_instance)
+
+            self.expectation_handler = GenericExpectationHandler(
+                self.sentinelone_service
+            )
+
+            self.expectation_manager = GenericExpectationManager(
+                oaev_api=self.api,
+                collector_id=self.get_id(),
+                expectation_handler=self.expectation_handler,
+                trace_service=self.trace_service,
+            )
+
+            supported_signatures = self.sentinelone_service.get_supported_signatures()
+            self.oaev_detection_helper = OpenBASDetectionHelper(
+                logger=self.logger,
+                relevant_signatures_types=supported_signatures,
+            )
+
+            self.logger.info(f"{LOG_PREFIX} Collector setup completed successfully")
+            self.logger.info(
+                f"{LOG_PREFIX} Supported signatures: {[sig.value for sig in supported_signatures]}"
+            )
+
+            service_info = self.sentinelone_service.get_service_info()
+            self.logger.debug(f"{LOG_PREFIX} Service info: {service_info}")
+
         except Exception as err:
             self.logger.error(f"{LOG_PREFIX} Collector setup failed: {err}")
             raise CollectorSetupError(f"Failed to setup the collector: {err}") from err
@@ -86,6 +122,16 @@ class Collector(CollectorDaemon):  # type: ignore[misc]
             self.logger.info(f"{LOG_PREFIX} Starting processing cycle...")
             self.logger.debug(
                 f"{LOG_PREFIX} Processing expectations using SentinelOne services"
+            )
+
+            results = self.expectation_manager.process_expectations(
+                detection_helper=self.oaev_detection_helper
+            )
+
+            self.logger.info(
+                f"{LOG_PREFIX} Processing cycle completed: {results.processed} total, "
+                f"{results.valid} valid, {results.invalid} invalid, "
+                f"{results.skipped} skipped"
             )
 
         except (KeyboardInterrupt, SystemExit):
